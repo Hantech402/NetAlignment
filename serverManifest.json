@@ -1,0 +1,125 @@
+{
+  "server": {
+    "app": {
+      "$filter": "env",
+      "development": {
+        "client": "http://localhost:3004",
+        "api": "http://localhost:3003",
+        "isDevelopment": true
+      }
+    },
+    "cache": "../node_modules/catbox-mongodb"
+  },
+  "connections": {
+    "$filter": "env",
+    "$default": [{
+      "port": 3003,
+      "labels": ["api"],
+      "routes": {
+        "cors": true
+      }
+    }],
+    "production": [{
+      "port": 80,
+      "labels": ["api"]
+    }]
+  },
+  "registrations": {
+    "$filter": "env",
+    "$base": [{
+      "plugin": {
+        "register": "good",
+        "options": {
+          "ops": {
+            "interval": 30000
+          },
+          "reporters": {
+            "console": [{
+              "module": "good-squeeze",
+              "name": "Squeeze",
+              "args": [{ "log": "*", "request": "*", "response": "*", "error": "*", "ops": "*" }]
+            }, {
+              "module": "good-console"
+            }, "stdout"]
+          }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "poop",
+        "options": {
+          "heapdumpFolder": "logs/heapdumps",
+          "logPath": "logs/poop.log"
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "nes"
+      }
+    }, {
+      "plugin": {
+        "register": "hapi-boom-decorators"
+      }
+    }, {
+      "plugin": {
+        "register": "scooter"
+      }
+    }, {
+      "plugin": "./core"
+    }, {
+      "plugin": {
+        "register": "./storage",
+        "options": {
+          "mongoDb" : {
+            "db": "net-alignment"
+          }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "./mailer",
+        "options": {
+          "transport": {
+            "host": "smtp.gmail.com",
+            "port": 465,
+            "secure": true,
+            "auth": {
+              "user": "netalignment@gmail.com",
+              "pass": "n3t4l1gnm3ntp4ss"
+            },
+          }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "bell"
+      }
+    } ,{
+      "plugin": {
+        "register": "./user",
+        "options": {
+          "jwt": {
+            "key": "I83At3WR1FaPTVOObwDWtXP19JucJWBmLLvT3K7XczEIcELzcrB1OyARV1Hs5z1"
+          },
+          "socialPlatforms": {
+          }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "./crud"
+      }
+    }],
+    "$default": [],
+    "development": [{
+      "plugin": {
+        "register": "./documentation"
+      }
+    }, {
+      "plugin": {
+        "register": "./monitoring"
+      }
+    }],
+    "production": []
+  }
+}

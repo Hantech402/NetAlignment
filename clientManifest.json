@@ -1,0 +1,27 @@
+{
+  "server": {
+    "app": {
+    }
+  },
+  "connections": {
+    "$filter": "env",
+    "$default": [{
+      "port": 3004,
+      "labels": ["web"]
+    }],
+    "production": [{
+      "port": 80,
+      "labels": ["web"]
+    }]
+  },
+  "registrations": {
+    "$filter": "env",
+    "$base": [{
+      "plugin": {
+        "register": "./web"
+      }
+    }],
+    "$default": [],
+    "production": []
+  }
+}
