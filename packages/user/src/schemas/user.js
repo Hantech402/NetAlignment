@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { titleOptions } from '../constants';
+import { titleOptions, roles } from '../constants';
 
 export default {
   _id: Joi.object(),
@@ -30,7 +30,7 @@ export default {
     resetAt: Joi.date(),
   }).default({}),
   lastLogin: Joi.date(),
-  roles: Joi.array().items(Joi.string()),
+  role: Joi.string().required().valid(roles),
   isAccountOwner: Joi.boolean().default(false),
   isActive: Joi.boolean().default(false),
   socialLogin: Joi.object().keys({
