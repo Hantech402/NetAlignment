@@ -5,3 +5,4 @@ npm-debug.log
 poop.log
 .idea
 logs/heapdumps
+lerna-debug.log
