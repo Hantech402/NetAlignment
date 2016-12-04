@@ -17,7 +17,7 @@
     "clean": "rm -rf node_modules/ && rm -rf packages/*/node_modules",
     "clean-setup": "npm run clean && yarn",
     "lint": "eslint .",
-    "seed": "babel-node scripts/seed.js",
+    "seed": "babel-node scripts/seed/index.js",
     "open-monitor": "open http://localhost:3003/status-monitor"
   },
   "repository": {

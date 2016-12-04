@@ -1,15 +1,29 @@
 import Joi from 'joi';
+import { titleOptions } from '../constants';
 
 export default {
   _id: Joi.object(),
   accountId: Joi.object().required(),
 
   username: Joi.string().required(),
+  title: Joi.string().valid(titleOptions).default(titleOptions[0]),
   firstName: Joi.string(),
+  middleName: Joi.string(),
   lastName: Joi.string(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
   salt: Joi.string(),
+  address: Joi.object().keys({
+    streetAddress1: Joi.string(),
+    streetAddress2: Joi.string(),
+    country: Joi.string(),
+    city: Joi.string(),
+    county: Joi.string(),
+    state: Joi.string(),
+    zipCode: Joi.string(),
+    phoneNumber: Joi.string(),
+  }).default({}),
+
   status: Joi.string(),
   resetPassword: Joi.object().keys({
     token: Joi.string(),
@@ -18,7 +32,7 @@ export default {
   lastLogin: Joi.date(),
   roles: Joi.array().items(Joi.string()),
   isAccountOwner: Joi.boolean().default(false),
-  isActive: Joi.boolean().default(true),
+  isActive: Joi.boolean().default(false),
   socialLogin: Joi.object().keys({
     facebook: Joi.object().keys({
       id: Joi.string().required(),
