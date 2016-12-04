@@ -10,14 +10,14 @@
   "license": "ISC",
   "dependencies": {
     "boom": "~4.2.0",
-    "hb-user": "~0.8.2",
+    "hb-user": "~0.8.3",
     "hoek": "~4.1.0",
     "joi": "~10.0.1",
     "lodash": "~4.17.2",
     "moment": "~2.16.0",
     "mongodb": "~2.2.11",
     "na-storage": "~1.0.0",
-    "octobus-mongodb": "~0.8.2",
-    "octobus.js": "~0.18.0"
+    "octobus-mongodb": "~0.8.3",
+    "octobus.js": "~0.18.1"
   }
 }
