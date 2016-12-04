@@ -1,6 +1,9 @@
 {
   "name": "net-alignment",
   "version": "0.1.0",
+  "engines": {
+    "node": "6.x.x"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
