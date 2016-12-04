@@ -6,6 +6,11 @@
         "client": "http://localhost:3004",
         "api": "http://localhost:3003",
         "isDevelopment": true
+      },
+      "development": {
+        "client": "http://localhost:3004",
+        "api": "http://localhost:80",
+        "isDevelopment": false
       }
     },
     "cache": "../node_modules/catbox-mongodb"
@@ -42,14 +47,6 @@
               "module": "good-console"
             }, "stdout"]
           }
-        }
-      }
-    }, {
-      "plugin": {
-        "register": "poop",
-        "options": {
-          "heapdumpFolder": "logs/heapdumps",
-          "logPath": "logs/poop.log"
         }
       }
     }, {
@@ -112,6 +109,14 @@
     }],
     "$default": [],
     "development": [{
+      "plugin": {
+        "register": "poop",
+        "options": {
+          "heapdumpFolder": "logs/heapdumps",
+          "logPath": "logs/poop.log"
+        }
+      }
+    }, {
       "plugin": {
         "register": "./documentation"
       }
