@@ -11,11 +11,11 @@
   "author": "Victor Zamfir <victor@wirestorm.us>",
   "license": "ISC",
   "dependencies": {
-    "async": "~2.1.2",
-    "babel-cli": "~6.18.0",
-    "joi": "~10.0.1",
+    "async": "2.1.4",
+    "babel-cli": "6.18.0",
+    "joi": "10.0.2",
     "mongo-dnorm": "0.2.3",
-    "mongodb": "~2.2.11",
-    "mongodb-migrate": "~2.0.1"
+    "mongodb": "2.2.12",
+    "mongodb-migrate": "2.0.1"
   }
 }
