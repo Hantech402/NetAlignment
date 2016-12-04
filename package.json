@@ -72,8 +72,7 @@
     "eslint-plugin-jsx-a11y": "~2.2.3",
     "eslint-plugin-react": "~6.7.1",
     "lerna": "2.0.0-beta.30",
-    "nodemon": "~1.11.0",
-    "webpack-hot-middleware": "~2.13.2"
+    "nodemon": "~1.11.0"
   },
   "babel": {
     "presets": [
