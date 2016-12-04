@@ -4,3 +4,4 @@ node_modules
 npm-debug.log
 poop.log
 .idea
+logs/heapdumps

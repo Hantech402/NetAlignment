@@ -5,7 +5,8 @@ import setupServices from './services';
 
 export function register(server, options, next) {
   process.on('unhandledRejection', (reason, p) => {
-    server.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+    console.log(reason);
+    server.log(`Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
     throw reason;
   });
 

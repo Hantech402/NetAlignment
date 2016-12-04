@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import Boom from 'boom';
-import * as handlers from './handlers';
+// import * as handlers from './handlers';
 
 export default [{
   path: '/user/register',
@@ -80,18 +80,18 @@ export default [{
     description: 'Recover password',
     tags: ['api'],
   },
-}, {
-  path: '/social-login/facebook',
-  method: ['GET', 'POST'],
-  handler: handlers.socialLogin,
-  config: {
-    auth: 'facebook',
-  },
-}, {
-  path: '/social-login/google',
-  method: ['GET', 'POST'],
-  handler: handlers.socialLogin,
-  config: {
-    auth: 'google',
-  },
+// }, {
+//   path: '/social-login/facebook',
+//   method: ['GET', 'POST'],
+//   handler: handlers.socialLogin,
+//   config: {
+//     auth: 'facebook',
+//   },
+// }, {
+//   path: '/social-login/google',
+//   method: ['GET', 'POST'],
+//   handler: handlers.socialLogin,
+//   config: {
+//     auth: 'google',
+//   },
 }];

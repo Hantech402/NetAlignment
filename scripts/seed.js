@@ -26,18 +26,16 @@ Glue.compose(manifest, options, (err, server) => {
     isConfirmed: true,
     isActive: true,
   }).then((account) => (
-    Promise.all([
-      dispatch('entity.User.createOne', {
-        accountId: account._id,
-        username: 'viczam',
-        firstName: 'Victor',
-        lastName: 'Zamfir',
-        email: 'zamfir.victor@gmail.com',
-        password: 'admin',
-        isAccountOwner: true,
-        isActive: true,
-      }),
-    ])
+    dispatch('entity.User.createOne', {
+      accountId: account._id,
+      username: 'viczam',
+      firstName: 'Victor',
+      lastName: 'Zamfir',
+      email: 'victor@wirestorm.us',
+      password: 'admin',
+      isAccountOwner: true,
+      isActive: true,
+    })
   )).then(() => {
     console.log('done!');
   }, console.log.bind(console));

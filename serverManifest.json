@@ -86,7 +86,7 @@
             "auth": {
               "user": "netalignment@gmail.com",
               "pass": "n3t4l1gnm3ntp4ss"
-            },
+            }
           }
         }
       }
@@ -94,7 +94,7 @@
       "plugin": {
         "register": "bell"
       }
-    } ,{
+    }, {
       "plugin": {
         "register": "./user",
         "options": {

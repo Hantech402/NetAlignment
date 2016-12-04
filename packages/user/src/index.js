@@ -10,7 +10,7 @@ export function register(server, options, next) {
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
   const { dispatch, lookup } = dispatcher;
   const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
-  const { mongoDb } = server.plugins['re-storage'];
+  const { mongoDb, refManager } = server.plugins['na-storage'];
 
   if (pluginOptions.socialPlatforms.facebook) {
     server.auth.strategy('facebook', 'bell', {
@@ -37,6 +37,7 @@ export function register(server, options, next) {
         references: [],
         schema: userSchema,
         db: mongoDb,
+        refManager,
       },
     },
   }]).then(() => {
