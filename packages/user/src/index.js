@@ -70,5 +70,5 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['na-storage', 'bell'],
+  dependencies: ['na-storage', 'bell', 'na-crud'],
 };

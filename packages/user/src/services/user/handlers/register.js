@@ -4,7 +4,15 @@ import Boom from 'boom';
 const { withLookups, withHandler } = decorators;
 
 const handler = async ({ username, email, password, Account, UserEntity }) => {
-  const existingUser = await UserEntity.findOne({ query: { username } });
+  const existingUser = await UserEntity.findOne({
+    query: {
+      $or: [{
+        username,
+      }, {
+        email: username,
+      }],
+    },
+  });
 
   if (existingUser) {
     throw Boom.badRequest('Username already taken.');

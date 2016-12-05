@@ -1,6 +1,22 @@
 import Joi from 'joi';
 import Boom from 'boom';
 // import * as handlers from './handlers';
+import { generateCRUDRoutes } from 'na-crud';
+import userSchema from '../../schemas/user';
+import crudHandlers from './handlers/crud';
+
+const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
+const userRoutes = {
+  ...generatedCRUDRoutes,
+  deleteOne: {
+    ...generatedCRUDRoutes.deleteOne,
+    config: {
+      ...generatedCRUDRoutes.deleteOne.config,
+      auth: 'jwt',
+    },
+    handler: crudHandlers.deleteOne,
+  },
+};
 
 export default [{
   path: '/user/register',
@@ -94,4 +110,8 @@ export default [{
 //   config: {
 //     auth: 'google',
 //   },
-}];
+}].concat(
+  Object.keys(userRoutes)
+    .filter((routeName) => routeName !== 'createOne')
+    .map((routeName) => userRoutes[routeName]),
+);
