@@ -2,8 +2,8 @@ import Joi from 'joi';
 import Boom from 'boom';
 // import * as handlers from './handlers';
 import { generateCRUDRoutes } from 'na-crud';
-import userSchema from '../../schemas/user';
 import crudHandlers from './handlers/crud';
+import userSchema, { registerSchema } from '../../schemas/user';
 
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
 const userRoutes = {
@@ -32,9 +32,7 @@ export default [{
   config: {
     validate: {
       payload: Joi.object().keys({
-        username: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().required(),
+        registerSchema,
       }).required(),
     },
     description: 'Register a new user',
