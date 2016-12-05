@@ -6,7 +6,7 @@ export default (serviceNamespace, path, config = {}) => ({
   path,
   method: 'DELETE',
   async handler(request, reply) {
-    const { eventDispatcher: { dispatch }, query } = request;
+    const { eventDispatcher: { dispatch }, payload: { query } } = request;
 
     try {
       const parsedQuery = toBSON(query);
@@ -21,7 +21,9 @@ export default (serviceNamespace, path, config = {}) => ({
   },
   config: {
     validate: {
-      query: Joi.object().required(),
+      payload: Joi.object().keys({
+        query: Joi.object().required(),
+      }).required(),
     },
     description: 'Delete an entity',
     tags: ['api'],

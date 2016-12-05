@@ -74,6 +74,10 @@
       }
     }, {
       "plugin": {
+        "register": "./crud"
+      }
+    }, {
+      "plugin": {
         "register": "./mailer",
         "options": {
           "transport": {
@@ -101,10 +105,6 @@
           "socialPlatforms": {
           }
         }
-      }
-    }, {
-      "plugin": {
-        "register": "./crud"
       }
     }],
     "$default": [],
