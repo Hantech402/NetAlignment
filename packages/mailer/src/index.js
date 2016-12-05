@@ -21,7 +21,7 @@ export function register(server, options, next) {
   ]).then(() => {
     server.views({
       engines: {
-        js: HapiReactViews,
+        jsx: HapiReactViews,
       },
       compileOptions: {
         layoutPath: path.join(__dirname, 'views'),
@@ -45,6 +45,7 @@ export function register(server, options, next) {
         });
       },
       transporter,
+      app: server.settings.app,
     });
 
     next();

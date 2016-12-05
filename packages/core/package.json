@@ -10,12 +10,12 @@
   "license": "ISC",
   "dependencies": {
     "boom": "4.2.0",
-    "hapi-octobus": "0.4.3",
+    "hapi-octobus": "0.4.4",
     "lodash": "4.17.2",
     "mongodb": "2.2.11",
     "mongodb-extended-json": "1.8.0",
     "octobus-mongodb": "0.8.3",
-    "octobus.js": "0.18.1",
+    "octobus.js": "0.18.2",
     "pretty-format": "4.3.1"
   },
   "devDependencies": {}

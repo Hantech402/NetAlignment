@@ -7,7 +7,7 @@
         "api": "http://localhost:3003",
         "isDevelopment": true
       },
-      "development": {
+      "production": {
         "client": "http://localhost:3004",
         "api": "http://localhost:80",
         "isDevelopment": false

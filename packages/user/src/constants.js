@@ -1,2 +1,2 @@
 export const titleOptions = ['Mr.', 'Mrs.', 'Dr. Engr.'];
-export const roles = ['administrator'];
+export const roles = ['administrator', 'lender', 'borrower'];

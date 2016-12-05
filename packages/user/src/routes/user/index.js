@@ -31,9 +31,7 @@ export default [{
   },
   config: {
     validate: {
-      payload: Joi.object().keys({
-        registerSchema,
-      }).required(),
+      payload: Joi.object().keys(registerSchema).required(),
     },
     description: 'Register a new user',
     tags: ['api'],

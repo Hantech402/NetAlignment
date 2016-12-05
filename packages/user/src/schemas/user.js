@@ -64,6 +64,7 @@ const registerSchema = {
     'title', 'firstName', 'middleName', 'lastName', 'address', 'password',
     'username', 'email',
   ]),
+  role: Joi.string().required().valid(['lender', 'borrower']),
 };
 
 export {
