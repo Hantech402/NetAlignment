@@ -15,7 +15,7 @@ const userSchema = {
   password: Joi.string().required(),
   salt: Joi.string(),
   address: Joi.object().keys({
-    streetAddress1: Joi.string(),
+    streetAddress1: Joi.string().required(),
     streetAddress2: Joi.string(),
     country: Joi.string(),
     city: Joi.string(),
@@ -23,7 +23,7 @@ const userSchema = {
     state: Joi.string(),
     zipCode: Joi.string(),
     phoneNumber: Joi.string(),
-  }).isRequired(),
+  }).required(),
 
   status: Joi.string(),
   resetPassword: Joi.object().keys({
