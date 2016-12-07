@@ -1,4 +1,4 @@
-const handler = async ({ result, dispatch }) => {
+export default (app) => ({ result, dispatch }) => {
   const { user } = result;
 
   dispatch('Mail.send', {
@@ -6,9 +6,8 @@ const handler = async ({ result, dispatch }) => {
     subject: 'forgot password',
     template: 'forgotPassword',
     context: {
+      app,
       user,
     },
   });
 };
-
-export default handler;

@@ -9,5 +9,5 @@ export default ({
 
   onAfter('User.register', handlers.sendRegistrationEmail(app));
 
-  onAfter('User.resetPassword', handlers.sendPasswordResetEmail);
+  onAfter('User.resetPassword', handlers.sendPasswordResetEmail(app));
 };
