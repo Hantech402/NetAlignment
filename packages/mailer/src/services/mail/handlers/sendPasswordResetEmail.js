@@ -1,4 +1,6 @@
-const handler = async ({ user }, { dispatch }) => {
+const handler = async ({ result, dispatch }) => {
+  const { user } = result;
+
   dispatch('Mail.send', {
     to: user.email,
     subject: 'forgot password',
