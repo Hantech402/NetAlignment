@@ -8,12 +8,13 @@ import setupServices from './services/index';
 import pluginOptionsSchema from './schemas/pluginOptions';
 
 export function register(server, options, next) {
+  const { isDevelopment } = server.settings.app;
   const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
   const transporter = nodemailer.createTransport({
-    ...pluginOptions,
-    logger: server.settings.isDevelopment,
-    debug: server.settings.isDevelopment,
+    ...pluginOptions.transport,
+    logger: isDevelopment,
+    debug: isDevelopment,
   });
 
   server.register([
