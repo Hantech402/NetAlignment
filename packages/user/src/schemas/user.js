@@ -23,7 +23,7 @@ const userSchema = {
     state: Joi.string(),
     zipCode: Joi.string(),
     phoneNumber: Joi.string(),
-  }).default({}),
+  }).isRequired(),
 
   status: Joi.string(),
   resetPassword: Joi.object().keys({
