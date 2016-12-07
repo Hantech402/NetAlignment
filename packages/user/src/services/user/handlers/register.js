@@ -1,5 +1,6 @@
 import { decorators, applyDecorators } from 'octobus.js';
 import Boom from 'boom';
+import pick from 'lodash/pick';
 
 const { withLookups, withHandler } = decorators;
 
@@ -34,8 +35,13 @@ const handler = async ({ params, Account, UserEntity }) => {
   });
 
   return {
-    user,
-    account,
+    user: pick(user, [
+      'accountId', '_id', 'title', 'firstName', 'lastName', 'email', 'username', 'role',
+      'address', 'isActive', 'createdAt', 'updatedAt',
+    ]),
+    account: pick(account, [
+      'isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt',
+    ]),
   };
 };
 

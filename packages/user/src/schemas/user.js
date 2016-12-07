@@ -33,7 +33,7 @@ const userSchema = {
   lastLogin: Joi.date(),
   role: Joi.string().required().valid(roles),
   isAccountOwner: Joi.boolean().default(false),
-  isActive: Joi.boolean().default(false),
+  isActive: Joi.boolean().default(true),
   socialLogin: Joi.object().keys({
     facebook: Joi.object().keys({
       id: Joi.string().required(),

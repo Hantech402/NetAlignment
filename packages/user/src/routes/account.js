@@ -10,20 +10,8 @@ export default [{
     const { id } = request.params;
 
     try {
-      const account = await AccountEntity.findById(objectId(id));
-      if (!account) {
-        return reply(Boom.notFound(`Unable to find account with id ${id}.`));
-      }
-
-      await AccountEntity.updateOne({
-        query: {
-          _id: objectId(id),
-        },
-        update: {
-          $set: {
-            isConfirmed: true,
-          },
-        },
+      const account = await AccountEntity.confirm({
+        _id: objectId(id),
       });
 
       return reply(account);
