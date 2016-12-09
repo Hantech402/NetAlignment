@@ -1,4 +1,8 @@
 export default (app) => ({ result, dispatch }) => {
+  if (!result || !result.user) {
+    return;
+  }
+
   const { user } = result;
 
   dispatch('Mail.send', {
