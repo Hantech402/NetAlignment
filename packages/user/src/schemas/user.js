@@ -1,8 +1,7 @@
 import Joi from 'joi';
-import pick from 'lodash/pick';
 import { titleOptions, roles } from '../constants';
 
-const userSchema = {
+export default {
   _id: Joi.object(),
   accountId: Joi.object().required(),
 
@@ -57,17 +56,4 @@ const userSchema = {
 
   createdAt: Joi.date(),
   updatedAt: Joi.date(),
-};
-
-const registerSchema = {
-  ...pick(userSchema, [
-    'title', 'firstName', 'middleName', 'lastName', 'address', 'password',
-    'username', 'email',
-  ]),
-  role: Joi.string().required().valid(['lender', 'borrower']),
-};
-
-export {
-  userSchema as default,
-  registerSchema,
 };

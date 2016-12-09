@@ -44,11 +44,13 @@ export function register(server, options, next) {
     setupServices({
       dispatcher,
       db: mongoDb,
+      pluginOptions,
     });
 
     const UserEntity = lookup('entity.User');
     const AccountEntity = lookup('entity.Account');
     const User = lookup('User');
+    const AuctionEntity = lookup('entity.Auction');
 
     server.expose('UserEntity', UserEntity);
     server.expose('AccountEntity', AccountEntity);
@@ -60,6 +62,7 @@ export function register(server, options, next) {
       UserEntity,
       AccountEntity,
       User,
+      AuctionEntity,
     });
 
     server.route(routes);
@@ -70,5 +73,5 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['na-storage', 'bell', 'na-crud'],
+  dependencies: ['na-storage', 'bell', 'na-crud', 'na-auctions'],
 };

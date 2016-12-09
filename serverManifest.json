@@ -98,6 +98,10 @@
       }
     }, {
       "plugin": {
+        "register": "./auctions"
+      }
+    }, {
+      "plugin": {
         "register": "./user",
         "options": {
           "jwt": {

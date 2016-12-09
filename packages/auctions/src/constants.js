@@ -14,6 +14,6 @@ export const rates = [
 ];
 
 export const termsByRate = {
-  fixed: ['30', '15', '10'],
-  adjustable: ['3/1', '5/1', '7/1'],
+  Fixed: ['30', '15', '10'],
+  Adjustable: ['3/1', '5/1', '7/1'],
 };

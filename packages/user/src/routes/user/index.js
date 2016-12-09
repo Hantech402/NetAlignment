@@ -1,9 +1,11 @@
 import Joi from 'joi';
 import Boom from 'boom';
-// import * as handlers from './handlers';
 import { generateCRUDRoutes } from 'na-crud';
+import { schemas } from 'na-auctions';
+import pick from 'lodash/pick';
+import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
-import userSchema, { registerSchema } from '../../schemas/user';
+import userSchema from '../../schemas/user';
 
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
 const userRoutes = {
@@ -21,17 +23,30 @@ const userRoutes = {
 export default [{
   path: '/user/register',
   method: 'POST',
-  handler: {
-    dispatch: {
-      event: 'User.register',
-      buildParams({ payload }) {
-        return payload;
-      },
-    },
-  },
+  // handler: {
+  //   dispatch: {
+  //     event: 'User.register',
+  //     buildParams({ payload }) {
+  //       return payload;
+  //     },
+  //   },
+  // },
+  handler: handlers.register,
   config: {
     validate: {
-      payload: Joi.object().keys(registerSchema).required(),
+      payload: Joi.object().keys({
+        ...pick(userSchema, [
+          'title', 'firstName', 'middleName', 'lastName', 'address', 'password',
+          'username', 'email',
+        ]),
+        role: Joi.string().required().valid(['lender', 'borrower']),
+        auction: Joi.any().when('role', {
+          is: 'borrower',
+          then: Joi.object().keys(
+            pick(schemas.auction, ['financialGoal', 'rate', 'termsByRate']),
+          ),
+        }),
+      }).required(),
     },
     description: 'Register a new user',
     tags: ['api'],
