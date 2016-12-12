@@ -15,4 +15,5 @@ export default ({
   subscribe('User.recoverPassword', handlers.recoverPassword);
   subscribe('User.socialLogin', handlers.socialLogin);
   subscribe('User.dump', handlers.dump);
+  subscribe('User.changePassword', handlers.changePassword);
 };

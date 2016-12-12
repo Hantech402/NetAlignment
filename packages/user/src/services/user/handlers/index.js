@@ -6,6 +6,7 @@ import resetPassword from './resetPassword';
 import recoverPassword from './recoverPassword';
 import socialLogin from './socialLogin';
 import dump from './dump';
+import changePassword from './changePassword';
 
 export {
   save,
@@ -16,4 +17,5 @@ export {
   recoverPassword,
   socialLogin,
   dump,
+  changePassword,
 };

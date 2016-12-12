@@ -6,6 +6,7 @@ import pick from 'lodash/pick';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
+import { ObjectID as objectId } from 'mongodb';
 
 const prefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
@@ -122,6 +123,33 @@ export default [{
 //   config: {
 //     auth: 'google',
 //   },
+}, {
+  path: `${prefix}/change-password`,
+  method: 'POST',
+  async handler(request, reply) {
+    const { User } = this;
+    const { oldPassword, password } = request.payload;
+    try {
+      reply(await User.changePassword({
+        password,
+        oldPassword,
+        userId: objectId(request.auth.credentials.id),
+      }));
+    } catch (err) {
+      reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: 'jwt',
+    validate: {
+      payload: Joi.object().keys({
+        oldPassword: Joi.string().required(),
+        password: Joi.string().required(),
+      }).required(),
+    },
+    description: 'Change password',
+    tags: ['api'],
+  },
 }].concat(
   Object.keys(userRoutes)
     .filter((routeName) => routeName !== 'createOne')
