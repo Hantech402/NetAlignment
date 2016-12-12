@@ -1,5 +1,8 @@
 import Glue from 'glue';
 import path from 'path';
+import DotEnv from 'dotenv';
+
+DotEnv.config();
 
 export default (store) => {
   const manifest = store.get('/', {

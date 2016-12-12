@@ -7,6 +7,7 @@ import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
 
+const prefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
 const userRoutes = {
   ...generatedCRUDRoutes,
@@ -21,7 +22,7 @@ const userRoutes = {
 };
 
 export default [{
-  path: '/user/register',
+  path: `${prefix}/register`,
   method: 'POST',
   // handler: {
   //   dispatch: {
@@ -52,7 +53,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/user/reset-password',
+  path: `${prefix}/reset-password`,
   method: 'POST',
   async handler(request, reply) {
     const { User } = this;
@@ -78,7 +79,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/user/recover-password/{token}',
+  path: `${prefix}/recover-password/{token}`,
   method: 'POST',
   async handler(request, reply) {
     const { User } = this;

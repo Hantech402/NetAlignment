@@ -11,7 +11,7 @@
   "dependencies": {
     "boom": "4.2.0",
     "date-fns": "1.15.1",
-    "hb-user": "0.8.3",
+    "hb-user": "0.8.4",
     "hoek": "4.1.0",
     "joi": "10.0.2",
     "lodash": "4.17.2",
