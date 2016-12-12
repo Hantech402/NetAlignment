@@ -1,12 +1,12 @@
 import Joi from 'joi';
 import Boom from 'boom';
+import { ObjectID as objectId } from 'mongodb';
 import { generateCRUDRoutes } from 'na-crud';
 import { schemas } from 'na-auctions';
 import pick from 'lodash/pick';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
-import { ObjectID as objectId } from 'mongodb';
 
 const prefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
