@@ -21,7 +21,7 @@
     "na-core": "*",
     "na-crud": "*",
     "na-storage": "*",
-    "octobus-mongodb": "0.8.3",
+    "octobus-mongodb": "0.8.4",
     "octobus.js": "0.18.2"
   }
 }
