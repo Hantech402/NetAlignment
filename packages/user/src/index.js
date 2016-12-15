@@ -51,6 +51,7 @@ export function register(server, options, next) {
       dispatcher,
       db: mongoDb,
       pluginOptions,
+      refManager,
     });
 
     const UserEntity = lookup('entity.User');
