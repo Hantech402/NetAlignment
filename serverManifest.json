@@ -130,6 +130,22 @@
         "register": "./monitoring"
       }
     }],
-    "production": []
+    "production": [{
+      "plugin": {
+        "register": "poop",
+        "options": {
+          "heapdumpFolder": "logs/heapdumps",
+          "logPath": "logs/poop.log"
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "./documentation"
+      }
+    }, {
+      "plugin": {
+        "register": "./monitoring"
+      }
+    }]
   }
 }
