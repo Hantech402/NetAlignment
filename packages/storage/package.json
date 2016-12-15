@@ -14,7 +14,7 @@
     "async": "2.1.4",
     "babel-cli": "6.18.0",
     "joi": "10.0.2",
-    "mongo-dnorm": "0.2.3",
+    "mongo-dnorm": "0.2.4",
     "mongodb": "2.2.12",
     "mongodb-migrate": "2.0.1"
   }
