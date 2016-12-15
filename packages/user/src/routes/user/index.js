@@ -7,6 +7,7 @@ import pick from 'lodash/pick';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
+import accountSchema from '../../schemas/account';
 
 const prefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
@@ -33,6 +34,7 @@ export default [{
           'title', 'firstName', 'middleName', 'lastName', 'address', 'password',
           'username', 'email',
         ]),
+        ...pick(accountSchema, ['loanOfficersEmails']),
         role: Joi.string().required().valid(['lender', 'borrower']),
         auction: Joi.any().when('role', {
           is: 'borrower',
@@ -105,20 +107,6 @@ export default [{
     description: 'Recover password',
     tags: ['api'],
   },
-// }, {
-//   path: '/social-login/facebook',
-//   method: ['GET', 'POST'],
-//   handler: handlers.socialLogin,
-//   config: {
-//     auth: 'facebook',
-//   },
-// }, {
-//   path: '/social-login/google',
-//   method: ['GET', 'POST'],
-//   handler: handlers.socialLogin,
-//   config: {
-//     auth: 'google',
-//   },
 }, {
   path: `${prefix}/change-password`,
   method: 'POST',

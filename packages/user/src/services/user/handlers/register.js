@@ -4,8 +4,8 @@ import pick from 'lodash/pick';
 
 const { withLookups, withHandler } = decorators;
 
-const handler = async ({ params, Account, UserEntity }) => {
-  const { username, email } = params;
+const handler = async ({ username, email, params, Account, UserEntity }) => {
+  const { licenseNr, loanOfficersEmails, ...userParams } = params;
   const existingUser = await UserEntity.findOne({
     query: {
       $or: [{
@@ -26,12 +26,15 @@ const handler = async ({ params, Account, UserEntity }) => {
     }
   }
 
-  const account = await Account.createOne({});
+  const account = await Account.createOne({
+    licenseNr,
+    loanOfficersEmails,
+  });
 
   const user = await UserEntity.createOne({
     accountId: account._id,
     isAccountOwner: true,
-    ...params,
+    ...userParams,
   });
 
   return {
