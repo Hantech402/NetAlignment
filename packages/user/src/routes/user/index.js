@@ -25,14 +25,6 @@ const userRoutes = {
 export default [{
   path: `${prefix}/register`,
   method: 'POST',
-  // handler: {
-  //   dispatch: {
-  //     event: 'User.register',
-  //     buildParams({ payload }) {
-  //       return payload;
-  //     },
-  //   },
-  // },
   handler: handlers.register,
   config: {
     validate: {
@@ -47,6 +39,10 @@ export default [{
           then: Joi.object().keys(
             pick(schemas.auction, ['financialGoal', 'rate', 'termsByRate']),
           ),
+        }),
+        licenseNr: Joi.any().when('role', {
+          is: 'lender',
+          then: Joi.number().required(),
         }),
       }).required(),
     },

@@ -6,6 +6,7 @@ export default {
 
   isConfirmed: Joi.boolean().default(false),
   isActive: Joi.boolean().default(true),
+  licenseNr: Joi.number(),
 
   isDeleted: Joi.boolean().default(false),
   deletedAt: Joi.date(),

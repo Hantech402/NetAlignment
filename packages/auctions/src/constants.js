@@ -17,3 +17,19 @@ export const termsByRate = {
   Fixed: ['30', '15', '10'],
   Adjustable: ['3/1', '5/1', '7/1'],
 };
+
+export const types = [
+  'VA', 'FHA', 'Conventional', 'USDA/Rural', 'Other',
+];
+
+export const purposes = [
+  'Purchase', 'Construction', 'Refinance', 'Construction-Permanent', 'Other',
+];
+
+export const propertyTypes = [
+  'Primary Residence', 'Secondary Residence', 'Investment',
+];
+
+export const estateTypes = [
+  'Free Simple', 'Leasehold',
+];
