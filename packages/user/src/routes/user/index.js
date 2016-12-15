@@ -4,6 +4,7 @@ import { ObjectID as objectId } from 'mongodb';
 import { generateCRUDRoutes } from 'na-crud';
 import { schemas } from 'na-auctions';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
@@ -132,6 +133,26 @@ export default [{
       }).required(),
     },
     description: 'Change password',
+    tags: ['api'],
+  },
+}, {
+  path: `${prefix}/me`,
+  method: 'GET',
+  async handler(request, reply) {
+    const { UserEntity } = this;
+
+    try {
+      const userId = objectId(request.auth.credentials.id);
+      const user = await UserEntity.findById(userId);
+      const result = omit(user, ['password']);
+      reply(result);
+    } catch (err) {
+      reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: 'jwt',
+    description: 'User profile',
     tags: ['api'],
   },
 }].concat(

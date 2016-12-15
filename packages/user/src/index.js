@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import * as hbUser from 'hb-user';
+import pick from 'lodash/pick';
 import pkg from '../package.json';
 import pluginOptionsSchema from './schemas/pluginOptions';
 import userSchema from './schemas/user';
@@ -34,7 +35,12 @@ export function register(server, options, next) {
       jwt: pluginOptions.jwt,
       serviceOptions: {
         ...pluginOptions.user,
-        references: [],
+        references: [{
+          collectionName: 'Account',
+          refProperty: 'accountId',
+          extractor: (account = {}) =>
+            pick(account, ['licenseNr', 'loanOfficersEmails']),
+        }],
         schema: userSchema,
         db: mongoDb,
         refManager,

@@ -51,6 +51,8 @@ export default {
   }).default({
   }),
 
+  _account: Joi.object(),
+
   isDeleted: Joi.boolean().default(false),
   deletedAt: Joi.date(),
 
