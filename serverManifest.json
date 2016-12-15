@@ -45,7 +45,18 @@
               "args": [{ "log": "*", "request": "*", "response": "*", "error": "*", "ops": "*" }]
             }, {
               "module": "good-console"
-            }, "stdout"]
+            }, "stdout"],
+            "file": [{
+              "module": "good-squeeze",
+              "name": "Squeeze",
+              "args": [{ "error": "*" }]
+            }, {
+              "module": "good-squeeze",
+              "name": "SafeJson"
+            }, {
+              "module": "good-file",
+              "args": ["./logs/errors"]
+            }]
           }
         }
       }
@@ -115,14 +126,6 @@
     "$default": [],
     "development": [{
       "plugin": {
-        "register": "poop",
-        "options": {
-          "heapdumpFolder": "logs/heapdumps",
-          "logPath": "logs/poop.log"
-        }
-      }
-    }, {
-      "plugin": {
         "register": "./documentation"
       }
     }, {
@@ -131,14 +134,6 @@
       }
     }],
     "production": [{
-      "plugin": {
-        "register": "poop",
-        "options": {
-          "heapdumpFolder": "logs/heapdumps",
-          "logPath": "logs/poop.log"
-        }
-      }
-    }, {
       "plugin": {
         "register": "./documentation"
       }
