@@ -7,21 +7,18 @@ export default ({
 }) => async (request, reply) => {
   const { eventDispatcher: { dispatch } } = request;
   const accountId = objectId(request.auth.credentials.accountId);
+  const { query } = request.query;
 
   try {
-    const query = {
-      ...toBSON(request.query),
+    const parsedQuery = {
+      ...toBSON(query),
       accountId,
     };
 
-    const entity = await dispatch(`entity.${entityName}.findOne`, { query });
+    const count = await dispatch(`entity.${entityName}.count`, { query: parsedQuery });
 
-    if (!entity) {
-      return reply(Boom.notFound('Unable to find entity.'));
-    }
-
-    return reply(entity);
+    reply(count);
   } catch (err) {
-    return reply(Boom.wrap(err));
+    reply(Boom.wrap(err));
   }
 };

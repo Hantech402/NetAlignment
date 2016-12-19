@@ -1,7 +1,11 @@
 import { generateCRUDRoutes } from 'na-crud';
+import * as crudHandlers from 'na-core/src/handlers';
 import auctionSchema from '../schemas/auction';
 
-const generatedCRUDRoutes = generateCRUDRoutes('entity.Auction', auctionSchema);
+const generatedCRUDRoutes = generateCRUDRoutes({
+  serviceNamespace: 'entity.Auction',
+  schema: auctionSchema,
+});
 
 const crudRoutes = [
   'count', 'createOne', 'deleteOne', 'findById', 'findMany', 'findOne', 'replaceOne', 'updateOne',
@@ -15,10 +19,12 @@ const crudRoutes = [
         scope: 'borrower',
       },
     },
-    handler: generatedCRUDRoutes[route].handler,
+    handler: crudHandlers[route]({
+      entityName: 'Auction',
+    }),
   }])
 ), []);
 
-const routes = [].concat(crudRoutes);
+const routes = [];
 
-export default routes;
+export default routes.concat(crudRoutes);

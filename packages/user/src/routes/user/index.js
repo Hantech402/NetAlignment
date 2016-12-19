@@ -11,7 +11,11 @@ import userSchema from '../../schemas/user';
 import accountSchema from '../../schemas/account';
 
 const prefix = '/users';
-const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
+const generatedCRUDRoutes = generateCRUDRoutes({
+  serviceNamespace: 'entity.User',
+  schema: userSchema,
+  pathPrefix: '/users',
+});
 const userRoutes = [
   'count', 'deleteOne', 'findById', 'findMany', 'findOne', 'replaceOne', 'updateOne',
 ].reduce((acc, route) => ({

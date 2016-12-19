@@ -7,15 +7,26 @@ import updateOneRoute from './routes/updateOne';
 import deleteOneRoute from './routes/deleteOne';
 import countRoute from './routes/count';
 
-export default (serviceNamespace, schema, pathPrefix = '', config = {}) => {
-  const findById = findByIdRoute(serviceNamespace, `${pathPrefix}/{id}`, config);
-  const findMany = findManyRoute(serviceNamespace, pathPrefix, config);
-  const findOne = findOneRoute(serviceNamespace, `${pathPrefix}/findOne`, config);
-  const createOne = createOneRoute(serviceNamespace, pathPrefix, schema, config);
-  const replaceOne = replaceOneRoute(serviceNamespace, `${pathPrefix}/{id}`, schema, config);
-  const updateOne = updateOneRoute(serviceNamespace, `${pathPrefix}/{id}`, config);
-  const deleteOne = deleteOneRoute(serviceNamespace, `${pathPrefix}/deleteOne`, config);
-  const count = countRoute(serviceNamespace, `${pathPrefix}/count`, config);
+const defaultOptions = {
+  isBoundToAccount: false,
+};
+
+export default ({
+  serviceNamespace,
+  schema,
+  pathPrefix = '',
+  config = {},
+  options = {},
+}) => {
+  const finalOptions = { ...defaultOptions, ...options };
+  const findById = findByIdRoute(serviceNamespace, `${pathPrefix}/{id}`, config, finalOptions);
+  const findMany = findManyRoute(serviceNamespace, pathPrefix, config, finalOptions);
+  const findOne = findOneRoute(serviceNamespace, `${pathPrefix}/findOne`, config, finalOptions);
+  const createOne = createOneRoute(serviceNamespace, pathPrefix, schema, config, finalOptions);
+  const replaceOne = replaceOneRoute(serviceNamespace, `${pathPrefix}/{id}`, schema, config, finalOptions);
+  const updateOne = updateOneRoute(serviceNamespace, `${pathPrefix}/{id}`, config, finalOptions);
+  const deleteOne = deleteOneRoute(serviceNamespace, `${pathPrefix}/deleteOne`, config, finalOptions);
+  const count = countRoute(serviceNamespace, `${pathPrefix}/count`, config, finalOptions);
 
   return {
     findById,
