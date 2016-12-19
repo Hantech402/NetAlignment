@@ -12,17 +12,22 @@ import accountSchema from '../../schemas/account';
 
 const prefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes('entity.User', userSchema, '/users');
-const userRoutes = {
-  ...generatedCRUDRoutes,
-  deleteOne: {
-    ...generatedCRUDRoutes.deleteOne,
+const userRoutes = [
+  'count', 'deleteOne', 'findById', 'findMany', 'findOne', 'replaceOne', 'updateOne',
+].reduce((acc, route) => ({
+  ...acc,
+  [route]: {
+    ...generatedCRUDRoutes[route],
     config: {
-      ...generatedCRUDRoutes.deleteOne.config,
-      auth: 'jwt',
+      ...generatedCRUDRoutes[route].config,
+      auth: {
+        strategy: 'jwt',
+        scope: 'admin',
+      },
     },
-    handler: crudHandlers.deleteOne,
+    handler: crudHandlers[route] || generatedCRUDRoutes[route].handler,
   },
-};
+}), {});
 
 export default [{
   path: `${prefix}/register`,
@@ -156,7 +161,5 @@ export default [{
     tags: ['api'],
   },
 }].concat(
-  Object.keys(userRoutes)
-    .filter((routeName) => routeName !== 'createOne')
-    .map((routeName) => userRoutes[routeName]),
+  Object.keys(userRoutes).map((routeName) => userRoutes[routeName]),
 );
