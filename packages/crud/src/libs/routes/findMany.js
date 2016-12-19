@@ -3,7 +3,7 @@ import { toBSON } from 'na-core';
 import Joi from 'joi';
 
 export default (serviceNamespace, path, config = {}) => ({
-  path,
+  path: path || '/',
   method: 'GET',
   async handler(request, reply) {
     const { eventDispatcher: { dispatch }, query } = request;

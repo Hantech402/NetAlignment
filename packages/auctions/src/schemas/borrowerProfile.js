@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import addressSchema from 'na-core/src/schemas/address';
 import { maritalStatuses } from '../constants';
 
 export default {
@@ -15,12 +16,14 @@ export default {
     age: Joi.number(),
   })),
   presentAddress: Joi.object().keys({
-    street: Joi.string(),
-    city: Joi.string(),
-    state: Joi.string(),
-    ZIP: Joi.string(),
+    ...addressSchema,
     ownership: Joi.string().valid(['Own', 'Rent']),
     rentYears: Joi.number(),
   }),
   mailingAddress: Joi.string(),
+  formerAddress: Joi.object().keys({
+    ...addressSchema,
+    ownership: Joi.string().valid(['Own', 'Rent']),
+    rentYears: Joi.number(),
+  }),
 };

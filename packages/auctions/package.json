@@ -13,6 +13,9 @@
     "joi": "10.0.2",
     "lodash": "4.17.2",
     "mongodb": "2.2.12",
+    "na-core": "*",
+    "na-crud": "*",
+    "na-user": "*",
     "octobus-mongodb": "0.8.5",
     "octobus.js": "0.18.2"
   }

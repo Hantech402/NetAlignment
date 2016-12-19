@@ -7,7 +7,7 @@ import updateOneRoute from './routes/updateOne';
 import deleteOneRoute from './routes/deleteOne';
 import countRoute from './routes/count';
 
-export default (serviceNamespace, schema, pathPrefix, config = {}) => {
+export default (serviceNamespace, schema, pathPrefix = '', config = {}) => {
   const findById = findByIdRoute(serviceNamespace, `${pathPrefix}/{id}`, config);
   const findMany = findManyRoute(serviceNamespace, pathPrefix, config);
   const findOne = findOneRoute(serviceNamespace, `${pathPrefix}/findOne`, config);

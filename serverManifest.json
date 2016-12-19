@@ -109,10 +109,6 @@
       }
     }, {
       "plugin": {
-        "register": "./auctions"
-      }
-    }, {
-      "plugin": {
         "register": "./user",
         "options": {
           "jwt": {
@@ -120,6 +116,13 @@
           },
           "socialPlatforms": {
           }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "./auctions",
+        "routes": {
+          "prefix": "/auctions"
         }
       }
     }],

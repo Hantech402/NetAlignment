@@ -2,7 +2,7 @@ import Boom from 'boom';
 import { toBSON } from 'na-core';
 
 export default (serviceNamespace, path, schema, config = {}) => ({
-  path,
+  path: path || '/',
   method: 'POST',
   async handler(request, reply) {
     const { eventDispatcher: { dispatch }, payload } = request;

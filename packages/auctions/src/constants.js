@@ -33,3 +33,5 @@ export const propertyTypes = [
 export const estateTypes = [
   'Free Simple', 'Leasehold',
 ];
+
+export const maritalStatuses = ['Married', 'Separated', 'Unmarried'];

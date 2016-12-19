@@ -2,10 +2,15 @@
  * https://docs.google.com/spreadsheets/d/1sGz0jbU7ps-Z6UlFzhTEApHt-FbJsTXadYeQqAHtUjc/edit?ts=5851a4eb#gid=0
  */
 import Joi from 'joi';
+import addressSchema from 'na-core/src/schemas/address';
 import {
   statuses, financialGoals, rates, termsByRate, types, purposes, propertyTypes,
   estateTypes,
 } from '../constants';
+import borrowerProfileSchema from './borrowerProfile';
+import employmentSchema from './employment';
+import incomeSchema from './income';
+import expenseSchema from './expense';
 
 export default {
   _id: Joi.object(),
@@ -28,17 +33,12 @@ export default {
   }),
   agencyCaseNumber: Joi.number(),
   lenderCaseNumber: Joi.number(),
-  amount: Joi.number(),
+  amount: Joi.number().min(0),
   interestRate: Joi.number().min(1).max(100),
   nrOfMonths: Joi.number().integer().min(1),
 
-  property: Joi.object().keys({
-    address: Joi.object().keys({
-      street: Joi.string(),
-      city: Joi.string(),
-      state: Joi.string(),
-      ZIP: Joi.string(),
-    }),
+  propertyInfo: Joi.object().keys({
+    address: Joi.object().keys(addressSchema),
     unitsNr: Joi.number(),
     legalDescription: Joi.string(),
     yearBuilt: Joi.number(),
@@ -83,6 +83,29 @@ export default {
       then: Joi.required(),
     }),
     paymentSource: Joi.string(),
+  }),
+
+  borrowerInfo: Joi.object().keys({
+    borrower: borrowerProfileSchema,
+    coBorrower: borrowerProfileSchema,
+  }),
+
+  employmentInfo: Joi.object().keys({
+    borrower: Joi.array().items(Joi.object().keys(employmentSchema)),
+    coBorrower: Joi.array().items(Joi.object().keys(employmentSchema)),
+  }),
+
+  monthlyIncomeAndCombinedHousingExpenseInformation: Joi.object().keys({
+    grossMonthlyIncome: Joi.object().keys({
+      borrower: Joi.object().keys(incomeSchema),
+      coBorrower: Joi.object().keys(incomeSchema),
+    }),
+    combinedHousingExpense: Joi.object().keys(expenseSchema),
+    otherIncome: Joi.array().items(Joi.object().keys({
+      dontConsiderBy: Joi.string().valid(['borrower', 'coBorrower']),
+      item: Joi.string(),
+      monthlyAmount: Joi.number(),
+    })),
   }),
 
   isDeleted: Joi.boolean().default(false),
