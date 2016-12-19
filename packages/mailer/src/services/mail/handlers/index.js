@@ -1,9 +1,11 @@
 import send from './send';
-import sendRegistrationEmail from './sendRegistrationEmail';
+import onAfterRegistration from './onAfterRegistration';
 import sendPasswordResetEmail from './sendPasswordResetEmail';
+import sendActivationEmail from './sendActivationEmail';
 
 export {
   send,
-  sendRegistrationEmail,
+  onAfterRegistration,
   sendPasswordResetEmail,
+  sendActivationEmail,
 };

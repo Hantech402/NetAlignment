@@ -7,7 +7,7 @@ export default (app) => ({ result, dispatch }) => {
   dispatch('Mail.send', {
     to: user.email,
     subject: 'welcome',
-    template: 'userRegistration',
+    template: 'accountActivation',
     context: {
       user,
       account,

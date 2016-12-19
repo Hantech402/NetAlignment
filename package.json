@@ -18,7 +18,8 @@
     "clean-setup": "npm run clean && yarn",
     "lint": "eslint .",
     "seed": "babel-node scripts/seed/index.js",
-    "open-monitor": "open http://localhost:3003/status-monitor"
+    "open-monitor": "open http://localhost:3003/status-monitor",
+    "start:production": "NODE_ENV=production pm2 start --interpreter babel-node server.js"
   },
   "repository": {
     "type": "git",

@@ -1,3 +1,6 @@
+/**
+ * https://docs.google.com/spreadsheets/d/1sGz0jbU7ps-Z6UlFzhTEApHt-FbJsTXadYeQqAHtUjc/edit?ts=5851a4eb#gid=0
+ */
 import Joi from 'joi';
 import {
   statuses, financialGoals, rates, termsByRate, types, purposes, propertyTypes,

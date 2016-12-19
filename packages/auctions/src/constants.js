@@ -1,5 +1,5 @@
 export const statuses = [
-  'draft', 'open', 'cancelled',
+  'draft', 'open', 'loanEstimate', 'accepted', 'expired', 'cancelled',
 ];
 
 export const financialGoals = [

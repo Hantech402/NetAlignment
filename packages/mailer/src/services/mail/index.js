@@ -7,7 +7,9 @@ export default ({
 
   subscribe('Mail.send', handlers.send({ renderTemplate, transporter }));
 
-  onAfter('User.register', handlers.sendRegistrationEmail(app));
+  onAfter('User.register', handlers.onAfterRegistration(app));
+
+  subscribe('Mail.sendActivationEmail', handlers.sendActivationEmail(app));
 
   onAfter('User.resetPassword', handlers.sendPasswordResetEmail(app));
 };
