@@ -9,9 +9,9 @@ export default ({
 }) => async (request, reply) => {
   const accountId = objectId(request.auth.credentials.accountId);
   const { eventDispatcher: { dispatch } } = request;
-  const id = extractId(request);
 
   try {
+    const id = extractId(request);
     const entity = await dispatch(`entity.${entityName}.findById`, id);
 
     if (

@@ -3,6 +3,7 @@ import fs from 'fs';
 import Joi from 'joi';
 import { generateCRUDRoutes } from 'na-crud';
 import * as crudHandlers from 'na-core/src/handlers';
+import objectIdValidator from 'na-core/src/schemas/objectId';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import auctionSchema from '../schemas/auction';
@@ -104,10 +105,11 @@ const routes = [{
         file: Joi.any().required().meta({ swaggerType: 'file' }).description('file'),
       }).required(),
       params: {
-        auctionId: Joi.string().required(),
+        auctionId: objectIdValidator.required(),
       },
     },
     tags: ['api'],
+    description: 'Uploading a file to an auction',
   },
 }, {
   path: '/{auctionId}/files/{fileId}',
@@ -162,11 +164,12 @@ const routes = [{
     ],
     validate: {
       params: {
-        auctionId: Joi.string().required(),
-        fileId: Joi.string().required(),
+        auctionId: objectIdValidator.required(),
+        fileId: objectIdValidator.required(),
       },
     },
     tags: ['api'],
+    description: 'Downloading a file of an auction',
   },
 }];
 

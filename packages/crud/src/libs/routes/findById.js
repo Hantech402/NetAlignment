@@ -1,6 +1,6 @@
-import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
+import objectIdValidator from 'na-core/src/schemas/objectId';
 
 export default (serviceNamespace, path, config = {}) => ({
   path,
@@ -24,7 +24,7 @@ export default (serviceNamespace, path, config = {}) => ({
   config: {
     validate: {
       params: {
-        id: Joi.string().required(),
+        id: objectIdValidator.required(),
       },
     },
     description: 'Get an entity by id',
