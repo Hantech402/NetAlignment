@@ -6,15 +6,15 @@ export default ({
   entityName,
 }) => async (request, reply) => {
   const accountId = objectId(request.auth.credentials.accountId);
-  const { eventDispatcher: { dispatch } } = request;
+  const { eventDispatcher: { dispatch }, query } = request;
 
   try {
-    const query = {
-      ...toBSON(request.query.query),
+    const dbQuery = {
+      ...toBSON(query.query),
       accountId,
     };
 
-    let cursor = await dispatch(`entity.${entityName}.findMany`, { query });
+    let cursor = await dispatch(`entity.${entityName}.findMany`, { query: dbQuery });
 
     if (query.offset !== undefined) {
       cursor = cursor.skip(parseInt(query.offset, 10));

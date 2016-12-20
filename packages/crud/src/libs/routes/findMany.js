@@ -32,6 +32,8 @@ export default (serviceNamespace, path, config = {}) => ({
     validate: {
       query: {
         query: Joi.object().default({}),
+        offset: Joi.number(),
+        limit: Joi.number(),
       },
     },
     description: 'Find all entities',

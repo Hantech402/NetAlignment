@@ -1,6 +1,10 @@
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
+import findManyHandler from 'na-core/src/handlers/findMany';
+import findManyRoute from 'na-crud/src/libs/routes/findMany';
+
+const findManyFilesRoute = findManyRoute('entity.File');
 
 export default [{
   path: '/account/{id}/confirm',
@@ -51,6 +55,18 @@ export default [{
       }),
     },
     description: 'Resend activation email',
+    tags: ['api'],
+  },
+}, {
+  ...findManyFilesRoute,
+  path: '/account/files',
+  handler: findManyHandler({
+    entityName: 'File',
+  }),
+  config: {
+    ...findManyFilesRoute.config,
+    auth: 'jwt',
+    description: 'Get all the files of an account',
     tags: ['api'],
   },
 }];
