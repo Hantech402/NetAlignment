@@ -5,12 +5,14 @@
       "development": {
         "client": "http://localhost:3004",
         "api": "http://localhost:3003",
-        "isDevelopment": true
+        "isDevelopment": true,
+        "uploadDir": "./uploads"
       },
       "production": {
         "client": "http://localhost:3004",
         "api": "http://localhost:80",
-        "isDevelopment": false
+        "isDevelopment": false,
+        "uploadDir": "./uploads"
       }
     },
     "cache": "../node_modules/catbox-mongodb"
@@ -116,6 +118,13 @@
           },
           "socialPlatforms": {
           }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "./filesManager",
+        "routes": {
+          "prefix": "/files"
         }
       }
     }, {

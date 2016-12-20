@@ -6,14 +6,16 @@ import * as schemas from './schemas';
 export function register(server, options, next) {
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
   const { dispatch, lookup } = dispatcher;
-  const { mongoDb } = server.plugins['na-storage'];
+  const { mongoDb, refManager } = server.plugins['na-storage'];
 
   setupServices({
     dispatcher,
     db: mongoDb,
+    refManager,
   });
 
   const AuctionEntity = lookup('entity.Auction');
+  const FileEntity = lookup('entity.File');
 
   server.expose('AuctionEntity', AuctionEntity);
 
@@ -21,6 +23,7 @@ export function register(server, options, next) {
     dispatch,
     lookup,
     AuctionEntity,
+    FileEntity,
   });
 
   server.route(routes);
@@ -30,7 +33,7 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['na-storage', 'na-crud'],
+  dependencies: ['na-storage', 'na-crud', 'na-files-manager'],
 };
 
 export {

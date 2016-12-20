@@ -15,7 +15,7 @@ import expenseSchema from './expense';
 export default {
   _id: Joi.object(),
   accountId: Joi.object().required(),
-  documentIds: Joi.array().default([]),
+  fileIds: Joi.array().default([]),
 
   status: Joi.string().valid(statuses),
   financialGoal: Joi.string().valid(financialGoals).required(),

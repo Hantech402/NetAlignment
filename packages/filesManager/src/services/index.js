@@ -1,5 +1,5 @@
-import setupMessageServices from './message';
+import setupFilesServices from './files';
 
 export default (options) => {
-  setupMessageServices(options);
+  setupFilesServices(options);
 };

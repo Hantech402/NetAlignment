@@ -5,12 +5,13 @@ import schema from '../../schemas/auction';
 const entityNamespace = 'entity.Auction';
 
 export default ({
-  dispatcher, db,
+  dispatcher, db, refManager,
 }) => {
   dispatcher.subscribeMap(entityNamespace,
     generateCRUDServices(dispatcher, entityNamespace, {
       db,
       schema,
+      refManager,
     },
   ));
 

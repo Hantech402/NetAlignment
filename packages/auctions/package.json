@@ -15,6 +15,7 @@
     "mongodb": "2.2.12",
     "na-core": "*",
     "na-crud": "*",
+    "na-files-manager": "*",
     "na-user": "*",
     "octobus-mongodb": "0.8.5",
     "octobus.js": "0.18.2"
