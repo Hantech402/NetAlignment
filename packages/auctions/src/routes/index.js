@@ -48,6 +48,8 @@ const routes = [{
         accountId: auction.accountId,
         filename,
         size: uploadedFile.bytes,
+        contentType: uploadedFile.headers['content-type'],
+        extension,
       });
 
       await AuctionEntity.updateOne({
@@ -75,17 +77,16 @@ const routes = [{
     }
   },
   config: {
+    auth: {
+      strategy: 'jwt',
+      scope: 'borrower',
+    },
     pre: [
       {
-        async method(request, reply) {
-          const { auctionId } = request.params;
-          const auction = await this.AuctionEntity.findById(objectId(auctionId));
-          if (!auction) {
-            return reply(Boom.notFound(`Unable to find entity with id ${auctionId}`));
-          }
-
-          return reply(auction);
-        },
+        method: crudHandlers.findById({
+          entityName: 'Auction',
+          extractId: (request) => objectId(request.params.auctionId),
+        }),
         assign: 'auction',
       },
     ],
@@ -104,6 +105,65 @@ const routes = [{
       }).required(),
       params: {
         auctionId: Joi.string().required(),
+      },
+    },
+    tags: ['api'],
+  },
+}, {
+  path: '/{auctionId}/files/{fileId}',
+  method: 'GET',
+  async handler(request, reply) {
+    const { fileId } = request.params;
+    const { auction, file } = request.pre;
+    const { uploadDir } = request.server.settings.app;
+
+    try {
+      const isValid = auction.fileIds.find((id) => id.toString() === fileId.toString());
+
+      if (!isValid) {
+        return reply(Boom.notFound(`Unable to find file with id ${fileId}`));
+      }
+
+      const filePath = path.join(uploadDir, `${file._id}${file.extension}`);
+
+      return fs.readFile(filePath, (err, fileContent) => {
+        if (err) {
+          return reply(Boom.wrap(err));
+        }
+
+        return reply(fileContent)
+          .header('Content-Type', file.contentType)
+          .header('Content-Disposition', `attachment; filename=${file.filename}`);
+      });
+    } catch (err) {
+      return reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: {
+      strategy: 'jwt',
+      scope: 'borrower',
+    },
+    pre: [
+      {
+        method: crudHandlers.findById({
+          entityName: 'Auction',
+          extractId: (request) => objectId(request.params.auctionId),
+        }),
+        assign: 'auction',
+      },
+      {
+        method: crudHandlers.findById({
+          entityName: 'File',
+          extractId: (request) => objectId(request.params.fileId),
+        }),
+        assign: 'file',
+      },
+    ],
+    validate: {
+      params: {
+        auctionId: Joi.string().required(),
+        fileId: Joi.string().required(),
       },
     },
     tags: ['api'],

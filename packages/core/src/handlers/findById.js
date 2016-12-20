@@ -1,15 +1,18 @@
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 
+const extractIdHandler = (request) => objectId(request.params.id);
+
 export default ({
   entityName,
+  extractId = extractIdHandler,
 }) => async (request, reply) => {
   const accountId = objectId(request.auth.credentials.accountId);
   const { eventDispatcher: { dispatch } } = request;
-  const { id } = request.params;
+  const id = extractId(request);
 
   try {
-    const entity = await dispatch(`entity.${entityName}.findById`, objectId(id));
+    const entity = await dispatch(`entity.${entityName}.findById`, id);
 
     if (
       !entity ||
