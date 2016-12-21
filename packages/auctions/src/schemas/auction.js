@@ -64,7 +64,7 @@ export default {
       is: Joi.valid(['Construction', 'Construction-Permanent']),
       then: Joi.required(),
     }),
-    purposeOfRefinance: Joi.number().when('purpose', {
+    purposeOfRefinance: Joi.string().when('purpose', {
       is: Joi.valid(['Refinance']),
       then: Joi.required(),
     }),

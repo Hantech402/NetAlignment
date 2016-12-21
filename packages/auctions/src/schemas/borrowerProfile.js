@@ -20,7 +20,7 @@ export default {
     ownership: Joi.string().valid(['Own', 'Rent']),
     rentYears: Joi.number(),
   }),
-  mailingAddress: Joi.string(),
+  mailingAddress: addressSchema,
   formerAddress: Joi.object().keys({
     ...addressSchema,
     ownership: Joi.string().valid(['Own', 'Rent']),

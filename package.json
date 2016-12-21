@@ -47,7 +47,7 @@
     "hapi-boom-decorators": "~2.1.0",
     "hoek": "~4.1.0",
     "moment": "~2.16.0",
-    "nes": "~6.3.1",
+    "nes": "~6.4.0",
     "npm-run-all": "~3.1.1",
     "pretty-format": "~4.3.1",
     "react": "~15.4.0",
