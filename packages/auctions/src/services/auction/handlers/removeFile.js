@@ -30,13 +30,7 @@ const handler = async ({ params, FileEntity, AuctionEntity }) => {
     }),
     new Promise(async (resolve, reject) => {
       const filePath = await FileEntity.getPath(file);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          return reject(err);
-        }
-
-        return resolve();
-      });
+      fs.unlink(filePath, (err) => (err ? reject(err) : resolve()));
     }),
   ]);
 };

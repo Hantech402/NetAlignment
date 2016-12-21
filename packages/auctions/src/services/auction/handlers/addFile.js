@@ -19,11 +19,14 @@ const handler = async ({ params, FileEntity, AuctionEntity }) => {
 
   const file = await FileEntity.createOne({
     accountId: auction.accountId,
-    auctionId: auction._id,
     filename,
     size: uploadedFile.bytes,
     contentType: uploadedFile.headers['content-type'],
     extension,
+    meta: {
+      auctionId: auction._id,
+    },
+    uploadedAt: new Date(),
   });
 
   await AuctionEntity.updateOne({
