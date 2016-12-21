@@ -7,7 +7,9 @@ const entityNamespace = 'entity.Auction';
 export default ({
   dispatcher, db, refManager,
 }) => {
-  dispatcher.subscribeMap(entityNamespace,
+  const { subscribeMap } = dispatcher;
+
+  subscribeMap(entityNamespace,
     generateCRUDServices(dispatcher, entityNamespace, {
       db,
       schema,
@@ -15,6 +17,5 @@ export default ({
     },
   ));
 
-  const { subscribeMap } = dispatcher;
   subscribeMap(entityNamespace, handlers);
 };

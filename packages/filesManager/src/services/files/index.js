@@ -1,17 +1,25 @@
 import { generateCRUDServices } from 'octobus-mongodb';
+import path from 'path';
 import schema from '../../schemas/file';
 import * as handlers from './handlers';
 
 const entityNamespace = 'entity.File';
 
 export default ({
-  dispatcher, db, refManager,
+  dispatcher, db, refManager, uploadDir,
 }) => {
-  dispatcher.subscribeMap(entityNamespace, generateCRUDServices(dispatcher, entityNamespace, {
+  const { subscribeMap, subscribe } = dispatcher;
+
+  subscribeMap(entityNamespace, generateCRUDServices(dispatcher, entityNamespace, {
     db,
     schema,
     refManager,
   }));
 
-  dispatcher.subscribeMap(entityNamespace, handlers);
+  subscribeMap(entityNamespace, handlers);
+
+  subscribe(
+    'entity.File.getPath',
+    ({ params: file }) => path.join(uploadDir, `${file._id}${file.extension}`),
+  );
 };

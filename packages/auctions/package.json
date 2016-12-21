@@ -9,6 +9,7 @@
   "author": "Victor Zamfir <victor@wirestorm.us>",
   "license": "ISC",
   "dependencies": {
+    "archiver": "1.3.0",
     "boom": "4.2.0",
     "joi": "10.0.2",
     "lodash": "4.17.2",
