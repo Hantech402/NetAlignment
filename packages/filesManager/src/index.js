@@ -1,6 +1,6 @@
 import pkg from '../package.json';
 import setupServices from './services';
-import routes from './routes';
+// import routes from './routes';
 
 export function register(server, options, next) {
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
@@ -14,7 +14,7 @@ export function register(server, options, next) {
     uploadDir,
   });
 
-  server.route(routes);
+  // server.route(routes);
 
   next();
 }
