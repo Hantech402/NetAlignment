@@ -3,6 +3,7 @@ import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import findManyHandler from 'na-core/src/handlers/findMany';
 import findManyRoute from 'na-crud/src/libs/routes/findMany';
+import objectIdValidator from 'na-core/src/schemas/objectId';
 
 const findManyFilesRoute = findManyRoute('entity.File');
 
@@ -26,7 +27,7 @@ export default [{
   config: {
     validate: {
       params: {
-        id: Joi.string().required(),
+        id: objectIdValidator.required(),
       },
     },
     description: 'Confirm account',
