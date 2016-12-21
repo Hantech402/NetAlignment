@@ -28,7 +28,10 @@
     }],
     "production": [{
       "port": 80,
-      "labels": ["api"]
+      "labels": ["api"],
+      "routes": {
+        "cors": true
+      }
     }]
   },
   "registrations": {
