@@ -8,8 +8,8 @@
         "isDevelopment": true,
         "uploadDir": "./uploads"
       },
-      "production": {
-        "client": "http://localhost:3004",
+      "staging": {
+        "client": "http://pure-beyond-73225.herokuapp.com",
         "api": "http://localhost:80",
         "isDevelopment": false,
         "uploadDir": "./uploads"
@@ -26,7 +26,7 @@
         "cors": true
       }
     }],
-    "production": [{
+    "staging": [{
       "port": 80,
       "labels": ["api"],
       "routes": {
@@ -148,7 +148,7 @@
         "register": "./monitoring"
       }
     }],
-    "production": [{
+    "staging": [{
       "plugin": {
         "register": "./documentation"
       }
