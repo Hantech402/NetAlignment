@@ -1,3 +1,4 @@
+import Inert from 'inert';
 import pkg from '../package.json';
 import setupServices from './services/index';
 import routes from './routes';
@@ -28,7 +29,9 @@ export function register(server, options, next) {
 
   server.route(routes);
 
-  return next();
+  server.register([
+    Inert,
+  ], next);
 }
 
 register.attributes = {

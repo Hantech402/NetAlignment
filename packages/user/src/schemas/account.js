@@ -7,9 +7,11 @@ export default {
   isConfirmed: Joi.boolean().default(false),
   isActive: Joi.boolean().default(true),
   licenseNr: Joi.number().allow(null),
-  loanOfficersEmails: Joi.array().items(Joi.string().required().email()).default([]).allow(null),
+  loanOfficersEmails: Joi.array().items(Joi.string().required().email()).allow(null),
 
   isDeleted: Joi.boolean().default(false),
+  isDeactivated: Joi.boolean().default(false),
+  isApproved: Joi.boolean().default(true),
   deletedAt: Joi.date(),
 
   createdAt: Joi.date(),

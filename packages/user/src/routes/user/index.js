@@ -62,6 +62,19 @@ export default [{
     tags: ['api'],
   },
 }, {
+  path: `${prefix}/refresh-token`,
+  method: 'POST',
+  handler: handlers.register,
+  config: {
+    validate: {
+      payload: Joi.object().keys({
+        token: Joi.string().required(),
+      }).required(),
+    },
+    description: 'Refresh JWT',
+    tags: ['api'],
+  },
+}, {
   path: `${prefix}/reset-password`,
   method: 'POST',
   async handler(request, reply) {

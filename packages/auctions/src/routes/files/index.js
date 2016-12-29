@@ -84,15 +84,21 @@ export default [{
 
       const filePath = await FileEntity.getPath(file);
 
-      return fs.readFile(filePath, (err, fileContent) => {
-        if (err) {
-          return reply(Boom.wrap(err));
-        }
-
-        return reply(fileContent)
-          .header('Content-Type', file.contentType)
-          .header('Content-Disposition', `attachment; filename=${file.filename}`);
+      return reply.file(filePath, {
+        confine: false,
+        filename: file.filename,
+        mode: 'attachment',
       });
+
+      // return fs.readFile(filePath, (err, fileContent) => {
+      //   if (err) {
+      //     return reply(Boom.wrap(err));
+      //   }
+      //
+      //   return reply(fileContent)
+      //     .header('Content-Type', file.contentType)
+      //     .header('Content-Disposition', `attachment; filename=${file.filename}`);
+      // });
     } catch (err) {
       return reply(Boom.wrap(err));
     }
