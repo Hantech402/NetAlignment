@@ -52,6 +52,7 @@ export function register(server, options, next) {
       db: mongoDb,
       pluginOptions,
       refManager,
+      app: server.settings.app,
     });
 
     const UserEntity = lookup('entity.User');

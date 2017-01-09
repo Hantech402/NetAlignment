@@ -18,8 +18,8 @@ export default {
   fileIds: Joi.array().default([]),
 
   status: Joi.string().valid(statuses),
-  financialGoal: Joi.string().valid(financialGoals).required(),
-  rate: Joi.string().valid(rates).required(),
+  financialGoal: Joi.string().valid(financialGoals),
+  rate: Joi.string().valid(rates),
   termsByRate: Object.keys(termsByRate).reduce((validator, rateValue) => (
     validator.when('rate', {
       is: rateValue,
@@ -48,30 +48,12 @@ export default {
       then: Joi.required(),
     }),
     type: Joi.string().valid(propertyTypes),
-    yearAcquired: Joi.number().when('purpose', {
-      is: Joi.valid(['Construction', 'Refinance', 'Construction-Permanent']),
-      then: Joi.required(),
-    }),
-    originalCost: Joi.number().when('purpose', {
-      is: Joi.valid(['Construction', 'Refinance', 'Construction-Permanent']),
-      then: Joi.required(),
-    }),
-    amountExistingLiens: Joi.number().when('purpose', {
-      is: Joi.valid(['Construction', 'Refinance', 'Construction-Permanent']),
-      then: Joi.required(),
-    }),
-    presentValueOfLot: Joi.number().when('purpose', {
-      is: Joi.valid(['Construction', 'Construction-Permanent']),
-      then: Joi.required(),
-    }),
-    purposeOfRefinance: Joi.string().when('purpose', {
-      is: Joi.valid(['Refinance']),
-      then: Joi.required(),
-    }),
-    costOfImprovements: Joi.number().when('purpose', {
-      is: Joi.valid(['Construction', 'Refinance', 'Construction-Permanent']),
-      then: Joi.required(),
-    }),
+    yearAcquired: Joi.number().allow(null),
+    originalCost: Joi.number().allow(null),
+    amountExistingLiens: Joi.number().allow(null),
+    presentValueOfLot: Joi.number().allow(null),
+    purposeOfRefinance: Joi.string().allow(null),
+    costOfImprovements: Joi.number().allow(null),
     improvementsType: Joi.string().valid(['made', 'toBeMade']),
     title: Joi.object().keys({
       names: Joi.array().items(Joi.string()),
@@ -106,6 +88,106 @@ export default {
       item: Joi.string(),
       monthlyAmount: Joi.number(),
     })),
+  }),
+
+  assetsAndLiabilities: Joi.object().keys({
+    completedJointly: Joi.boolean(),
+    assets: Joi.array().items(Joi.object().keys({
+      accountNr: Joi.string(),
+      bankInfo: Joi.string(),
+      cashOrMarketValue: Joi.number(),
+    })),
+    liabilities: Joi.array().items(Joi.object().keys({
+      nameAndAddressOfCompany: Joi.string(),
+      accountNr: Joi.string(),
+      monthlyPayment: Joi.number(),
+      monthsLeftToPay: Joi.number(),
+      unpaidBalance: Joi.number(),
+    })),
+    scheduleOfRealEstateOwned: Joi.array().items(Joi.object().keys({
+      propertyAddress: Joi.string(),
+      propertyType: Joi.string().valid(['sold', 'pending sale', 'rental being held for income']),
+      presentMarketValue: Joi.number(),
+      amountOfMortgagesAndLiens: Joi.number(),
+      grossRentalIncome: Joi.number(),
+      mortgagepayments: Joi.number(),
+      insuranceMaintenanceOrTaxes: Joi.number(),
+      netRentalIncome: Joi.number(),
+    })),
+  }),
+
+  detailsOfTransaction: Joi.object().keys({
+    a: Joi.number(),
+    b: Joi.number(),
+    c: Joi.number(),
+    d: Joi.number(),
+    e: Joi.number(),
+    f: Joi.number(),
+    g: Joi.number(),
+    h: Joi.number(),
+    i: Joi.number(),
+    j: Joi.number(),
+    k: Joi.number(),
+    l: Joi.number(),
+    m: Joi.number(),
+    n: Joi.number(),
+    o: Joi.number(),
+    p: Joi.number(),
+  }),
+
+  declarations: Joi.object().keys({
+    a: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    b: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    c: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    d: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    e: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    f: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    g: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    h: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    i: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    j: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    k: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    l: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
+    m: Joi.object().keys({
+      borrower: Joi.boolean(),
+      coBorrower: Joi.boolean(),
+    }),
   }),
 
   isDeleted: Joi.boolean().default(false),

@@ -20,6 +20,6 @@ export default ({
 
   subscribe(
     'entity.File.getPath',
-    ({ params: file }) => path.join(uploadDir, `${file._id}${file.extension}`),
+    ({ params: file }) => path.join(uploadDir, `${file.accountId}/${file._id}${file.extension}`),
   );
 };

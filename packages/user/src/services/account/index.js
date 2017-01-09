@@ -5,9 +5,9 @@ import * as handlers from './handlers';
 const entityNamespace = 'entity.Account';
 
 export default ({
-  dispatcher, db, refManager,
+  dispatcher, db, refManager, app,
 }) => {
-  const { subscribeMap } = dispatcher;
+  const { subscribeMap, onAfter } = dispatcher;
 
   subscribeMap(entityNamespace, generateCRUDServices(dispatcher, entityNamespace, {
     db,
@@ -16,4 +16,6 @@ export default ({
   }));
 
   subscribeMap(entityNamespace, handlers);
+
+  onAfter('entity.Account.createOne', handlers.createUploadDir(app));
 };
