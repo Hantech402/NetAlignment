@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
 export default {
-  street: Joi.string(),
-  city: Joi.string(),
-  state: Joi.string(),
-  zipCode: Joi.string(),
+  street: Joi.string().allow(''),
+  city: Joi.string().allow(''),
+  state: Joi.string().allow(''),
+  zipCode: Joi.string().allow(''),
 };

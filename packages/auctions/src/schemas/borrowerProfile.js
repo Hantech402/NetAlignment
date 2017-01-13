@@ -3,8 +3,8 @@ import addressSchema from 'na-core/src/schemas/address';
 import { maritalStatuses } from '../constants';
 
 export default {
-  socialSecurityNumber: Joi.string(),
-  homePhoneNr: Joi.string(),
+  socialSecurityNumber: Joi.string().allow(''),
+  homePhoneNr: Joi.string().allow(''),
   birthdate: Joi.object().keys({
     year: Joi.number(),
     month: Joi.number(),

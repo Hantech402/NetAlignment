@@ -14,7 +14,7 @@ import expenseSchema from './expense';
 
 export default {
   _id: Joi.object(),
-  accountId: Joi.object().required(),
+  accountId: Joi.object(),
   fileIds: Joi.array().default([]),
 
   status: Joi.string().valid(statuses),
@@ -30,41 +30,44 @@ export default {
   typeOther: Joi.string().when('type', {
     is: 'Other',
     then: Joi.required(),
+    otherwise: Joi.allow(''),
   }),
   agencyCaseNumber: Joi.number(),
   lenderCaseNumber: Joi.number(),
   amount: Joi.number().min(0),
-  interestRate: Joi.number().min(1).max(100),
-  nrOfMonths: Joi.number().integer().min(1),
+  interestRate: Joi.number().allow(null),
+  nrOfMonths: Joi.number().allow(null),
 
   propertyInfo: Joi.object().keys({
     address: Joi.object().keys(addressSchema),
     unitsNr: Joi.number(),
-    legalDescription: Joi.string(),
+    legalDescription: Joi.string().allow(''),
     yearBuilt: Joi.number(),
     purpose: Joi.string().valid(purposes),
     purposeOther: Joi.string().when('purpose', {
       is: 'Other',
       then: Joi.required(),
+      otherwise: Joi.allow(''),
     }),
     type: Joi.string().valid(propertyTypes),
     yearAcquired: Joi.number().allow(null),
     originalCost: Joi.number().allow(null),
     amountExistingLiens: Joi.number().allow(null),
     presentValueOfLot: Joi.number().allow(null),
-    purposeOfRefinance: Joi.string().allow(null),
+    purposeOfRefinance: Joi.string().allow(''),
     costOfImprovements: Joi.number().allow(null),
     improvementsType: Joi.string().valid(['made', 'toBeMade']),
     title: Joi.object().keys({
       names: Joi.array().items(Joi.string()),
-      manner: Joi.string(),
+      manner: Joi.string().allow(''),
     }),
     estateHeldIn: Joi.string().valid(estateTypes),
     leaseholdExpiration: Joi.date().when('estateHeldIn', {
       is: 'Leasehold',
       then: Joi.required(),
+      otherwise: Joi.allow(''),
     }),
-    paymentSource: Joi.string(),
+    paymentSource: Joi.string().allow(''),
   }),
 
   borrowerInfo: Joi.object().keys({
@@ -191,9 +194,9 @@ export default {
   }),
 
   isDeleted: Joi.boolean().default(false),
-  deletedAt: Joi.date(),
-  expiresAt: Joi.date(),
+  deletedAt: Joi.date().allow(''),
+  expiresAt: Joi.date().allow(''),
 
-  createdAt: Joi.date(),
-  updatedAt: Joi.date(),
+  createdAt: Joi.date().allow(''),
+  updatedAt: Joi.date().allow(''),
 };
