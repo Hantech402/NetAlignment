@@ -7,6 +7,8 @@ import { ObjectID as objectId } from 'mongodb';
 import * as crudHandlers from 'na-core/src/handlers';
 import archiver from 'archiver';
 
+const pathPrefix = '/applications/{applicationId}';
+
 const baseConfig = {
   auth: {
     strategy: 'jwt',
@@ -16,21 +18,21 @@ const baseConfig = {
     {
       method: crudHandlers.findById({
         entityName: 'LoanApplication',
-        extractId: (request) => objectId(request.params.loanApplicationId),
+        extractId: (request) => objectId(request.params.applicationId),
       }),
       assign: 'loanApplication',
     },
   ],
   validate: {
     params: {
-      loanApplicationId: objectIdValidator.required(),
+      applicationId: objectIdValidator.required(),
     },
   },
   tags: ['api'],
 };
 
 export default [{
-  path: '/{loanApplicationId}/upload',
+  path: `${pathPrefix}/upload`,
   method: 'POST',
   async handler(request, reply) {
     const { LoanApplicationEntity } = this;
@@ -68,7 +70,7 @@ export default [{
     description: 'Uploading a file to a loan application',
   },
 }, {
-  path: '/{loanApplicationId}/files/{fileId}',
+  path: `${pathPrefix}/files/{fileId}`,
   method: 'GET',
   async handler(request, reply) {
     const { FileEntity } = this;
@@ -117,14 +119,14 @@ export default [{
     ],
     validate: {
       params: {
-        loanApplicationId: objectIdValidator.required(),
+        applicationId: objectIdValidator.required(),
         fileId: objectIdValidator.required(),
       },
     },
     tags: ['api'],
   },
 }, {
-  path: '/{loanApplicationId}/files/archive',
+  path: `${pathPrefix}/files/archive`,
   method: 'GET',
   async handler(request, reply) {
     const { FileEntity } = this;
@@ -164,7 +166,7 @@ export default [{
     description: 'Downloading an archive of all the files',
   },
 }, {
-  path: '/{loanApplicationId}/files/{fileId}',
+  path: `${pathPrefix}/files/{fileId}`,
   method: 'DELETE',
   async handler(request, reply) {
     const { LoanApplicationEntity } = this;
@@ -202,7 +204,7 @@ export default [{
     ],
     validate: {
       params: {
-        loanApplicationId: objectIdValidator.required(),
+        applicationId: objectIdValidator.required(),
         fileId: objectIdValidator.required(),
       },
     },

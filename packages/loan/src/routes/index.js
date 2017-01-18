@@ -7,6 +7,7 @@ import filesRoutes from './files';
 // import { ObjectID as objectId } from 'mongodb';
 
 const generatedCRUDRoutes = generateCRUDRoutes({
+  pathPrefix: '/applications',
   serviceNamespace: 'entity.LoanApplication',
   schema: loanApplicationSchema,
 });
