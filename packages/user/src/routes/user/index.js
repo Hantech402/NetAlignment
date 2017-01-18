@@ -2,7 +2,7 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import { generateCRUDRoutes } from 'na-crud';
-import { schemas } from 'na-auctions';
+import { schemas } from 'na-loan';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import * as handlers from './handlers';
@@ -46,10 +46,10 @@ export default [{
         ]),
         ...pick(accountSchema, ['loanOfficersEmails']),
         role: Joi.string().required().valid(['lender', 'borrower']),
-        auction: Joi.any().when('role', {
+        loanApplication: Joi.any().when('role', {
           is: 'borrower',
           then: Joi.object().keys(
-            pick(schemas.auction, ['financialGoal', 'rate', 'termsByRate']),
+            pick(schemas.loanApplication, ['financialGoal', 'rate', 'termsByRate']),
           ),
         }),
         licenseNr: Joi.any().when('role', {

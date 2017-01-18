@@ -2,34 +2,34 @@ import { generateCRUDRoutes } from 'na-crud';
 import * as crudHandlers from 'na-core/src/handlers';
 import { toBSON } from 'na-core';
 import Boom from 'boom';
-import auctionSchema from '../schemas/auction';
+import loanApplicationSchema from '../schemas/loanApplication';
 import filesRoutes from './files';
 // import { ObjectID as objectId } from 'mongodb';
 
 const generatedCRUDRoutes = generateCRUDRoutes({
-  serviceNamespace: 'entity.Auction',
-  schema: auctionSchema,
+  serviceNamespace: 'entity.LoanApplication',
+  schema: loanApplicationSchema,
 });
 
 generatedCRUDRoutes.deleteOne.config.pre = [
   {
     async method(request, reply) {
-      const { AuctionEntity } = this;
-      const auction = await AuctionEntity.findOne({
+      const { LoanApplicationEntity } = this;
+      const loanApplication = await LoanApplicationEntity.findOne({
         query: toBSON(request.payload.query),
       });
 
-      if (!auction) {
+      if (!loanApplication) {
         return reply(Boom.notFound('Unable to find entity.'));
       }
 
-      if (!['draft'].includes(auction.status)) {
-        return reply(Boom.badRequest(`Can't delete a ${auction.status} auction.`));
+      if (!['draft'].includes(loanApplication.status)) {
+        return reply(Boom.badRequest(`Can't delete a ${loanApplication.status} loanApplication.`));
       }
 
-      return reply(auction);
+      return reply(loanApplication);
     },
-    assign: 'auction',
+    assign: 'loanApplication',
   },
   ...(generatedCRUDRoutes.deleteOne.config.pre || []),
 ];
@@ -37,22 +37,22 @@ generatedCRUDRoutes.deleteOne.config.pre = [
 generatedCRUDRoutes.updateOne.config.pre = [
   {
     async method(request, reply) {
-      const { AuctionEntity } = this;
-      const auction = await AuctionEntity.findOne({
+      const { LoanApplicationEntity } = this;
+      const loanApplication = await LoanApplicationEntity.findOne({
         query: toBSON(request.payload.query),
       });
 
-      if (!auction) {
+      if (!loanApplication) {
         return reply(Boom.notFound('Unable to find entity.'));
       }
 
-      if (!['draft'].includes(auction.status)) {
-        return reply(Boom.badRequest(`Can't delete a ${auction.status} auction.`));
+      if (!['draft'].includes(loanApplication.status)) {
+        return reply(Boom.badRequest(`Can't delete a ${loanApplication.status} loanApplication.`));
       }
 
-      return reply(auction);
+      return reply(loanApplication);
     },
-    assign: 'auction',
+    assign: 'loanApplication',
   },
   ...(generatedCRUDRoutes.deleteOne.config.pre || []),
 ];
@@ -70,7 +70,7 @@ const crudRoutes = [
       },
     },
     handler: crudHandlers[route]({
-      entityName: 'Auction',
+      entityName: 'LoanApplication',
     }),
   }])
 ), []);

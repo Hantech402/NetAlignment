@@ -15,31 +15,31 @@ const baseConfig = {
   pre: [
     {
       method: crudHandlers.findById({
-        entityName: 'Auction',
-        extractId: (request) => objectId(request.params.auctionId),
+        entityName: 'LoanApplication',
+        extractId: (request) => objectId(request.params.loanApplicationId),
       }),
-      assign: 'auction',
+      assign: 'loanApplication',
     },
   ],
   validate: {
     params: {
-      auctionId: objectIdValidator.required(),
+      loanApplicationId: objectIdValidator.required(),
     },
   },
   tags: ['api'],
 };
 
 export default [{
-  path: '/{auctionId}/upload',
+  path: '/{loanApplicationId}/upload',
   method: 'POST',
   async handler(request, reply) {
-    const { AuctionEntity } = this;
-    const { auction } = request.pre;
+    const { LoanApplicationEntity } = this;
+    const { loanApplication } = request.pre;
     const uploadedFile = request.payload.file;
 
     try {
-      const file = await AuctionEntity.addFile({
-        auction,
+      const file = await LoanApplicationEntity.addFile({
+        loanApplication,
         uploadedFile,
       });
 
@@ -65,18 +65,18 @@ export default [{
         file: Joi.any().required().meta({ swaggerType: 'file' }).description('file'),
       }).required(),
     },
-    description: 'Uploading a file to an auction',
+    description: 'Uploading a file to a loan application',
   },
 }, {
-  path: '/{auctionId}/files/{fileId}',
+  path: '/{loanApplicationId}/files/{fileId}',
   method: 'GET',
   async handler(request, reply) {
     const { FileEntity } = this;
     const { fileId } = request.params;
-    const { auction, file } = request.pre;
+    const { loanApplication, file } = request.pre;
 
     try {
-      const isValid = auction.fileIds.find((id) => id.toString() === fileId.toString());
+      const isValid = loanApplication.fileIds.find((id) => id.toString() === fileId.toString());
 
       if (!isValid) {
         return reply(Boom.notFound(`Unable to find file with id ${fileId}`));
@@ -117,18 +117,18 @@ export default [{
     ],
     validate: {
       params: {
-        auctionId: objectIdValidator.required(),
+        loanApplicationId: objectIdValidator.required(),
         fileId: objectIdValidator.required(),
       },
     },
     tags: ['api'],
   },
 }, {
-  path: '/{auctionId}/files/archive',
+  path: '/{loanApplicationId}/files/archive',
   method: 'GET',
   async handler(request, reply) {
     const { FileEntity } = this;
-    const { auction } = request.pre;
+    const { loanApplication } = request.pre;
     const { uploadDir } = request.server.settings.app;
 
     try {
@@ -144,7 +144,7 @@ export default [{
       const files = await FileEntity.findMany({
         query: {
           _id: {
-            $in: auction.fileIds,
+            $in: loanApplication.fileIds,
           },
         },
       }).then((c) => c.toArray());
@@ -164,22 +164,22 @@ export default [{
     description: 'Downloading an archive of all the files',
   },
 }, {
-  path: '/{auctionId}/files/{fileId}',
+  path: '/{loanApplicationId}/files/{fileId}',
   method: 'DELETE',
   async handler(request, reply) {
-    const { AuctionEntity } = this;
+    const { LoanApplicationEntity } = this;
     const { fileId } = request.params;
-    const { auction, file } = request.pre;
+    const { loanApplication, file } = request.pre;
 
     try {
-      const isValid = auction.fileIds.find((id) => id.toString() === fileId.toString());
+      const isValid = loanApplication.fileIds.find((id) => id.toString() === fileId.toString());
 
       if (!isValid) {
         return reply(Boom.notFound(`Unable to find file with id ${fileId}`));
       }
 
-      await AuctionEntity.removeFile({
-        auction,
+      await LoanApplicationEntity.removeFile({
+        loanApplication,
         file,
       });
 
@@ -202,10 +202,10 @@ export default [{
     ],
     validate: {
       params: {
-        auctionId: objectIdValidator.required(),
+        loanApplicationId: objectIdValidator.required(),
         fileId: objectIdValidator.required(),
       },
     },
-    description: 'Delete a file of an auction',
+    description: 'Delete a file of an loanApplication',
   },
 }];

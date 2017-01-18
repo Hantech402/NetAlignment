@@ -6,11 +6,11 @@ const { withLookups, withHandler, withSchema } = decorators;
 
 const schema = Joi.object().keys({
   file: Joi.object().required(),
-  auction: Joi.object().required(),
+  loanApplication: Joi.object().required(),
 }).required();
 
-const handler = async ({ params, FileEntity, AuctionEntity }) => {
-  const { auction, file } = params;
+const handler = async ({ params, FileEntity, LoanApplicationEntity }) => {
+  const { loanApplication, file } = params;
 
   return Promise.all([
     await FileEntity.deleteOne({
@@ -18,9 +18,9 @@ const handler = async ({ params, FileEntity, AuctionEntity }) => {
         _id: file._id,
       },
     }),
-    await AuctionEntity.updateOne({
+    await LoanApplicationEntity.updateOne({
       query: {
-        _id: auction._id,
+        _id: loanApplication._id,
       },
       update: {
         $pull: {
@@ -39,7 +39,7 @@ export default applyDecorators([
   withSchema(schema),
   withLookups({
     FileEntity: 'entity.File',
-    AuctionEntity: 'entity.Auction',
+    LoanApplicationEntity: 'entity.LoanApplication',
   }),
   withHandler,
 ], handler);

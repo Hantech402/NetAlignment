@@ -15,15 +15,15 @@ export function register(server, options, next) {
     refManager,
   });
 
-  const AuctionEntity = lookup('entity.Auction');
+  const LoanApplicationEntity = lookup('entity.LoanApplication');
   const FileEntity = lookup('entity.File');
 
-  server.expose('AuctionEntity', AuctionEntity);
+  server.expose('LoanApplicationEntity', LoanApplicationEntity);
 
   server.bind({
     dispatch,
     lookup,
-    AuctionEntity,
+    LoanApplicationEntity,
     FileEntity,
   });
 

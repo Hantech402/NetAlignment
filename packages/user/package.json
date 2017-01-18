@@ -17,7 +17,7 @@
     "lodash": "4.17.2",
     "moment": "2.16.0",
     "mongodb": "2.2.12",
-    "na-auctions": "*",
+    "na-loan": "*",
     "na-core": "*",
     "na-crud": "*",
     "na-storage": "*",

@@ -132,9 +132,9 @@
       }
     }, {
       "plugin": {
-        "register": "./auctions",
+        "register": "./loan",
         "routes": {
-          "prefix": "/auctions"
+          "prefix": "/loans"
         }
       }
     }],

@@ -7,31 +7,31 @@ const { withLookups, withHandler, withSchema } = decorators;
 
 const schema = Joi.object().keys({
   uploadedFile: Joi.object().required(),
-  auction: Joi.object().required(),
+  loanApplication: Joi.object().required(),
 }).required();
 
-const handler = async ({ params, FileEntity, AuctionEntity }) => {
-  const { auction, uploadedFile } = params;
+const handler = async ({ params, FileEntity, LoanApplicationEntity }) => {
+  const { loanApplication, uploadedFile } = params;
 
   const filename = path.basename(uploadedFile.filename);
   const extension = path.extname(uploadedFile.filename);
   const uploadPath = uploadedFile.path;
 
   const file = await FileEntity.createOne({
-    accountId: auction.accountId,
+    accountId: loanApplication.accountId,
     filename,
     size: uploadedFile.bytes,
     contentType: uploadedFile.headers['content-type'],
     extension,
     meta: {
-      auctionId: auction._id,
+      loanApplicationId: loanApplication._id,
     },
     uploadedAt: new Date(),
   });
 
-  await AuctionEntity.updateOne({
+  await LoanApplicationEntity.updateOne({
     query: {
-      _id: auction._id,
+      _id: loanApplication._id,
     },
     update: {
       $push: {
@@ -57,7 +57,7 @@ export default applyDecorators([
   withSchema(schema),
   withLookups({
     FileEntity: 'entity.File',
-    AuctionEntity: 'entity.Auction',
+    LoanApplicatioEntity: 'entity.LoanApplication',
   }),
   withHandler,
 ], handler);

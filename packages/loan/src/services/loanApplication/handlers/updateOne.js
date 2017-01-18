@@ -8,7 +8,7 @@ const schema = Joi.object().keys({
   update: Joi.object().required(),
 }).required();
 
-const handler = async ({ params, next, AuctionEntity }) => {
+const handler = async ({ params, next, LoanApplicationEntity }) => {
   // console.log('test');
   return next(params);
 };
@@ -16,7 +16,7 @@ const handler = async ({ params, next, AuctionEntity }) => {
 export default applyDecorators([
   withSchema(schema),
   withLookups({
-    AuctionEntity: 'entity.Auction',
+    LoanApplicationEntity: 'entity.LoanApplication',
   }),
   withHandler,
 ], handler);

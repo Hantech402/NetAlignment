@@ -4,16 +4,16 @@ import Joi from 'joi';
 const { withLookups, withHandler, withSchema } = decorators;
 
 const schema = Joi.object().keys({
-  auctionId: Joi.object().required(),
+  loanApplicationId: Joi.object().required(),
 }).required();
 
 const handler = async ({ params, FileEntity }) => {
-  const { auctionId } = params;
+  const { loanApplicationId } = params;
 
   const files = await FileEntity.findMany({
     query: {
       meta: {
-        auctionId,
+        loanApplicationId,
       },
     },
   }).then((c) => c.toArray());
