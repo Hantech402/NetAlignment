@@ -13,4 +13,6 @@ export default {
     logger: Joi.boolean().default(false),
     debug: Joi.boolean().default(false),
   }),
+  saveToDisk: Joi.boolean().default(false),
+  emailsDir: Joi.string(),
 };

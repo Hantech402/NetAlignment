@@ -1,4 +1,4 @@
-export default (app) => ({ result, dispatch }) => {
+export default ({ result, dispatch }) => {
   if (!result || !result.user) {
     return;
   }
@@ -7,11 +7,10 @@ export default (app) => ({ result, dispatch }) => {
   dispatch('Mail.send', {
     to: user.email,
     subject: 'welcome',
-    template: 'accountActivation',
+    template: 'UserRegistration',
     context: {
       user,
       account,
-      app,
     },
   });
 };

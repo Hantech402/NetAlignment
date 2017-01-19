@@ -8,22 +8,19 @@ const schema = Joi.object().keys({
   account: Joi.object().required(),
 }).required();
 
-export default (app) => {
-  const handler = ({ user, account, dispatch }) => (
-    dispatch('Mail.send', {
-      to: user.email,
-      subject: 'welcome',
-      template: 'accountActivation',
-      context: {
-        user,
-        account,
-        app,
-      },
-    })
-  );
+const handler = ({ user, account, dispatch }) => (
+  dispatch('Mail.send', {
+    to: user.email,
+    subject: 'welcome',
+    template: 'UserRegistration',
+    context: {
+      user,
+      account,
+    },
+  })
+);
 
-  return applyDecorators([
-    withSchema(schema),
-    withHandler,
-  ], handler);
-};
+export default applyDecorators([
+  withSchema(schema),
+  withHandler,
+], handler);

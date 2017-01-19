@@ -1,15 +1,15 @@
 import * as handlers from './handlers';
 
 export default ({
-  dispatcher, renderTemplate, transporter, app,
+  dispatcher, renderTemplate, transporter, emailsDir, app,
 }) => {
   const { subscribe, onAfter } = dispatcher;
 
-  subscribe('Mail.send', handlers.send({ renderTemplate, transporter }));
+  subscribe('Mail.send', handlers.send({ renderTemplate, transporter, emailsDir, app, emailsDir }));
 
-  onAfter('User.register', handlers.onAfterRegistration(app));
+  onAfter('User.register', handlers.onAfterRegistration);
 
-  subscribe('Mail.sendActivationEmail', handlers.sendActivationEmail(app));
+  subscribe('Mail.sendActivationEmail', handlers.sendActivationEmail);
 
-  onAfter('User.resetPassword', handlers.sendPasswordResetEmail(app));
+  onAfter('User.resetPassword', handlers.onAfterPasswordReset);
 };

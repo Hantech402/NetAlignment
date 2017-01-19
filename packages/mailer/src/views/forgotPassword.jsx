@@ -1,19 +1,20 @@
 import React, { PropTypes } from 'react';
+import Layout from './Layout';
 
-const Hello = ({ user, app }) => (
-  <div>
+const ForgostPassword = ({ user, app, transportConfig }) => (
+  <Layout transportConfig={transportConfig}>
     <h1>Hello!</h1>
     <p>Your forgot you password.</p>
     <p>
       Click {' '}
-      <a href={`${app.client}/user/recover-password/${user.resetPassword.token}`}>here</a>
+      <a href={`${app.client}/change-password/${user.resetPassword.token}`}>here</a>
       {' '} to recover your password.
     </p>
     <p>ktxbye!</p>
-  </div>
+  </Layout>
 );
 
-Hello.propTypes = {
+ForgostPassword.propTypes = {
   user: PropTypes.shape({
     resetPassword: PropTypes.shape({
       token: PropTypes.string.isRequired,
@@ -22,6 +23,7 @@ Hello.propTypes = {
   app: PropTypes.shape({
     client: PropTypes.string.isRequired,
   }),
+  transportConfig: PropTypes.object,
 };
 
-export default Hello;
+export default ForgostPassword;
