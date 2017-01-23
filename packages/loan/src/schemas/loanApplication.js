@@ -1,6 +1,3 @@
-/**
- * https://docs.google.com/spreadsheets/d/1sGz0jbU7ps-Z6UlFzhTEApHt-FbJsTXadYeQqAHtUjc/edit?ts=5851a4eb#gid=0
- */
 import Joi from 'joi';
 import addressSchema from 'na-core/src/schemas/address';
 import {
@@ -16,6 +13,9 @@ export default {
   _id: Joi.object(),
   accountId: Joi.object().required(),
   fileIds: Joi.array().default([]),
+
+  borrower: Joi.string(),
+  coBorrower: Joi.string(),
 
   status: Joi.string().valid(statuses),
   financialGoal: Joi.string().valid(financialGoals),
