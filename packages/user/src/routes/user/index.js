@@ -10,13 +10,14 @@ import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
 import accountSchema from '../../schemas/account';
 
-const prefix = '/users';
+const pathPrefix = '/users';
 const generatedCRUDRoutes = generateCRUDRoutes({
-  serviceNamespace: 'entity.User',
+  pathPrefix,
+  entityName: 'User',
   schema: userSchema,
-  pathPrefix: '/users',
 });
-const userRoutes = [
+
+const userCRUDRoutes = [
   'count', 'deleteOne', 'findById', 'findMany', 'findOne', 'replaceOne', 'updateOne',
 ].reduce((acc, route) => ({
   ...acc,
@@ -34,7 +35,7 @@ const userRoutes = [
 }), {});
 
 export default [{
-  path: `${prefix}/register`,
+  path: `${pathPrefix}/register`,
   method: 'POST',
   handler: handlers.register,
   config: {
@@ -62,7 +63,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: `${prefix}/refresh-token`,
+  path: `${pathPrefix}/refresh-token`,
   method: 'POST',
   handler: handlers.register,
   config: {
@@ -75,7 +76,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: `${prefix}/reset-password`,
+  path: `${pathPrefix}/reset-password`,
   method: 'POST',
   async handler(request, reply) {
     const { User } = this;
@@ -101,7 +102,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: `${prefix}/recover-password/{token}`,
+  path: `${pathPrefix}/recover-password/{token}`,
   method: 'POST',
   async handler(request, reply) {
     const { User } = this;
@@ -131,7 +132,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: `${prefix}/change-password`,
+  path: `${pathPrefix}/change-password`,
   method: 'POST',
   async handler(request, reply) {
     const { User } = this;
@@ -158,7 +159,7 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: `${prefix}/me`,
+  path: `${pathPrefix}/me`,
   method: 'GET',
   async handler(request, reply) {
     const { UserEntity } = this;
@@ -178,5 +179,5 @@ export default [{
     tags: ['api'],
   },
 }].concat(
-  Object.keys(userRoutes).map((routeName) => userRoutes[routeName]),
+  Object.keys(userCRUDRoutes).map((routeName) => userCRUDRoutes[routeName]),
 );

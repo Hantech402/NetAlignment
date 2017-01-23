@@ -8,8 +8,8 @@ export default ({
   extractQuery = (request) => request.pre.query,
 }) => async (request, reply) => {
   const { dispatch } = request.eventDispatcher;
-  const query = extractQuery(request);
   const id = extractId(request);
+  const query = extractQuery(request) || { _id: id };
 
   try {
     const entity = await dispatch(`${entityNs}.${entityName}.findOne`, { query });

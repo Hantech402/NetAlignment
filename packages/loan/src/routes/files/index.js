@@ -1,11 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import Joi from 'joi';
-import objectIdValidator from 'na-core/src/schemas/objectId';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
-import * as crudHandlers from 'na-core/src/handlers';
+import findById from 'na-crud/src/handlers/findById';
 import archiver from 'archiver';
+import { objectIdPattern } from 'na-core/src/constants';
 
 const pathPrefix = '/applications/{applicationId}';
 
@@ -16,7 +16,7 @@ const baseConfig = {
   },
   pre: [
     {
-      method: crudHandlers.findById({
+      method: findById({
         entityName: 'LoanApplication',
         extractId: (request) => objectId(request.params.applicationId),
       }),
@@ -25,7 +25,7 @@ const baseConfig = {
   ],
   validate: {
     params: {
-      applicationId: objectIdValidator.required(),
+      applicationId: Joi.string(objectIdPattern).required(),
     },
   },
   tags: ['api'],
@@ -110,7 +110,7 @@ export default [{
     pre: [
       ...baseConfig.pre,
       {
-        method: crudHandlers.findById({
+        method: findById({
           entityName: 'File',
           extractId: (request) => objectId(request.params.fileId),
         }),
@@ -119,8 +119,8 @@ export default [{
     ],
     validate: {
       params: {
-        applicationId: objectIdValidator.required(),
-        fileId: objectIdValidator.required(),
+        applicationId: Joi.string(objectIdPattern).required(),
+        fileId: Joi.string(objectIdPattern).required(),
       },
     },
     tags: ['api'],
@@ -195,7 +195,7 @@ export default [{
     pre: [
       ...baseConfig.pre,
       {
-        method: crudHandlers.findById({
+        method: findById({
           entityName: 'File',
           extractId: (request) => objectId(request.params.fileId),
         }),
@@ -204,8 +204,8 @@ export default [{
     ],
     validate: {
       params: {
-        applicationId: objectIdValidator.required(),
-        fileId: objectIdValidator.required(),
+        applicationId: Joi.string(objectIdPattern).required(),
+        fileId: Joi.string(objectIdPattern).required(),
       },
     },
     description: 'Delete a file of an loanApplication',
