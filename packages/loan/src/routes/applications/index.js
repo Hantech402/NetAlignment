@@ -1,9 +1,10 @@
+import { ObjectID as objectId } from 'mongodb';
 import omit from 'lodash/omit';
 import { generateCRUDRoutes } from 'na-crud';
 import applyAccountToCRUDRoute from 'na-user/src/routes/account/handlers/applyAccountToCRUDRoute';
+import findOne from 'na-crud/src/handlers/findOne';
 import Boom from 'boom';
 import loanApplicationSchema from '../../schemas/loanApplication';
-import findApplication from './handlers/findApplication';
 
 const pathPrefix = '/applications';
 
@@ -37,7 +38,13 @@ Object.keys(crudRoutes).forEach((route) => {
 
 crudRoutes.deleteOne.config.pre.push(
   {
-    method: findApplication,
+    method: findOne({
+      entityName: 'LoanApplication',
+      extractQuery: (request) => ({
+        ...request.pre.query,
+        accountId: objectId(request.auth.credentials.accountId),
+      }),
+    }),
     assign: 'loanApplication',
   },
   {
