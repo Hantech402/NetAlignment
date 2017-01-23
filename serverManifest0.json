@@ -100,16 +100,12 @@
         },
         "options": {
           "transport": {
-            "pool": true,
-            "host": "smtp.gmail.com",
-            "port": 465,
-            "secure": true,
+            "host": "mailtrap.io",
+            "port": 2525,
             "auth": {
-              "user": "netalignment@gmail.com",
-              "pass": "n3t4l1gnm3ntp4ss"
             }
           },
-          "saveToDisk": false,
+          "saveToDisk": true,
           "emailsDir": "./emails"
         }
       }
