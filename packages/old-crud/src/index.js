@@ -7,7 +7,7 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['hapi-octobus'],
+  dependencies: ['hapi-octobus', 'na-user'],
 };
 
 export {

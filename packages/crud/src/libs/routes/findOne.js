@@ -1,32 +1,26 @@
-import Boom from 'boom';
 import { toBSON } from 'na-core';
+import Joi from 'joi';
+import handler from '../../handlers/findOne';
 
-export default (serviceNamespace, path, config = {}) => ({
+export default ({ entityName, entityNs, path, config = {} }) => ({
   path,
   method: 'GET',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch } } = request;
-
-    try {
-      const parsedQuery = toBSON(request.query);
-      const entity = await dispatch(`${serviceNamespace}.findOne`, parsedQuery);
-
-      if (!entity) {
-        return reply(Boom.notFound('Unable to find entity.'));
-      }
-
-      return reply(entity);
-    } catch (err) {
-      return Boom.wrap(err);
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:findOne`,
     validate: {
-      query: {
-      },
+      query: Joi.object().keys({
+        query: Joi.object().default({}),
+      }).default({}),
     },
-    description: 'Find a single entity',
+    description: `Find a single entity of type ${entityName}`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply(toBSON(request.query.query)),
+        assign: 'query',
+      },
+    ],
     ...config,
   },
 });

@@ -1,34 +1,27 @@
-import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
-import objectIdValidator from 'na-core/src/schemas/objectId';
+import Joi from 'joi';
+import { objectIdPattern } from 'na-core/src/constants';
+import handler from '../../handlers/findById';
 
-export default (serviceNamespace, path, config = {}) => ({
+export default ({ entityName, entityNs, path, config = {} }) => ({
   path,
   method: 'GET',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch } } = request;
-    const { id } = request.params;
-
-    try {
-      const entity = await dispatch(`${serviceNamespace}.findById`, objectId(id));
-
-      if (entity) {
-        reply(entity);
-      } else {
-        reply(Boom.notFound(`Unable to find entity with id ${id}`));
-      }
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:findById`,
     validate: {
       params: {
-        id: objectIdValidator.required(),
+        id: Joi.string().regex(objectIdPattern).required(),
       },
     },
-    description: 'Get an entity by id',
+    description: `Get an entity of type ${entityName} by id`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply({ _id: objectId(request.params.id) }),
+        assign: 'query',
+      },
+    ],
     ...config,
   },
 });

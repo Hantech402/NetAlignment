@@ -1,43 +1,33 @@
 import Joi from 'joi';
-import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import { toBSON } from 'na-core';
+import { objectIdPattern } from 'na-core/src/constants';
+import handler from '../../handlers/replaceOne';
 
-export default (serviceNamespace, path, schema, config = {}) => ({
+export default ({ entityName, entityNs, path, schema, config = {} }) => ({
   path,
   method: 'PUT',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch } } = request;
-    const { id } = request.params;
-
-    try {
-      const parsedPayload = toBSON(request.payload);
-      const entity = await dispatch(`${serviceNamespace}.findById`, objectId(id));
-
-      if (!entity) {
-        reply(Boom.notFound(`Unable to find entity with id ${id}`));
-      }
-
-      const result = await dispatch(`${serviceNamespace}.replaceOne`, {
-        _id: objectId(id),
-        createdAt: entity.createdAt,
-        ...parsedPayload,
-      });
-
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:replaceOne`,
     validate: {
       params: {
-        id: Joi.string().required(),
+        id: Joi.string().regex(objectIdPattern).required(),
       },
       payload: schema,
     },
     description: 'Replace an entity',
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply({ _id: objectId(request.params.id) }),
+        assign: 'query',
+      },
+      {
+        method: (request, reply) => reply(toBSON(request.payload)),
+        assign: 'payload',
+      },
+    ],
     ...config,
   },
 });

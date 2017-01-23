@@ -1,3 +1,4 @@
+import trimEnd from 'lodash/trimEnd';
 import findByIdRoute from './routes/findById';
 import findManyRoute from './routes/findMany';
 import findOneRoute from './routes/findOne';
@@ -7,26 +8,28 @@ import updateOneRoute from './routes/updateOne';
 import deleteOneRoute from './routes/deleteOne';
 import countRoute from './routes/count';
 
-const defaultOptions = {
-  isBoundToAccount: false,
-};
-
 export default ({
-  serviceNamespace,
+  entityName,
+  entityNs = 'entity',
   schema,
-  pathPrefix = '',
+  pathPrefix,
   config = {},
-  options = {},
 }) => {
-  const finalOptions = { ...defaultOptions, ...options };
-  const findById = findByIdRoute(serviceNamespace, `${pathPrefix}/{id}`, config, finalOptions);
-  const findMany = findManyRoute(serviceNamespace, pathPrefix, config, finalOptions);
-  const findOne = findOneRoute(serviceNamespace, `${pathPrefix}/findOne`, config, finalOptions);
-  const createOne = createOneRoute(serviceNamespace, pathPrefix, schema, config, finalOptions);
-  const replaceOne = replaceOneRoute(serviceNamespace, `${pathPrefix}/{id}`, schema, config, finalOptions);
-  const updateOne = updateOneRoute(serviceNamespace, `${pathPrefix}/{id}`, config, finalOptions);
-  const deleteOne = deleteOneRoute(serviceNamespace, `${pathPrefix}/deleteOne`, config, finalOptions);
-  const count = countRoute(serviceNamespace, `${pathPrefix}/count`, config, finalOptions);
+  const baseOptions = {
+    entityName,
+    entityNs,
+    config,
+  };
+  const basePath = `${trimEnd(pathPrefix, '/')}`;
+
+  const findById = findByIdRoute({ ...baseOptions, path: `${basePath}/{id}` });
+  const findMany = findManyRoute({ ...baseOptions, path: basePath });
+  const findOne = findOneRoute({ ...baseOptions, path: `${basePath}/findOne` });
+  const createOne = createOneRoute({ ...baseOptions, path: basePath, schema });
+  const replaceOne = replaceOneRoute({ ...baseOptions, path: `${basePath}/{id}`, schema });
+  const updateOne = updateOneRoute({ ...baseOptions, path: `${basePath}/{id}` });
+  const deleteOne = deleteOneRoute({ ...baseOptions, path: `${basePath}/deleteOne` });
+  const count = countRoute({ ...baseOptions, path: `${basePath}/count` });
 
   return {
     findById,

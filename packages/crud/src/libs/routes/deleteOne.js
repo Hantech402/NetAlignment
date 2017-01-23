@@ -1,32 +1,26 @@
 import Joi from 'joi';
-import Boom from 'boom';
 import { toBSON } from 'na-core';
+import handler from '../../handlers/deleteOne';
 
-export default (serviceNamespace, path, config = {}) => ({
+export default ({ entityName, entityNs, path, config = {} }) => ({
   path,
   method: 'DELETE',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch }, payload: { query } } = request;
-
-    try {
-      const parsedQuery = toBSON(query);
-      const result = await dispatch(
-        `${serviceNamespace}.deleteOne`, { query: parsedQuery },
-      );
-
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:deleteOne`,
     validate: {
       payload: Joi.object().keys({
         query: Joi.object().required(),
       }).required(),
     },
-    description: 'Delete an entity',
+    description: `Delete an entity of type ${entityName}`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply(toBSON(request.payload.query)),
+        assign: 'query',
+      },
+    ],
     ...config,
   },
 });

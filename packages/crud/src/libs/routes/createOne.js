@@ -1,26 +1,23 @@
-import Boom from 'boom';
 import { toBSON } from 'na-core';
+import handler from '../../handlers/createOne';
 
-export default (serviceNamespace, path, schema, config = {}) => ({
-  path: path || '/',
+export default ({ entityName, entityNs, path, schema, config = {} }) => ({
+  path,
   method: 'POST',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch }, payload } = request;
-    try {
-      const parsedPayload = toBSON(payload);
-      const result = await dispatch(`${serviceNamespace}.createOne`, parsedPayload);
-
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:createOne`,
     validate: {
       payload: schema,
     },
-    description: 'Add a new entity',
+    description: `Add a new entity of type ${entityName}`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply(toBSON(request.payload)),
+        assign: 'payload',
+      },
+    ],
     ...config,
   },
 });
