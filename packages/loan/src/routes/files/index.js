@@ -3,9 +3,11 @@ import fs from 'fs';
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
+import findOne from 'na-crud/src/handlers/findOne';
 import findById from 'na-crud/src/handlers/findById';
 import archiver from 'archiver';
 import { objectIdPattern } from 'na-core/src/constants';
+import * as handlers from './handlers';
 
 const pathPrefix = '/applications/{applicationId}';
 
@@ -16,9 +18,12 @@ const baseConfig = {
   },
   pre: [
     {
-      method: findById({
+      method: findOne({
         entityName: 'LoanApplication',
-        extractId: (request) => objectId(request.params.applicationId),
+        extractQuery: (request) => ({
+          _id: objectId(request.params.applicationId),
+          accountId: objectId(request.auth.credentials.accountId),
+        }),
       }),
       assign: 'loanApplication',
     },
@@ -34,22 +39,7 @@ const baseConfig = {
 export default [{
   path: `${pathPrefix}/upload`,
   method: 'POST',
-  async handler(request, reply) {
-    const { LoanApplicationEntity } = this;
-    const { loanApplication } = request.pre;
-    const uploadedFile = request.payload.file;
-
-    try {
-      const file = await LoanApplicationEntity.addFile({
-        loanApplication,
-        uploadedFile,
-      });
-
-      reply(file);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.upload,
   config: {
     ...baseConfig,
     payload: {
@@ -72,39 +62,7 @@ export default [{
 }, {
   path: `${pathPrefix}/files/{fileId}`,
   method: 'GET',
-  async handler(request, reply) {
-    const { FileEntity } = this;
-    const { fileId } = request.params;
-    const { loanApplication, file } = request.pre;
-
-    try {
-      const isValid = loanApplication.fileIds.find((id) => id.toString() === fileId.toString());
-
-      if (!isValid) {
-        return reply(Boom.notFound(`Unable to find file with id ${fileId}`));
-      }
-
-      const filePath = await FileEntity.getPath(file);
-
-      return reply.file(filePath, {
-        confine: false,
-        filename: file.filename,
-        mode: 'attachment',
-      });
-
-      // return fs.readFile(filePath, (err, fileContent) => {
-      //   if (err) {
-      //     return reply(Boom.wrap(err));
-      //   }
-      //
-      //   return reply(fileContent)
-      //     .header('Content-Type', file.contentType)
-      //     .header('Content-Disposition', `attachment; filename=${file.filename}`);
-      // });
-    } catch (err) {
-      return reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.download,
   config: {
     ...baseConfig,
     pre: [

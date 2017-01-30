@@ -1,18 +1,34 @@
-import path from 'path';
-import fs from 'fs';
 import Joi from 'joi';
+import { ObjectID as objectId } from 'mongodb';
+import findOne from 'na-crud/src/handlers/findOne';
+import { objectIdPattern } from 'na-core/src/constants';
+import * as handlers from './handlers';
+
+const pres = {
+  file: {
+    method: findOne({
+      entityName: 'File',
+      extractQuery: (request) => ({
+        _id: objectId(request.params.fileId),
+        accountId: objectId(request.auth.credentials.accountId),
+      }),
+    }),
+    assign: 'file',
+  },
+};
 
 export default [{
   path: '/upload',
   method: 'POST',
-  handler(request, reply) {
-    const uploadName = path.basename(request.payload.file.filename);
-    const uploadPath = request.payload.file.path;
-    const destination = path.join(request.server.settings.app.uploadDir, uploadName);
-
-    fs.rename(uploadPath, destination, reply);
-  },
+  handler: handlers.upload,
   config: {
+    auth: 'jwt',
+    pre: [{
+      method(request, reply) {
+        reply(request.payload.file);
+      },
+      assign: 'uploadedFile',
+    }],
     payload: {
       output: 'file',
       parse: true,
@@ -24,9 +40,40 @@ export default [{
     },
     validate: {
       payload: {
-        file: Joi.any().meta({ swaggerType: 'file' }).description('file'),
+        file: Joi.any().required().meta({ swaggerType: 'file' }).description('file'),
+      },
+    },
+    description: 'Upload a file',
+    tags: ['api'],
+  },
+}, {
+  path: '/{fileId}/download',
+  method: 'GET',
+  handler: handlers.download,
+  config: {
+    auth: 'jwt',
+    pre: [pres.file],
+    validate: {
+      params: {
+        fileId: Joi.string().regex(objectIdPattern).required(),
       },
     },
     tags: ['api'],
+    description: 'Download a file',
+  },
+}, {
+  path: '/{fileId}',
+  method: 'DELETE',
+  handler: handlers.remove,
+  config: {
+    auth: 'jwt',
+    pre: [pres.file],
+    validate: {
+      params: {
+        fileId: Joi.string().regex(objectIdPattern).required(),
+      },
+    },
+    tags: ['api'],
+    description: 'Delete a file',
   },
 }];

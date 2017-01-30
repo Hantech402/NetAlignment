@@ -2,10 +2,12 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import findManyHandler from 'na-core/src/handlers/findMany';
-import findManyRoute from 'na-crud/src/libs/routes/findMany';
+import findMany from 'na-crud/src/libs/routes/findMany';
 import objectIdValidator from 'na-core/src/schemas/objectId';
 
-const findManyFilesRoute = findManyRoute('entity.File');
+const findManyFiles = findMany({
+  entityName: 'File',
+});
 
 export default [{
   path: '/account/{id}/confirm',
@@ -59,13 +61,20 @@ export default [{
     tags: ['api'],
   },
 }, {
-  ...findManyFilesRoute,
+  ...findManyFiles,
   path: '/account/files',
-  handler: findManyHandler({
-    entityName: 'File',
-  }),
   config: {
-    ...findManyFilesRoute.config,
+    ...findManyFiles.config,
+    pre: [
+      ...findManyFiles.config.pre,
+      {
+        method(request, reply) {
+          const { queryParams } = request.pre;
+          queryParams.query.accountId = objectId(request.auth.credentials.accountId);
+          reply();
+        },
+      },
+    ],
     auth: 'jwt',
     description: 'Get all the files of an account',
     tags: ['api'],

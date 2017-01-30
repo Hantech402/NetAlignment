@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import Layout from './Layout';
+import Layout from './Layout.jsx'; // eslint-disable-line
 
 const ForgostPassword = ({ user, app, transportConfig }) => (
   <Layout transportConfig={transportConfig}>

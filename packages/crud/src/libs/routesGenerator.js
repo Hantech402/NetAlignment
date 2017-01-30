@@ -6,6 +6,7 @@ import createOneRoute from './routes/createOne';
 import replaceOneRoute from './routes/replaceOne';
 import updateOneRoute from './routes/updateOne';
 import deleteOneRoute from './routes/deleteOne';
+import deleteOneByIdRoute from './routes/deleteOneById';
 import countRoute from './routes/count';
 
 export default ({
@@ -29,6 +30,7 @@ export default ({
   const replaceOne = replaceOneRoute({ ...baseOptions, path: `${basePath}/{id}`, schema });
   const updateOne = updateOneRoute({ ...baseOptions, path: `${basePath}/{id}` });
   const deleteOne = deleteOneRoute({ ...baseOptions, path: `${basePath}/deleteOne` });
+  const deleteOneById = deleteOneByIdRoute({ ...baseOptions, path: `${basePath}/{id}` });
   const count = countRoute({ ...baseOptions, path: `${basePath}/count` });
 
   return {
@@ -40,5 +42,6 @@ export default ({
     updateOne,
     count,
     deleteOne,
+    deleteOneById,
   };
 };

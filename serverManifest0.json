@@ -127,6 +127,9 @@
     }, {
       "plugin": {
         "register": "./filesManager",
+        "options": {
+          "uploadDir": "./uploads"
+        },
         "routes": {
           "prefix": "/files"
         }

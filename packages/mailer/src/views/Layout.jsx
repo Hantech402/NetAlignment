@@ -8,6 +8,12 @@ const Layout = ({
       <meta charSet="utf-8" />
     </head>
     <body>
+      {transportConfig &&
+        <div>
+          <pre>{JSON.stringify(transportConfig, null, 2)}</pre>
+          <hr />
+        </div>
+      }
       <div>
         {children}
       </div>

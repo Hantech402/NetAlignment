@@ -1,22 +1,41 @@
+import Joi from 'joi';
+import Inert from 'inert';
 import pkg from '../package.json';
 import setupServices from './services';
-// import routes from './routes';
+import pluginOptionsSchema from './schemas/pluginOptions';
+import routes from './routes';
 
 export function register(server, options, next) {
+  const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
+  const { dispatch, lookup } = dispatcher;
   const { mongoDb: db, refManager } = server.plugins['na-storage'];
-  const { uploadDir } = server.settings.app;
+  const { uploadDir } = pluginOptions;
 
-  setupServices({
-    dispatcher,
-    db,
-    refManager,
-    uploadDir,
-  });
+  server.register([
+    Inert,
+  ]).then(() => {
+    setupServices({
+      dispatcher,
+      db,
+      refManager,
+      uploadDir,
+    });
 
-  // server.route(routes);
+    const FileEntity = lookup('entity.File');
 
-  next();
+    server.expose('FileEntity', FileEntity);
+
+    server.bind({
+      dispatch,
+      lookup,
+      FileEntity,
+    });
+
+    server.route(routes);
+
+    next();
+  }, next);
 }
 
 register.attributes = {
