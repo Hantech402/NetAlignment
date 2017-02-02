@@ -1,7 +1,7 @@
-import upload from './upload';
-import download from './download';
+import findMany from './findMany';
+import getArchive from './getArchive';
 
 export {
-  upload,
-  download,
+  findMany,
+  getArchive,
 };

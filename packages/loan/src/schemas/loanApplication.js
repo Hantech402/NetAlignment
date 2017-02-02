@@ -1,8 +1,7 @@
 import Joi from 'joi';
 import addressSchema from 'na-core/src/schemas/address';
 import {
-  statuses, financialGoals, rates, termsByRate, types, purposes, propertyTypes,
-  estateTypes,
+  statuses, financialGoals, rates, termsByRate, types, purposes, propertyTypes, estateTypes,
 } from '../constants';
 import borrowerProfileSchema from './borrowerProfile';
 import employmentSchema from './employment';

@@ -1,11 +1,6 @@
-import path from 'path';
-import fs from 'fs';
 import Joi from 'joi';
-import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import findOne from 'na-crud/src/handlers/findOne';
-import findById from 'na-crud/src/handlers/findById';
-import archiver from 'archiver';
 import { objectIdPattern } from 'na-core/src/constants';
 import * as handlers from './handlers';
 
@@ -37,135 +32,19 @@ const baseConfig = {
 };
 
 export default [{
-  path: `${pathPrefix}/upload`,
-  method: 'POST',
-  handler: handlers.upload,
-  config: {
-    ...baseConfig,
-    payload: {
-      output: 'file',
-      parse: true,
-    },
-    plugins: {
-      'hapi-swagger': {
-        payloadType: 'form',
-      },
-    },
-    validate: {
-      ...baseConfig.validate,
-      payload: Joi.object().keys({
-        file: Joi.any().required().meta({ swaggerType: 'file' }).description('file'),
-      }).required(),
-    },
-    description: 'Uploading a file to a loan application',
-  },
-}, {
-  path: `${pathPrefix}/files/{fileId}`,
+  path: `${pathPrefix}/files`,
   method: 'GET',
-  handler: handlers.download,
+  handler: handlers.findMany,
   config: {
     ...baseConfig,
-    pre: [
-      ...baseConfig.pre,
-      {
-        method: findById({
-          entityName: 'File',
-          extractId: (request) => objectId(request.params.fileId),
-        }),
-        assign: 'file',
-      },
-    ],
-    validate: {
-      params: {
-        applicationId: Joi.string(objectIdPattern).required(),
-        fileId: Joi.string(objectIdPattern).required(),
-      },
-    },
-    tags: ['api'],
+    description: 'Retrieve loan application files',
   },
 }, {
   path: `${pathPrefix}/files/archive`,
   method: 'GET',
-  async handler(request, reply) {
-    const { FileEntity } = this;
-    const { loanApplication } = request.pre;
-    const { uploadDir } = request.server.settings.app;
-
-    try {
-      const archive = archiver('zip', {
-        store: true,
-      });
-
-      archive.on('open', () => {
-        reply(archive);
-          // .header('Content-Disposition', `attachment; filename=archive.zip`);
-      });
-
-      const files = await FileEntity.findMany({
-        query: {
-          _id: {
-            $in: loanApplication.fileIds,
-          },
-        },
-      }).then((c) => c.toArray());
-
-      files.forEach((file) => {
-        const filePath = path.join(uploadDir, `${file._id}${file.extension}`);
-        archive.append(fs.createReadStream(filePath));
-      });
-
-      archive.finalize();
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.getArchive,
   config: {
     ...baseConfig,
     description: 'Downloading an archive of all the files',
-  },
-}, {
-  path: `${pathPrefix}/files/{fileId}`,
-  method: 'DELETE',
-  async handler(request, reply) {
-    const { LoanApplicationEntity } = this;
-    const { fileId } = request.params;
-    const { loanApplication, file } = request.pre;
-
-    try {
-      const isValid = loanApplication.fileIds.find((id) => id.toString() === fileId.toString());
-
-      if (!isValid) {
-        return reply(Boom.notFound(`Unable to find file with id ${fileId}`));
-      }
-
-      await LoanApplicationEntity.removeFile({
-        loanApplication,
-        file,
-      });
-
-      return reply();
-    } catch (err) {
-      return reply(Boom.wrap(err));
-    }
-  },
-  config: {
-    ...baseConfig,
-    pre: [
-      ...baseConfig.pre,
-      {
-        method: findById({
-          entityName: 'File',
-          extractId: (request) => objectId(request.params.fileId),
-        }),
-        assign: 'file',
-      },
-    ],
-    validate: {
-      params: {
-        applicationId: Joi.string(objectIdPattern).required(),
-        fileId: Joi.string(objectIdPattern).required(),
-      },
-    },
-    description: 'Delete a file of an loanApplication',
   },
 }];
