@@ -167,7 +167,7 @@ export default [{
     try {
       const userId = objectId(request.auth.credentials.id);
       const user = await UserEntity.findById(userId);
-      const result = omit(user, ['password']);
+      const result = omit(user, ['password', 'salt']);
       reply(result);
     } catch (err) {
       reply(Boom.wrap(err));
@@ -177,6 +177,50 @@ export default [{
     auth: 'jwt',
     description: 'User profile',
     tags: ['api'],
+  },
+}, {
+  path: `${pathPrefix}/me`,
+  method: 'PATCH',
+  async handler(request, reply) {
+    const { UserEntity } = this;
+    const userId = objectId(request.auth.credentials.id);
+    const data = request.payload;
+
+    try {
+      const user = await UserEntity.findById(userId);
+      await UserEntity.updateOne({
+        query: {
+          _id: userId,
+        },
+        update: {
+          $set: data,
+        },
+      });
+
+      reply(
+        omit({
+          ...user,
+          ...data,
+        }, ['password', 'salt']),
+      );
+    } catch (err) {
+      reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: 'jwt',
+    description: 'Update user profile',
+    tags: ['api'],
+    validate: {
+      payload: {
+        ...pick(userSchema, [
+          'title', 'firstName', 'middleName', 'lastName', 'address', 'username', 'email',
+        ]),
+        address: userSchema.address.optional(),
+        username: userSchema.username.optional(),
+        email: userSchema.username.optional(),
+      },
+    },
   },
 }].concat(
   Object.keys(userCRUDRoutes).map((routeName) => userCRUDRoutes[routeName]),
