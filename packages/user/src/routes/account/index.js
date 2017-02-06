@@ -1,7 +1,6 @@
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
-import findManyHandler from 'na-core/src/handlers/findMany';
 import findMany from 'na-crud/src/libs/routes/findMany';
 import objectIdValidator from 'na-core/src/schemas/objectId';
 
@@ -33,6 +32,45 @@ export default [{
       },
     },
     description: 'Confirm account',
+    tags: ['api'],
+  },
+}, {
+  path: '/account/deactivate',
+  method: 'POST',
+  async handler(request, reply) {
+    const { AccountEntity } = this;
+    const accountId = objectId(request.auth.credentials.accountId);
+    const { reason } = request.payload;
+
+    try {
+      await AccountEntity.updateOne({
+        query: {
+          _id: accountId,
+        },
+        update: {
+          $set: {
+            isDeactivated: true,
+            deactivationReason: reason,
+          },
+        },
+      });
+
+      return reply();
+    } catch (err) {
+      return reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: {
+      strategy: 'jwt',
+      scope: 'borrower',
+    },
+    validate: {
+      payload: {
+        reason: Joi.string().required(),
+      },
+    },
+    description: 'Deactivate account',
     tags: ['api'],
   },
 }, {

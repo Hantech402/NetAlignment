@@ -11,6 +11,7 @@ export default {
 
   isDeleted: Joi.boolean().default(false),
   isDeactivated: Joi.boolean().default(false),
+  deactivationReason: Joi.string(),
   isApproved: Joi.boolean().default(true),
   deletedAt: Joi.date(),
 
