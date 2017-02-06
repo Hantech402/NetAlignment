@@ -9,10 +9,10 @@
   "author": "Victor Zamfir <victor@wirestorm.us>",
   "license": "ISC",
   "dependencies": {
-    "na-core": "~1.0.0",
     "boom": "4.2.0",
     "joi": "10.0.1",
     "lodash": "4.17.2",
-    "mongodb": "2.2.11"
+    "mongodb": "2.2.11",
+    "na-core": "~1.0.0"
   }
 }
