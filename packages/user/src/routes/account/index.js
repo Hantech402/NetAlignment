@@ -40,24 +40,18 @@ export default [{
   async handler(request, reply) {
     const { AccountEntity } = this;
     const accountId = objectId(request.auth.credentials.accountId);
-    const { reason } = request.payload;
+    const { reason, deleteFiles } = request.payload;
 
     try {
-      await AccountEntity.updateOne({
-        query: {
+      reply(
+        AccountEntity.deactivate({
           _id: accountId,
-        },
-        update: {
-          $set: {
-            isDeactivated: true,
-            deactivationReason: reason,
-          },
-        },
-      });
-
-      return reply();
+          reason,
+          deleteFiles,
+        }),
+      );
     } catch (err) {
-      return reply(Boom.wrap(err));
+      reply(Boom.wrap(err));
     }
   },
   config: {
@@ -68,6 +62,7 @@ export default [{
     validate: {
       payload: {
         reason: Joi.string().required(),
+        deleteFiles: Joi.boolean().default(false),
       },
     },
     description: 'Deactivate account',

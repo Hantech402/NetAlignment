@@ -214,11 +214,9 @@ export default [{
     validate: {
       payload: {
         ...pick(userSchema, [
-          'title', 'firstName', 'middleName', 'lastName', 'address', 'username', 'email',
+          'title', 'firstName', 'middleName', 'lastName', 'address',
         ]),
         address: userSchema.address.optional(),
-        username: userSchema.username.optional(),
-        email: userSchema.username.optional(),
       },
     },
   },
