@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import Inert from 'inert';
+import HapiHawk from 'hapi-auth-hawk';
 import pkg from '../package.json';
 import setupServices from './services';
 import pluginOptionsSchema from './schemas/pluginOptions';
@@ -10,11 +11,21 @@ export function register(server, options, next) {
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
   const { dispatch, lookup } = dispatcher;
   const { mongoDb: db, refManager } = server.plugins['na-storage'];
-  const { uploadDir } = pluginOptions;
+  const { uploadDir, bewitCredentials } = pluginOptions;
 
   server.register([
     Inert,
+    HapiHawk,
   ]).then(() => {
+    server.auth.strategy('bewit', 'bewit', {
+      getCredentialsFunc: (id, cb) => {
+        cb(null, {
+          ...bewitCredentials,
+          id,
+        });
+      },
+    });
+
     setupServices({
       dispatcher,
       db,
@@ -30,6 +41,7 @@ export function register(server, options, next) {
       dispatch,
       lookup,
       FileEntity,
+      bewitCredentials,
     });
 
     server.route(routes);

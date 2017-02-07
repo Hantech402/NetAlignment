@@ -17,9 +17,9 @@
     "lodash": "4.17.2",
     "moment": "2.16.0",
     "mongodb": "2.2.12",
-    "na-loan": "*",
     "na-core": "*",
     "na-crud": "*",
+    "na-loan": "*",
     "na-storage": "*",
     "octobus-mongodb": "0.8.5",
     "octobus.js": "0.18.2"

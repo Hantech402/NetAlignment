@@ -51,8 +51,16 @@ export default [{
   method: 'GET',
   handler: handlers.download,
   config: {
-    auth: 'jwt',
-    pre: [pres.file],
+    auth: 'bewit',
+    pre: [{
+      method: findOne({
+        entityName: 'File',
+        extractQuery: (request) => ({
+          _id: objectId(request.params.fileId),
+        }),
+      }),
+      assign: 'file',
+    }],
     validate: {
       params: {
         fileId: Joi.string().regex(objectIdPattern).required(),
@@ -75,5 +83,19 @@ export default [{
     },
     tags: ['api'],
     description: 'Delete a file',
+  },
+}, {
+  path: '/sign-url',
+  method: 'POST',
+  handler: handlers.signURL,
+  config: {
+    auth: 'jwt',
+    validate: {
+      payload: {
+        url: Joi.string().uri().required(),
+      },
+    },
+    tags: ['api'],
+    description: 'Sign a file download',
   },
 }];
