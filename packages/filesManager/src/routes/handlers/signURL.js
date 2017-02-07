@@ -13,5 +13,7 @@ export default async function (request, reply) {
     ttlSec: 60,
   });
 
-  reply(`${url}?bewit=${bewit}`);
+  reply({
+    url: `${url}?bewit=${bewit}`,
+  });
 }
