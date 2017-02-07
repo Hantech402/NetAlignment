@@ -40,14 +40,13 @@ export default [{
   async handler(request, reply) {
     const { AccountEntity } = this;
     const accountId = objectId(request.auth.credentials.accountId);
-    const { reason, deleteFiles } = request.payload;
+    const { reason } = request.payload;
 
     try {
       reply(
         AccountEntity.deactivate({
           _id: accountId,
           reason,
-          deleteFiles,
         }),
       );
     } catch (err) {
@@ -62,7 +61,6 @@ export default [{
     validate: {
       payload: {
         reason: Joi.string().required(),
-        deleteFiles: Joi.boolean().default(false),
       },
     },
     description: 'Deactivate account',

@@ -6,7 +6,6 @@ const { withSchema, withLookups } = decorators;
 const schema = Joi.object().keys({
   _id: Joi.object().required(),
   reason: Joi.string().required(),
-  deleteFiles: Joi.boolean().default(false),
 }).required();
 
 export default applyDecorators([
@@ -16,7 +15,7 @@ export default applyDecorators([
     FileEntity: 'entity.File',
   }),
 ], async ({ params, AccountEntity, FileEntity }) => {
-  const { _id, reason, deleteFiles } = params;
+  const { _id, reason } = params;
 
   const result = await AccountEntity.updateOne({
     query: {
@@ -30,13 +29,11 @@ export default applyDecorators([
     },
   });
 
-  if (deleteFiles) {
-    await FileEntity.deleteMany({
-      query: {
-        accountId: _id,
-      },
-    });
-  }
+  await FileEntity.deleteMany({
+    query: {
+      accountId: _id,
+    },
+  });
 
   return result;
 });
