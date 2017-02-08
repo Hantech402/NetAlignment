@@ -1,18 +1,17 @@
 import Boom from 'boom';
 import archiver from 'archiver';
 import fs from 'fs';
+import { ObjectID as objectId } from 'mongodb';
 import path from 'path';
 
 export default async function (request, reply) {
   const { FileEntity } = this;
-  const { loanApplication } = request.pre;
+  const accountId = objectId(request.auth.credentials.id);
 
   try {
     const files = await FileEntity.findMany({
       query: {
-        _id: {
-          $in: loanApplication.fileIds,
-        },
+        accountId,
       },
     }).then((c) => c.toArray());
 

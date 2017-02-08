@@ -3,6 +3,7 @@ import upload from './upload';
 import remove from './remove';
 import signURL from './signURL';
 import empty from './empty';
+import archive from './archive';
 
 export {
   download,
@@ -10,4 +11,5 @@ export {
   remove,
   signURL,
   empty,
+  archive,
 };

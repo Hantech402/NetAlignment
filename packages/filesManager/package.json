@@ -9,6 +9,7 @@
   "author": "Victor Zamfir <victor.zamfir@wirestorm.us>",
   "license": "ISC",
   "dependencies": {
+    "archiver": "1.3.0",
     "boom": "4.2.0",
     "fs-promise": "1.0.0",
     "hapi-auth-hawk": "3.0.1",

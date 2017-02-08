@@ -74,6 +74,15 @@ export default [{
     description: 'Download a file',
   },
 }, {
+  path: '/archive',
+  method: 'GET',
+  handler: handlers.archive,
+  config: {
+    ...baseConfig,
+    auth: 'bewit',
+    description: 'Download an archive with all the files of an account',
+  },
+}, {
   path: '/{fileId}',
   method: 'DELETE',
   handler: handlers.remove,
