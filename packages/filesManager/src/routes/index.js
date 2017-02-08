@@ -4,6 +4,11 @@ import findOne from 'na-crud/src/handlers/findOne';
 import { objectIdPattern } from 'na-core/src/constants';
 import * as handlers from './handlers';
 
+const baseConfig = {
+  auth: 'jwt',
+  tags: ['api'],
+};
+
 const pres = {
   file: {
     method: findOne({
@@ -22,7 +27,7 @@ export default [{
   method: 'POST',
   handler: handlers.upload,
   config: {
-    auth: 'jwt',
+    ...baseConfig,
     pre: [{
       method(request, reply) {
         reply(request.payload.file);
@@ -44,13 +49,13 @@ export default [{
       },
     },
     description: 'Upload a file',
-    tags: ['api'],
   },
 }, {
   path: '/{fileId}/download',
   method: 'GET',
   handler: handlers.download,
   config: {
+    ...baseConfig,
     auth: 'bewit',
     pre: [{
       method: findOne({
@@ -66,7 +71,6 @@ export default [{
         fileId: Joi.string().regex(objectIdPattern).required(),
       },
     },
-    tags: ['api'],
     description: 'Download a file',
   },
 }, {
@@ -74,14 +78,13 @@ export default [{
   method: 'DELETE',
   handler: handlers.remove,
   config: {
-    auth: 'jwt',
+    ...baseConfig,
     pre: [pres.file],
     validate: {
       params: {
         fileId: Joi.string().regex(objectIdPattern).required(),
       },
     },
-    tags: ['api'],
     description: 'Delete a file',
   },
 }, {
@@ -89,13 +92,20 @@ export default [{
   method: 'POST',
   handler: handlers.signURL,
   config: {
-    auth: 'jwt',
+    ...baseConfig,
     validate: {
       payload: {
         url: Joi.string().uri().required(),
       },
     },
-    tags: ['api'],
     description: 'Sign a file download',
+  },
+}, {
+  path: '/empty',
+  method: 'POST',
+  handler: handlers.empty,
+  config: {
+    ...baseConfig,
+    description: 'Delete all the files from repository',
   },
 }];
