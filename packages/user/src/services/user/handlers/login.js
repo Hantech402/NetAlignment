@@ -7,9 +7,11 @@ const { withSchema, withLookups, withHandler } = decorators;
 const schema = Joi.object().keys({
   username: Joi.string().required(),
   password: Joi.string().required(),
+  skipDeactivationCheck: Joi.boolean().default(false),
 }).required();
 
 const handler = async ({ username, UserEntity, AccountEntity, next, params }) => {
+  const { skipDeactivationCheck, ...restParams } = params;
   const user = await UserEntity.findOne({ query: { username } });
 
   if (!user) {
@@ -30,11 +32,11 @@ const handler = async ({ username, UserEntity, AccountEntity, next, params }) =>
     throw Boom.badRequest('Account is not active!');
   }
 
-  if (account.isDeactivated) {
+  if (!skipDeactivationCheck && !account.isDeactivated) {
     throw Boom.badRequest(`Your account is deactivated! Reason - "${account.deactivationReason}".`);
   }
 
-  return next(params);
+  return next(restParams);
 };
 
 export default applyDecorators([

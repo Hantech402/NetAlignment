@@ -1,10 +1,11 @@
+import pick from 'lodash/pick';
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import findMany from 'na-crud/src/libs/routes/findMany';
-import findOne from 'na-crud/src/handlers/findOne';
 import objectIdValidator from 'na-core/src/schemas/objectId';
 import * as handlers from './handlers';
+import userSchema from '../../schemas/user';
 
 const findManyFiles = findMany({
   entityName: 'File',
@@ -73,21 +74,12 @@ export default [{
   method: 'POST',
   handler: handlers.reactivate,
   config: {
-    auth: {
-      strategy: 'jwt',
-      scope: 'borrower',
+    auth: false,
+    validate: {
+      payload: pick(userSchema, ['username', 'password']),
     },
-    description: 'Activate account',
+    description: 'Reactivate account',
     tags: ['api'],
-    pre: [{
-      method: findOne({
-        entityName: 'Account',
-        extractQuery: (request) => ({
-          _id: objectId(request.auth.credentials.accountId),
-        }),
-      }),
-      assign: 'account',
-    }],
   },
 }, {
   path: '/account/resend-activation-email',
