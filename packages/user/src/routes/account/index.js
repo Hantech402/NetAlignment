@@ -67,6 +67,40 @@ export default [{
     tags: ['api'],
   },
 }, {
+  path: '/account/activate',
+  method: 'POST',
+  async handler(request, reply) {
+    const { AccountEntity } = this;
+    const accountId = objectId(request.auth.credentials.accountId);
+
+    try {
+      await AccountEntity.updateOne({
+        query: {
+          _id: accountId,
+        },
+        update: {
+          $set: {
+            isDeactivated: false,
+          },
+        },
+      });
+
+      reply({
+        ok: true,
+      });
+    } catch (err) {
+      reply(Boom.wrap(err));
+    }
+  },
+  config: {
+    auth: {
+      strategy: 'jwt',
+      scope: 'borrower',
+    },
+    description: 'Activate account',
+    tags: ['api'],
+  },
+}, {
   path: '/account/resend-activation-email',
   method: 'POST',
   async handler(request, reply) {
