@@ -30,6 +30,10 @@ const handler = async ({ username, UserEntity, AccountEntity, next, params }) =>
     throw Boom.badRequest('Account is not active!');
   }
 
+  if (account.isDeactivated) {
+    throw Boom.badRequest(`Your account is deactivated! Reason - "${account.deactivationReason}".`);
+  }
+
   return next(params);
 };
 
