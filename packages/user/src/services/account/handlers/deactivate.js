@@ -13,9 +13,11 @@ export default applyDecorators([
   withLookups({
     AccountEntity: 'entity.Account',
     FileEntity: 'entity.File',
+    LoanApplication: 'entity.LoanApplication',
   }),
-], async ({ params, AccountEntity, FileEntity }) => {
+], async ({ params, AccountEntity, FileEntity, LoanApplication }) => {
   const { _id, reason } = params;
+  const accountId = _id;
 
   const result = await AccountEntity.updateOne({
     query: {
@@ -29,11 +31,14 @@ export default applyDecorators([
     },
   });
 
-  await FileEntity.deleteMany({
-    query: {
-      accountId: _id,
-    },
-  });
+  await Promise.all([
+    LoanApplication.deleteMany({
+      query: { accountId },
+    }),
+    FileEntity.deleteMany({
+      query: { accountId },
+    }),
+  ]);
 
   return result;
 });
