@@ -2,7 +2,9 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import findMany from 'na-crud/src/libs/routes/findMany';
+import findOne from 'na-crud/src/handlers/findOne';
 import objectIdValidator from 'na-core/src/schemas/objectId';
+import * as handlers from './handlers';
 
 const findManyFiles = findMany({
   entityName: 'File',
@@ -67,31 +69,9 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/account/activate',
+  path: '/account/reactivate',
   method: 'POST',
-  async handler(request, reply) {
-    const { AccountEntity } = this;
-    const accountId = objectId(request.auth.credentials.accountId);
-
-    try {
-      await AccountEntity.updateOne({
-        query: {
-          _id: accountId,
-        },
-        update: {
-          $set: {
-            isDeactivated: false,
-          },
-        },
-      });
-
-      reply({
-        ok: true,
-      });
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.reactivate,
   config: {
     auth: {
       strategy: 'jwt',
@@ -99,6 +79,15 @@ export default [{
     },
     description: 'Activate account',
     tags: ['api'],
+    pre: [{
+      method: findOne({
+        entityName: 'Account',
+        extractQuery: (request) => ({
+          _id: objectId(request.auth.credentials.accountId),
+        }),
+      }),
+      assign: 'account',
+    }],
   },
 }, {
   path: '/account/resend-activation-email',
