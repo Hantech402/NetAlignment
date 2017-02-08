@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { decorators, applyDecorators } from 'octobus.js';
+import Boom from 'boom';
 
 const { withSchema, withLookups } = decorators;
 
@@ -18,6 +19,17 @@ export default applyDecorators([
 ], async ({ params, AccountEntity, FileEntity, LoanApplication }) => {
   const { _id, reason } = params;
   const accountId = _id;
+
+  const activeLoanApplicationsNr = await LoanApplication.count({
+    query: {
+      accountId,
+      status: 'open',
+    },
+  });
+
+  if (activeLoanApplicationsNr) {
+    throw Boom.badRequest('You can\'t deactivate an account with active loan applications!');
+  }
 
   const result = await AccountEntity.updateOne({
     query: {
