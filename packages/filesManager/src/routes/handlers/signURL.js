@@ -10,7 +10,7 @@ export default async function (request, reply) {
       ...bewitCredentials,
       id,
     },
-    ttlSec: 600,
+    ttlSec: 60,
   });
 
   reply({
