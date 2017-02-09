@@ -2,14 +2,9 @@ import pick from 'lodash/pick';
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
-import findMany from 'na-crud/src/libs/routes/findMany';
 import objectIdValidator from 'na-core/src/schemas/objectId';
 import * as handlers from './handlers';
 import userSchema from '../../schemas/user';
-
-const findManyFiles = findMany({
-  entityName: 'File',
-});
 
 export default [{
   path: '/account/{id}/confirm',
@@ -104,25 +99,6 @@ export default [{
       }),
     },
     description: 'Resend activation email',
-    tags: ['api'],
-  },
-}, {
-  ...findManyFiles,
-  path: '/account/files',
-  config: {
-    ...findManyFiles.config,
-    pre: [
-      ...findManyFiles.config.pre,
-      {
-        method(request, reply) {
-          const { queryParams } = request.pre;
-          queryParams.query.accountId = objectId(request.auth.credentials.accountId);
-          reply();
-        },
-      },
-    ],
-    auth: 'jwt',
-    description: 'Get all the files of an account',
     tags: ['api'],
   },
 }];

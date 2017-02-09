@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { ObjectID as objectId } from 'mongodb';
 import findOne from 'na-crud/src/handlers/findOne';
+import findManyRoute from 'na-crud/src/libs/routes/findMany';
 import { objectIdPattern } from 'na-core/src/constants';
 import * as handlers from './handlers';
 
@@ -22,7 +23,30 @@ const pres = {
   },
 };
 
+const findManyFilesRoute = findManyRoute({
+  entityName: 'File',
+});
+
 export default [{
+  ...findManyFilesRoute,
+  path: '/',
+  config: {
+    ...findManyFilesRoute.config,
+    pre: [
+      ...findManyFilesRoute.config.pre,
+      {
+        method(request, reply) {
+          const { queryParams } = request.pre;
+          queryParams.query.accountId = objectId(request.auth.credentials.accountId);
+          reply();
+        },
+      },
+    ],
+    auth: 'jwt',
+    description: 'Get all the files of an account',
+    tags: ['api'],
+  },
+}, {
   path: '/upload',
   method: 'POST',
   handler: handlers.upload,
