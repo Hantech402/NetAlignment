@@ -62,6 +62,30 @@ export default [{
     },
     description: 'Register a new user',
     tags: ['api'],
+    pre: [{
+      async method(request, reply) {
+        const { AccountEntity } = this;
+        const { role, licenseNr } = request.payload;
+        if (role === 'lender') {
+          const brokerAccount = await AccountEntity.findOne({
+            query: { licenseNr },
+          });
+
+          if (
+            brokerAccount &&
+            (brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr)
+          ) {
+            reply(Boom.badRequest('Loan officers spots are at full!'));
+          }
+
+          Object.assign(request.payload, {
+            brokerAccountId: brokerAccount._id,
+          });
+        }
+
+        reply();
+      },
+    }],
   },
 }, {
   path: `${pathPrefix}/refresh-token`,
