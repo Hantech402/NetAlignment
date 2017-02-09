@@ -46,7 +46,7 @@ export default [{
           'username', 'email',
         ]),
         ...pick(accountSchema, ['loanOfficersEmails']),
-        role: Joi.string().required().valid(['lender', 'borrower']),
+        role: Joi.string().required().valid(['lender', 'borrower', 'broker']),
         loanApplication: Joi.any().when('role', {
           is: 'borrower',
           then: Joi.object().keys(
@@ -54,9 +54,10 @@ export default [{
           ),
         }),
         licenseNr: Joi.any().when('role', {
-          is: 'lender',
+          is: Joi.any().valid(['lender', 'broker']),
           then: Joi.number().required(),
         }),
+        employeesNr: Joi.number().allow(null),
       }).required(),
     },
     description: 'Register a new user',
