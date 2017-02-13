@@ -4,7 +4,7 @@ import fs from 'fs';
 import { ObjectID as objectId } from 'mongodb';
 import path from 'path';
 
-export default async function (request, reply) {
+export default async function (request, reply) { // eslint-disable-line
   const { FileEntity } = this;
   const accountId = objectId(request.auth.credentials.id);
 
@@ -14,6 +14,10 @@ export default async function (request, reply) {
         accountId,
       },
     }).then((c) => c.toArray());
+
+    if (!files.length) {
+      return reply(null);
+    }
 
     const archive = archiver('zip', {
       store: true,
