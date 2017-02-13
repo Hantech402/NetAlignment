@@ -45,6 +45,7 @@ export default [{
   handler: handlers.getArchive,
   config: {
     ...baseConfig,
+    auth: 'bewit',
     description: 'Downloading an archive of all the files',
   },
 }];
