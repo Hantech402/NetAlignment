@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { ObjectID as objectId } from 'mongodb';
 import Glue from 'glue';
 import path from 'path';
 import Hoek from 'hoek';
@@ -19,24 +20,21 @@ const options = {
 Glue.compose(manifest, options, (err, server) => {
   Hoek.assert(!err, err);
 
-  const { dispatch, on } = server.eventDispatcher;
+  const { lookup, on } = server.eventDispatcher;
+
+  const User = lookup('User');
+  const AccountEntity = lookup('entity.Account');
 
   on('error', console.log.bind(console));
 
   Promise.all(
-    users.map((user) => (
-      dispatch('entity.Account.createOne', {
-        isConfirmed: true,
-        isActive: true,
-      }).then((account) => (
-        dispatch('entity.User.createOne', {
-          ...user,
-          accountId: account._id,
-          isAccountOwner: true,
-          isActive: true,
-        })
-      ))
-    )),
+    users.map(async (userData) => {
+      const { account } = await User.register(userData);
+
+      await AccountEntity.confirm({
+        _id: objectId(account._id),
+      });
+    }),
   ).then(() => {
     console.log('done!');
   }, console.log.bind(console));

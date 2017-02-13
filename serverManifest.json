@@ -100,16 +100,33 @@
         },
         "options": {
           "transport": {
-            "pool": true,
-            "host": "smtp.gmail.com",
-            "port": 465,
-            "secure": true,
-            "auth": {
-              "user": "netalignment@gmail.com",
-              "pass": "n3t4l1gnm3ntp4ss"
+            "$filter": "env",
+            "development": {
+              "host": "mailtrap.io",
+              "port": 2525,
+              "auth": {
+              }
+            },
+            "staging": {
+              "pool": true,
+              "host": "smtp.gmail.com",
+              "port": 465,
+              "secure": true,
+              "auth": {
+                "user": "netalignment@gmail.com",
+                "pass": "n3t4l1gnm3ntp4ss"
+              }
             }
           },
-          "saveToDisk": false,
+          "saveToDisk": {
+            "$filter": "env",
+            "development": {
+              "$value": true
+            },
+            "staging": {
+              "$value": false
+            }
+          },
           "emailsDir": "./emails"
         }
       }
