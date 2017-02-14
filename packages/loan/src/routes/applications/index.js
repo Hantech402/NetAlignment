@@ -1,7 +1,8 @@
 import { ObjectID as objectId } from 'mongodb';
 import omit from 'lodash/omit';
 import { generateCRUDRoutes } from 'na-crud';
-import applyAccountToCRUDRoute from 'na-user/src/routes/account/handlers/applyAccountToCRUDRoute';
+import applyAccountToCRUDRoute
+  from 'na-user/src/routes/account/handlers/applyAccountToCRUDRoute';
 import findOne from 'na-crud/src/handlers/findOne';
 import Boom from 'boom';
 import loanApplicationSchema from '../../schemas/loanApplication';
@@ -22,7 +23,7 @@ const crudRoutes = generateCRUDRoutes({
   schema: omit(loanApplicationSchema, ['accountId']),
 });
 
-Object.keys(crudRoutes).forEach((route) => {
+Object.keys(crudRoutes).forEach(route => {
   crudRoutes[route] = {
     ...crudRoutes[route],
     config: {
@@ -40,7 +41,7 @@ crudRoutes.deleteOne.config.pre.push(
   {
     method: findOne({
       entityName: 'LoanApplication',
-      extractQuery: (request) => ({
+      extractQuery: request => ({
         ...request.pre.query,
         accountId: objectId(request.auth.credentials.accountId),
       }),
@@ -52,7 +53,11 @@ crudRoutes.deleteOne.config.pre.push(
       const { loanApplication } = request.pre;
 
       if (!['draft'].includes(loanApplication.status)) {
-        return reply(Boom.badRequest(`Can't delete a ${loanApplication.status} loanApplication.`));
+        return reply(
+          Boom.badRequest(
+            `Can't delete a ${loanApplication.status} loanApplication.`,
+          ),
+        );
       }
 
       return reply();
@@ -61,5 +66,8 @@ crudRoutes.deleteOne.config.pre.push(
 );
 
 export default [
-  ...Object.keys(crudRoutes).reduce((acc, route) => [...acc, crudRoutes[route]], []),
+  ...Object.keys(crudRoutes).reduce(
+    (acc, route) => [...acc, crudRoutes[route]],
+    [],
+  ),
 ];
