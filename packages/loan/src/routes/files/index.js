@@ -45,6 +45,18 @@ export default [{
   handler: handlers.getArchive,
   config: {
     ...baseConfig,
+    pre: [
+      {
+        method: findOne({
+          entityName: 'LoanApplication',
+          extractQuery: (request) => ({
+            _id: objectId(request.params.applicationId),
+            accountId: objectId(request.auth.credentials.id),
+          }),
+        }),
+        assign: 'loanApplication',
+      },
+    ],
     auth: 'bewit',
     description: 'Downloading an archive of all the files',
   },
