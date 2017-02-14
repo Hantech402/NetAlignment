@@ -5,12 +5,18 @@ import { decorators, applyDecorators } from 'octobus.js';
 const { withSchema, withLookups, withHandler } = decorators;
 
 const schema = Joi.object().keys({
-  email: Joi.string().email().required(),
+  usernameOrEmail: Joi.string().required(),
 }).required();
 
-const handler = async ({ email, AccountEntity, UserEntity, dispatch }) => {
+const handler = async ({ usernameOrEmail, AccountEntity, UserEntity, dispatch }) => {
   const user = await UserEntity.findOne({
-    query: { email },
+    query: {
+      $or: [{
+        username: usernameOrEmail,
+      }, {
+        email: usernameOrEmail,
+      }],
+    },
   });
 
   if (!user) {

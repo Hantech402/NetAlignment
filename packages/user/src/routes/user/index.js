@@ -71,6 +71,10 @@ export default [{
             query: { licenseNr },
           });
 
+          /**
+           * TODO
+           * check if lender.email is to be found through brokerAccount.loanOfficersEmails
+           */
           if (
             brokerAccount &&
             (brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr)

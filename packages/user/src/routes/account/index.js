@@ -81,10 +81,10 @@ export default [{
   method: 'POST',
   async handler(request, reply) {
     const { AccountEntity } = this;
-    const { email } = request.payload;
+    const { usernameOrEmail } = request.payload;
 
     try {
-      await AccountEntity.resendActivationEmail({ email });
+      await AccountEntity.resendActivationEmail({ usernameOrEmail });
       return reply({
         ok: true,
       });
@@ -95,7 +95,7 @@ export default [{
   config: {
     validate: {
       payload: Joi.object().keys({
-        email: Joi.string().required().email(),
+        usernameOrEmail: Joi.string().required(),
       }),
     },
     description: 'Resend activation email',
