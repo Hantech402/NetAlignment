@@ -2,6 +2,8 @@ import Joi from 'joi';
 import { generateCRUDRoutes } from 'na-crud';
 import { schemas } from 'na-loan';
 import pick from 'lodash/pick';
+import findMany from 'na-crud/src/handlers/findMany';
+import findManyRoute from 'na-crud/src/libs/routes/findMany';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
@@ -31,6 +33,8 @@ const userCRUDRoutes = [
   },
 }), {});
 
+const findManyLenders = findManyRoute({ entityName: 'User' });
+
 export default [{
   path: `${pathPrefix}/register`,
   method: 'POST',
@@ -52,7 +56,7 @@ export default [{
         }),
         licenseNr: Joi.any().when('role', {
           is: Joi.any().valid(['lender', 'broker']),
-          then: Joi.number().required(),
+          then: Joi.string().required(),
         }),
         employeesNr: Joi.number().allow(null),
       }).required(),
