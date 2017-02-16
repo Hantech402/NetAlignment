@@ -3,8 +3,9 @@ import updateProfile from './updateProfile';
 import getProfile from './getProfile';
 import changePassword from './changePassword';
 import recoverPassword from './recoverPassword';
-import validateRegistrationPayload from './validateRegistrationPayload';
+import validateLenderRegistration from './validateLenderRegistration';
 import resetPassword from './resetPassword';
+import validateLicenseNr from './validateLicenseNr';
 
 export {
   register,
@@ -12,6 +13,7 @@ export {
   getProfile,
   changePassword,
   recoverPassword,
-  validateRegistrationPayload,
+  validateLenderRegistration,
   resetPassword,
+  validateLicenseNr,
 };

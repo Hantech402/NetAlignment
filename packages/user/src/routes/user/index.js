@@ -64,7 +64,10 @@ export default [{
     description: 'Register a new user',
     tags: ['api'],
     pre: [{
-      method: handlers.validateRegistrationPayload,
+      method: handlers.validateLicenseNr,
+      assign: 'brokerAccount',
+    }, {
+      method: handlers.validateLenderRegistration,
     }],
   },
 }, {

@@ -5,7 +5,15 @@ import pick from 'lodash/pick';
 const { withLookups, withHandler } = decorators;
 
 const handler = async ({ username, email, params, Account, UserEntity }) => {
-  const { licenseNr, loanOfficersEmails, brokerAccountId, employeesNr, ...userParams } = params;
+  const { licenseNr, loanOfficersEmails, brokerAccountId, employeesNr, ...userParams } = {
+    ...params,
+    employeesNr: params.employeesNr || (params.loanOfficersEmails || []).length,
+  };
+
+  if (loanOfficersEmails.length > employeesNr) {
+    throw Boom.badRequest('Employees number is smaller than the provided loan officers emails!');
+  }
+
   const existingUser = await UserEntity.findOne({
     query: {
       $or: [{
