@@ -101,4 +101,19 @@ export default [{
     description: 'Resend activation email',
     tags: ['api'],
   },
+}, {
+  path: '/account/find-matching-broker/{licenseNr}',
+  method: 'GET',
+  handler: handlers.findMatchingBroker,
+  config: {
+    auth: false,
+    id: 'Account.findMatchingBroker',
+    validate: {
+      params: {
+        licenseNr: Joi.string().required(),
+      },
+    },
+    description: 'Find a broker by licenseNr',
+    tags: ['api'],
+  },
 }];

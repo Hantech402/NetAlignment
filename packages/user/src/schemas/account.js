@@ -7,7 +7,7 @@ export default {
 
   isConfirmed: Joi.boolean().default(false),
   isActive: Joi.boolean().default(true),
-  licenseNr: Joi.number().allow(null),
+  licenseNr: Joi.string().allow(null),
   loanOfficersEmails: Joi.array().items(Joi.string().required().email()).allow(null),
   employeesNr: Joi.number().allow(null),
 
