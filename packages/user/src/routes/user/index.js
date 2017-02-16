@@ -150,6 +150,39 @@ export default [{
       },
     },
   },
+}, {
+  path: `${pathPrefix}/lenders`,
+  method: 'GET',
+  handler: findMany({
+    entityName: 'User',
+  }),
+  config: {
+    id: 'findLenders',
+    auth: {
+      strategy: 'jwt',
+      scope: ['borrower', 'broker'],
+    },
+    validate: {
+      ...findManyLenders.config.validate,
+    },
+    pre: [
+      ...findManyLenders.config.pre,
+      {
+        async method(request, reply) {
+          const { queryParams } = request.pre;
+          /**
+           * TODO
+           * add more filters to make sure the related account is active
+           *  - use user._account for that
+           */
+          queryParams.query.role = 'lender';
+          reply();
+        },
+      },
+    ],
+    description: 'Find lenders',
+    tags: ['api'],
+  },
 }].concat(
   Object.keys(userCRUDRoutes).map((routeName) => userCRUDRoutes[routeName]),
 );

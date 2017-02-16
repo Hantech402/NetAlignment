@@ -38,8 +38,9 @@ export function register(server, options, next) {
         references: [{
           collectionName: 'Account',
           refProperty: 'accountId',
-          extractor: (account = {}) =>
-            pick(account, ['licenseNr', 'loanOfficersEmails']),
+          extractor: (account = {}) => (
+            pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated'])
+          ),
         }],
         schema: userSchema,
         db: mongoDb,
