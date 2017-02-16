@@ -1,10 +1,7 @@
 import Joi from 'joi';
-import Boom from 'boom';
-import { ObjectID as objectId } from 'mongodb';
 import { generateCRUDRoutes } from 'na-crud';
 import { schemas } from 'na-loan';
 import pick from 'lodash/pick';
-import omit from 'lodash/omit';
 import * as handlers from './handlers';
 import crudHandlers from './handlers/crud';
 import userSchema from '../../schemas/user';
@@ -63,32 +60,7 @@ export default [{
     description: 'Register a new user',
     tags: ['api'],
     pre: [{
-      async method(request, reply) {
-        const { AccountEntity } = this;
-        const { role, licenseNr } = request.payload;
-        if (role === 'lender') {
-          const brokerAccount = await AccountEntity.findOne({
-            query: { licenseNr },
-          });
-
-          /**
-           * TODO
-           * check if lender.email is to be found through brokerAccount.loanOfficersEmails
-           */
-          if (
-            brokerAccount &&
-            (brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr)
-          ) {
-            reply(Boom.badRequest('Loan officers spots are at full!'));
-          }
-
-          Object.assign(request.payload, {
-            brokerAccountId: brokerAccount._id,
-          });
-        }
-
-        reply();
-      },
+      method: handlers.validateRegistrationPayload,
     }],
   },
 }, {
@@ -107,20 +79,7 @@ export default [{
 }, {
   path: `${pathPrefix}/reset-password`,
   method: 'POST',
-  async handler(request, reply) {
-    const { User } = this;
-    const { usernameOrEmail } = request.payload;
-    try {
-      const { user, updateResult } = await User.resetPassword(usernameOrEmail);
-      const curatedUser = await User.dump(user);
-      reply({
-        user: curatedUser,
-        updateResult,
-      });
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.resetPassword,
   config: {
     validate: {
       payload: Joi.object().keys({
@@ -133,21 +92,7 @@ export default [{
 }, {
   path: `${pathPrefix}/recover-password/{token}`,
   method: 'POST',
-  async handler(request, reply) {
-    const { User } = this;
-    const { password } = request.payload;
-    const { token } = request.params;
-    try {
-      const { user, updateResult } = await User.recoverPassword({ password, token });
-      const curatedUser = await User.dump(user);
-      reply({
-        user: curatedUser,
-        updateResult,
-      });
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.recoverPassword,
   config: {
     validate: {
       params: Joi.object().keys({
@@ -163,19 +108,7 @@ export default [{
 }, {
   path: `${pathPrefix}/change-password`,
   method: 'POST',
-  async handler(request, reply) {
-    const { User } = this;
-    const { oldPassword, password } = request.payload;
-    try {
-      reply(await User.changePassword({
-        password,
-        oldPassword,
-        userId: objectId(request.auth.credentials.id),
-      }));
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.changePassword,
   config: {
     auth: 'jwt',
     validate: {
@@ -190,18 +123,7 @@ export default [{
 }, {
   path: `${pathPrefix}/me`,
   method: 'GET',
-  async handler(request, reply) {
-    const { UserEntity } = this;
-
-    try {
-      const userId = objectId(request.auth.credentials.id);
-      const user = await UserEntity.findById(userId);
-      const result = omit(user, ['password', 'salt']);
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.getProfile,
   config: {
     auth: 'jwt',
     description: 'User profile',
@@ -210,32 +132,7 @@ export default [{
 }, {
   path: `${pathPrefix}/me`,
   method: 'PATCH',
-  async handler(request, reply) {
-    const { UserEntity } = this;
-    const userId = objectId(request.auth.credentials.id);
-    const data = request.payload;
-
-    try {
-      const user = await UserEntity.findById(userId);
-      await UserEntity.updateOne({
-        query: {
-          _id: userId,
-        },
-        update: {
-          $set: data,
-        },
-      });
-
-      reply(
-        omit({
-          ...user,
-          ...data,
-        }, ['password', 'salt']),
-      );
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.updateProfile,
   config: {
     auth: 'jwt',
     description: 'Update user profile',
