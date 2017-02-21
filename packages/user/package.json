@@ -11,6 +11,7 @@
   "dependencies": {
     "boom": "4.2.0",
     "date-fns": "1.15.1",
+    "fs-promise": "2.0.0",
     "hb-user": "0.8.4",
     "hoek": "4.1.0",
     "joi": "10.0.2",

@@ -10,7 +10,10 @@ const handler = async ({ username, email, params, Account, UserEntity }) => {
     employeesNr: params.employeesNr || (params.loanOfficersEmails || []).length,
   };
 
-  if (loanOfficersEmails.length > employeesNr) {
+  if (
+    (userParams.role === 'broker') &&
+    (loanOfficersEmails.length > employeesNr)
+  ) {
     throw Boom.badRequest('Employees number is smaller than the provided loan officers emails!');
   }
 
