@@ -175,6 +175,13 @@
       "plugin": {
         "register": "./monitoring"
       }
+    }, {
+      "plugin": {
+        "register": "./maintenance",
+        "routes": {
+          "prefix": "/maintenance"
+        }
+      }
     }],
     "staging": [{
       "plugin": {
@@ -183,6 +190,13 @@
     }, {
       "plugin": {
         "register": "./monitoring"
+      }
+    }, {
+      "plugin": {
+        "register": "./maintenance",
+        "routes": {
+          "prefix": "/maintenance"
+        }
       }
     }]
   }

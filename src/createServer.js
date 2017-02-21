@@ -4,10 +4,8 @@ import DotEnv from 'dotenv';
 
 DotEnv.config();
 
-export default (store) => {
-  const manifest = store.get('/', {
-    env: process.env.NODE_ENV,
-  });
+export default (store, env = process.env.NODE_ENV) => {
+  const manifest = store.get('/', { env });
 
   const options = {
     relativeTo: path.join(__dirname, '..', 'packages'),
