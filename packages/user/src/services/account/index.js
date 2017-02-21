@@ -1,3 +1,4 @@
+import omit from 'lodash/omit';
 import { generateCRUDServices } from 'octobus-mongodb';
 import schema from '../../schemas/account';
 import * as handlers from './handlers';
@@ -7,7 +8,7 @@ const entityNamespace = 'entity.Account';
 export default ({
   dispatcher, db, refManager, app,
 }) => {
-  const { subscribeMap, onAfter } = dispatcher;
+  const { subscribeMap } = dispatcher;
 
   subscribeMap(entityNamespace, generateCRUDServices(dispatcher, entityNamespace, {
     db,
@@ -15,7 +16,8 @@ export default ({
     refManager,
   }));
 
-  subscribeMap(entityNamespace, handlers);
-
-  onAfter('entity.Account.createOne', handlers.createUploadDir(app));
+  subscribeMap(entityNamespace, {
+    ...omit(handlers, ['getUploadDir']),
+    getUploadDir: handlers.getUploadDir(app.uploadDir),
+  });
 };

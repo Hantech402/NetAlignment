@@ -1,11 +1,15 @@
 import confirm from './cofirm';
 import resendActivationEmail from './resendActivationEmail';
-import createUploadDir from './createUploadDir';
 import deactivate from './deactivate';
+import getUploadDir from './getUploadDir';
+import createUploadDir from './createUploadDir';
+import createOne from './createOne';
 
 export {
   confirm,
   resendActivationEmail,
-  createUploadDir,
   deactivate,
+  getUploadDir,
+  createUploadDir,
+  createOne,
 };
