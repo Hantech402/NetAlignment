@@ -3,17 +3,24 @@ import pick from 'lodash/pick';
 
 export default async function (request, reply) {
   const { AccountEntity, UserEntity } = this;
-  const { licenseNr } = request.params;
+  const { licenseNr, employeeEmail } = request.query;
 
   try {
-    const account = await AccountEntity.findOne({
-      query: {
-        licenseNr,
-        isActive: true,
-        isDeactivated: false,
-        isConfirmed: true,
-      },
-    });
+    const query = {
+      isActive: true,
+      isDeactivated: false,
+      isConfirmed: true,
+    };
+
+    if (licenseNr) {
+      query.licenseNr = licenseNr;
+    }
+
+    if (employeeEmail) {
+      query.loanOfficersEmails = employeeEmail;
+    }
+
+    const account = await AccountEntity.findOne({ query });
 
     if (!account) {
       return reply(Boom.notFound('Unable to find account!'));

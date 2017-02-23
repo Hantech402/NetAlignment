@@ -1,7 +1,7 @@
 import reactivate from './reactivate';
-import findMatchingBroker from './findMatchingBroker';
+import findBroker from './findBroker';
 
 export {
   reactivate,
-  findMatchingBroker,
+  findBroker,
 };

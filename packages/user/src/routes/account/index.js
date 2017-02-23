@@ -102,18 +102,19 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/account/find-matching-broker/{licenseNr}',
+  path: '/account/find-broker',
   method: 'GET',
-  handler: handlers.findMatchingBroker,
+  handler: handlers.findBroker,
   config: {
     auth: false,
-    id: 'Account.findMatchingBroker',
+    id: 'Account.findBroker',
     validate: {
-      params: {
-        licenseNr: Joi.string().required(),
+      query: {
+        licenseNr: Joi.string().allow(null),
+        employeeEmail: Joi.string().email().allow(null),
       },
     },
-    description: 'Find a broker by licenseNr',
+    description: 'Find a broker',
     tags: ['api'],
   },
 }];
