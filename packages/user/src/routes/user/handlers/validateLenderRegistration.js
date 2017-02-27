@@ -20,11 +20,11 @@ export default async function (request, reply) {
       brokerAccount &&
       (brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr)
     ) {
-      reply(Boom.badRequest('Loan officers spots are at full!'));
+      return reply(Boom.badRequest('Loan officers spots are at full!'));
     }
 
     if (!brokerAccount.loanOfficersEmails.includes(email)) {
-      reply(Boom.badRequest('The emails is not be found through the list of broker\'s loan officers emails!'));
+      return reply(Boom.badRequest('The emails is not be found through the list of broker\'s loan officers emails!'));
     }
 
     Object.assign(request.payload, {

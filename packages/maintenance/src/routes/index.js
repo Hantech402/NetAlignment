@@ -1,6 +1,14 @@
 import BPromise from 'bluebird';
 import Boom from 'boom';
 
+const baseConfig = {
+  auth: {
+    strategy: 'jwt',
+    scope: 'admin',
+  },
+  tags: ['api'],
+};
+
 export default [{
   path: '/create-upload-dirs',
   method: 'POST',
@@ -25,11 +33,17 @@ export default [{
     }
   },
   config: {
-    auth: {
-      strategy: 'jwt',
-      scope: 'admin',
-    },
+    ...baseConfig,
     description: 'Create upload directories for accounts that don\'t have them',
-    tags: ['api'],
+  },
+}, {
+  path: '/seed',
+  method: 'POST',
+  async handler(req, reply) {
+    reply(new Error('Not implemented!'));
+  },
+  config: {
+    ...baseConfig,
+    description: 'Clean up database and populate it with stub data',
   },
 }];
