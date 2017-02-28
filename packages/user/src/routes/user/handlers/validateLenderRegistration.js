@@ -24,7 +24,7 @@ export default async function (request, reply) {
     }
 
     if (!brokerAccount.loanOfficersEmails.includes(email)) {
-      return reply(Boom.badRequest('The emails is not be found through the list of broker\'s loan officers emails!'));
+      return reply(Boom.badRequest('This email cannot be found in the list of this broker\'s loan officers\' emails!'));
     }
 
     Object.assign(request.payload, {
