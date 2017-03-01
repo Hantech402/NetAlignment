@@ -52,11 +52,9 @@ crudRoutes.deleteOne.config.pre.push(
     method(request, reply) {
       const { loanApplication } = request.pre;
 
-      if (!['draft'].includes(loanApplication.status)) {
+      if (loanApplication.status === 'open') {
         return reply(
-          Boom.badRequest(
-            `Can't delete a ${loanApplication.status} loanApplication.`,
-          ),
+          Boom.badRequest('Can\'t delete an open loanApplication.'),
         );
       }
 
