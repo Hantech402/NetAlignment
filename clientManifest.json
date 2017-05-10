@@ -1,11 +1,20 @@
 {
   "server": {
     "app": {
+      "$filter": "env",
+      "development": {
+        "api": "http://localhost:3001",
+        "isDevelopment": true
+      },
+      "production": {
+        "api": "http://localhost:80",
+        "isDevelopment": false
+      }
     }
   },
   "connections": {
     "$filter": "env",
-    "$default": [{
+    "development": [{
       "port": 3004,
       "labels": ["web"]
     }],
@@ -18,7 +27,40 @@
     "$filter": "env",
     "$base": [{
       "plugin": {
-        "register": "./web"
+        "register": "good",
+        "options": {
+          "ops": {
+            "interval": 30000
+          },
+          "reporters": {
+            "console": [{
+              "module": "good-squeeze",
+              "name": "Squeeze",
+              "args": [{ "log": "*", "request": "*", "response": "*", "error": "*", "ops": "*" }]
+            }, {
+              "module": "good-console"
+            }, "stdout"],
+            "file": [{
+              "module": "good-squeeze",
+              "name": "Squeeze",
+              "args": [{ "error": "*" }]
+            }, {
+              "module": "good-squeeze",
+              "name": "SafeJson"
+            }, {
+              "module": "good-file",
+              "args": ["./logs/errors"]
+            }]
+          }
+        }
+      }
+    }, {
+      "plugin": {
+        "register": "makeen-web",
+        "options": {
+          "assetsPath": "./packages/web-app/build",
+          "viewsDir": "./node_modules/makeen-web/src/views"
+        }
       }
     }],
     "$default": [],

@@ -1,66 +1,34 @@
-import HapiReactViews from 'hapi-react-views';
-import Inert from 'inert';
-import Vision from 'vision';
-import nodemailer from 'nodemailer';
-import Joi from 'joi';
+import * as MakeenMailer from 'makeen-mailer';
+import path from 'path';
 import pkg from '../package.json';
-import setupServices from './services/index';
-import pluginOptionsSchema from './schemas/pluginOptions';
-import fileTransporter from './fileTransporter';
-import browseEmailsRoute from './routes/browseEmails';
 
-export function register(server, options, next) {
-  const { app } = server.settings;
-  const { isDevelopment } = app;
-  const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
-  const { saveToDisk, emailsDir } = pluginOptions;
-  const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
-
-  const transporter = saveToDisk ? fileTransporter : nodemailer.createTransport({
-    ...pluginOptions.transport,
-    logger: isDevelopment,
-    debug: isDevelopment,
-  });
-
-  server.register([
-    Inert,
-    Vision,
-  ]).then(() => {
-    server.views({
-      engines: {
-        jsx: HapiReactViews,
+export async function register(server, options, next) {
+  try {
+    const { messageBus } = server.plugins['hapi-octobus'];
+    await server.register([
+      {
+        register: MakeenMailer.register,
+        options: {
+          ...options,
+          messageBus,
+          emailsDir: path.join(__dirname, '..', 'emails'),
+          views: {
+            relativeTo: __dirname,
+          },
+        },
+        routes: {
+          prefix: '/emails',
+        },
       },
-      relativeTo: __dirname,
-      path: 'views',
-    });
+    ]);
 
-    setupServices({
-      dispatcher,
-      renderTemplate(template, context, renderOptions) {
-        return new Promise((resolve, reject) => {
-          server.render(template, context, renderOptions, (renderErr, rendered) => {
-            if (renderErr) {
-              return reject(renderErr);
-            }
-
-            return resolve(rendered);
-          });
-        });
-      },
-      transporter,
-      emailsDir,
-      app,
-    });
-
-    if (saveToDisk) {
-      server.route(browseEmailsRoute(emailsDir));
-    }
-
-    return next();
-  }, next);
+    next();
+  } catch (error) {
+    next(error);
+  }
 }
 
 register.attributes = {
   pkg,
-  dependencies: ['hapi-octobus'],
+  dependencies: [],
 };

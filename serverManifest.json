@@ -3,19 +3,21 @@
     "app": {
       "$filter": "env",
       "development": {
-        "client": "http://localhost:3004",
+        "client": "http://localhost:3000",
         "api": "http://localhost:3003",
-        "isDevelopment": true,
-        "uploadDir": "./uploads"
+        "isDevelopment": true
       },
-      "staging": {
-        "client": "http://pure-beyond-73225.herokuapp.com",
+      "production": {
+        "client": "http://localhost:3000",
         "api": "http://localhost:80",
-        "isDevelopment": false,
-        "uploadDir": "./uploads"
+        "isDevelopment": false
       }
     },
-    "cache": "../node_modules/catbox-mongodb"
+    "cache": {
+      "engine": "catbox-mongodb",
+      "uri": "mongodb://127.0.0.1:27017"
+    },
+    "useDomains": false
   },
   "connections": {
     "$filter": "env",
@@ -26,7 +28,21 @@
         "cors": true
       }
     }],
-    "staging": [{
+    "development": [{
+      "port": 3001,
+      "labels": ["api"],
+      "routes": {
+        "cors": true
+      }
+    }],
+    "testing": [{
+      "port": 3002,
+      "labels": ["api"],
+      "routes": {
+        "cors": true
+      }
+    }],
+    "production": [{
       "port": 80,
       "labels": ["api"],
       "routes": {
@@ -67,137 +83,60 @@
       }
     }, {
       "plugin": {
-        "register": "nes"
-      }
-    }, {
-      "plugin": {
-        "register": "hapi-boom-decorators"
-      }
-    }, {
-      "plugin": {
-        "register": "scooter"
-      }
-    }, {
-      "plugin": "./core"
-    }, {
-      "plugin": {
-        "register": "./storage",
+        "register": "makeen-db",
         "options": {
           "mongoDb" : {
-            "db": "net-alignment"
+            "db": "makeen-boilerplate",
+            "port": 27017,
+            "host": "127.0.0.1"
           }
         }
       }
     }, {
       "plugin": {
-        "register": "./crud"
+        "register": "makeen-core"
       }
     }, {
       "plugin": {
-        "register": "./mailer",
-        "routes": {
-          "prefix": "/emails"
-        },
+        "register": "makeen-storage",
         "options": {
-          "transport": {
-            "$filter": "env",
-            "development": {
-              "host": "mailtrap.io",
-              "port": 2525,
-              "auth": {
-              }
-            },
-            "staging": {
-              "pool": true,
-              "host": "smtp.gmail.com",
-              "port": 465,
-              "secure": true,
-              "auth": {
-                "user": "netalignment@gmail.com",
-                "pass": "n3t4l1gnm3ntp4ss"
-              }
-            }
-          },
-          "saveToDisk": {
-            "$filter": "env",
-            "development": {
-              "$value": true
-            },
-            "staging": {
-              "$value": false
-            }
-          },
-          "emailsDir": "./emails"
+          "uploadDir": "./uploads",
+          "bewitCredentials": {
+            "key": "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn"
+          }
         }
       }
     }, {
       "plugin": {
-        "register": "bell"
+        "register": "./mailer",
+        "options": {
+          "saveToDisk": true
+        }
       }
     }, {
       "plugin": {
         "register": "./user",
         "options": {
           "jwt": {
-            "key": "I83At3WR1FaPTVOObwDWtXP19JucJWBmLLvT3K7XczEIcELzcrB1OyARV1Hs5z1"
+            "key": "I83At3WR1FaPTVoObwDWtXP19JucJWBmLLvT3K7XczEIceLzcrR1OyARV1Hs5z1"
           },
           "socialPlatforms": {
           }
-        }
-      }
-    }, {
-      "plugin": {
-        "register": "./filesManager",
-        "options": {
-          "uploadDir": "./uploads",
-          "bewitCredentials": {
-            "key": "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn"
-          }
-        },
-        "routes": {
-          "prefix": "/files"
-        }
-      }
-    }, {
-      "plugin": {
-        "register": "./loan",
-        "routes": {
-          "prefix": "/loans"
         }
       }
     }],
     "$default": [],
     "development": [{
       "plugin": {
-        "register": "./documentation"
+        "register": "makeen-documentation"
       }
     }, {
       "plugin": {
-        "register": "./monitoring"
-      }
-    }, {
-      "plugin": {
-        "register": "./maintenance",
-        "routes": {
-          "prefix": "/maintenance"
+        "register": "makeen-monitoring",
+        "options": {
         }
       }
     }],
-    "staging": [{
-      "plugin": {
-        "register": "./documentation"
-      }
-    }, {
-      "plugin": {
-        "register": "./monitoring"
-      }
-    }, {
-      "plugin": {
-        "register": "./maintenance",
-        "routes": {
-          "prefix": "/maintenance"
-        }
-      }
-    }]
+    "production": []
   }
 }

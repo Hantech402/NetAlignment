@@ -1,9 +1,21 @@
-- swagger documentation - http://localhost:3003/documentation
+makeen-boilerplate
+=======
 
-Running the API
-----------------
-- make sure you have mongodb setup locally
-- `npm install` :)
-- to create the seed users just run `npm run seed`
-- `NODE_ENV=development npm run watch`
-- the API will run on http://localhost:3003/
+Getting started:
+- clone the project
+- `$ yarn`
+
+## Running the project in development mode:
+- `$ npm start`
+- if you want to run the web-app in development mode then you'll have to
+```
+$ cd ./packages/web-app
+$ npm start
+```
+
+The following servers will be started:
+- development server - http://localhost:3001
+- client server - http://localhost:3004
+- web-app server - http://localhost:3000
+
+## Running the project in production mode:

@@ -1,0 +1,75 @@
+sudo: required
+
+language: node_js
+node_js:
+   - "7.5.0"
+
+#Greetings! For successful deployment to dockerhub, you'll need to set the DOCKERHUB_REPO env var to your dockerhub (and create the repo)
+#you'll need to login to your travis portal and set the following env variables as secure env variables:
+#DOCKERHUB_USER
+#DOCKERHUB_PASS
+
+env:
+   global:
+      - DOCKER_COMPOSE_VERSION: 1.11.2
+      - DOCKERHUB_REPO: makeenllc/makeen-boilerplate
+
+services:
+   - docker
+
+branches:
+   only:
+   - master
+   - stable
+   - develop
+   - /^build-.*$/
+      
+before_install:
+   - sudo apt-get update
+   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+   - sudo rm /usr/local/bin/docker-compose
+   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+   - chmod +x docker-compose
+   - sudo mv docker-compose /usr/local/bin
+   - export VERSION=$(cat MAKEEN_VERSION)
+   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then echo "${TRAVIS_BRANCH}-${VERSION} BUILD ${TRAVIS_BUILD_NUMBER}" > MAKEEN_BUILD_INFO; fi 
+
+
+install:
+   - docker-compose -f docker-build.yml -p makeen build
+   - docker-compose -f docker-build.yml -p makeen up -d 
+
+# before_script -- not needed yet
+
+script:
+   - bash tests/curltests.sh
+
+#after_success:
+
+#after_failure:
+
+before_deploy:
+   - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+   - source ci-scripts/helper-functions.sh
+   - mkdir -p ~/.ssh/
+   - openssl aes-256-cbc -K $encrypted_b7a72865a8ea_key -iv $encrypted_b7a72865a8ea_iv -in secrets/makeen.key.enc -out ~/.ssh/id_rsa -d
+   - chmod 600 ~/.ssh/id_rsa
+   - sudo apt-get install -y libssl-dev libffi-dev python-dev build-essential
+   - echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+   - sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+   - sudo apt-get install apt-transport-https
+   - sudo apt-get update && sudo apt-get install azure-cli
+   #- az login -u ${AZURE_USER} -p ${AZURE_PASSWORD}
+   #- az account set --subscription ${AZURE_SUBSCRIPTION}
+    
+deploy:
+   provider: script
+   script: bash ci-scripts/deploy.sh
+   on:
+      all_branches: true
+         
+
+after_deploy:
+   - shred ~/.ssh/id_rsa
+
+#after_script:

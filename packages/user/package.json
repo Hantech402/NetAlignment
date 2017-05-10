@@ -1,28 +1,24 @@
 {
-  "name": "na-user",
-  "version": "1.0.0",
+  "name": "makeen-boilerplate-user",
+  "version": "0.1.0",
   "description": "User system",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Victor Zamfir <victor@wirestorm.us>",
-  "license": "ISC",
+  "author": "Victor Zamfir <victor@makeen.io>",
+  "license": "MIT",
   "dependencies": {
     "boom": "4.2.0",
-    "date-fns": "1.15.1",
-    "fs-promise": "2.0.0",
-    "hb-user": "0.8.4",
-    "hoek": "4.1.0",
+    "fs-promise": "1.0.0",
     "joi": "10.0.2",
     "lodash": "4.17.2",
-    "moment": "2.16.0",
+    "makeen-core": "0.5.20",
+    "makeen-mailer": "0.5.4",
+    "makeen-router": "0.5.7",
+    "makeen-user": "0.5.7",
     "mongodb": "2.2.12",
-    "na-core": "*",
-    "na-crud": "*",
-    "na-loan": "*",
-    "na-storage": "*",
-    "octobus-mongodb": "0.8.5",
-    "octobus.js": "0.18.2"
+    "octobus-crud": "0.5.0",
+    "octobus.js": "0.30.0"
   }
 }

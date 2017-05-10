@@ -1,6 +1,9 @@
+import DotEnv from 'dotenv';
 import Confidence from 'confidence';
+import { createServer } from 'makeen-core';
 import manifestConfig from './serverManifest.json';
-import createServer from './src/createServer';
+
+DotEnv.config();
 
 process.once('uncaughtException', console.log); // eslint-disable-line no-console
 

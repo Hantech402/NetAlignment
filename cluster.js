@@ -1,17 +1,18 @@
 /* eslint-disable no-console */
 import cluster from 'cluster';
 import Confidence from 'confidence';
+import { createServer } from 'makeen-core';
 import manifestConfig from './serverManifest.json';
-import createServer from './src/createServer';
 
 const numCPUs = require('os').cpus().length;
 
 if (cluster.isMaster) {
-  for (let i = 0; i < numCPUs; i++) { // eslint-disable-line
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
 
-  cluster.on('online', (worker) => {
+  cluster.on('online', worker => {
     console.log(
       `Worker ${worker.process.pid} is online, expecting: ${numCPUs} workers.`,
     );
@@ -19,7 +20,9 @@ if (cluster.isMaster) {
 
   // Get a new worker if one dies
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
+    console.log(
+      `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`,
+    );
 
     if (code !== 0 && !worker.suicide) {
       console.log('Starting a new worker');
