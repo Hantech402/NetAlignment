@@ -1,0 +1,20 @@
+{
+  "name": "na-actions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Victor Zamfir <victor.zamfir@wirestorm.us>",
+  "license": "ISC",
+  "dependencies": {
+    "boom": "4.2.0",
+    "joi": "10.0.2",
+    "lodash": "4.17.2",
+    "makeen-crud": "0.1.0",
+    "makeen-storage": "0.5.5",
+    "octobus-mongodb": "0.8.5",
+    "octobus.js": "0.18.2"
+  }
+}

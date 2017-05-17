@@ -124,6 +124,8 @@
           }
         }
       }
+    }, {
+      "plugin": "./storage"
     }],
     "$default": [],
     "development": [{
