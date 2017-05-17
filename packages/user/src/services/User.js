@@ -41,26 +41,24 @@ export default class NetAlignUserService extends UserService {
      * (2) that broker has a number of employee emails equal to their employeesNr, and (3)
      * the lender’s email isn’t on the list?
      */
-    if (brokerAccount) {
-      if (
-        brokerAccount &&
-        brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr
-      ) {
-        throw new Error('Loan officers spots are at full!');
-      }
-
-      if (!brokerAccount.loanOfficersEmails.includes(email)) {
-        throw new Error(
-          "This email cannot be found in the list of this broker's loan officers' emails!",
-        );
-      }
-
-      return {
-        brokerAccountId: brokerAccount._id,
-      };
+    if (!brokerAccount) {
+      return null;
     }
 
-    return null;
+    const tooManyOfficers = brokerAccount &&
+      brokerAccount.loanOfficersEmails >= brokerAccount.employeesNr;
+    if (tooManyOfficers) {
+      throw new Error('Loan officers spots are at full!');
+    }
+
+    const unknownEmail = !brokerAccount.loanOfficersEmails.includes(email);
+    if (unknownEmail) {
+      throw new Error(
+        "This email cannot be found in the list of this broker's loan officers' emails!",
+      );
+    }
+
+    return { brokerAccountId: brokerAccount._id };
   }
 
   @service()
@@ -72,15 +70,14 @@ export default class NetAlignUserService extends UserService {
       loanOfficersEmails,
       brokerAccountId,
       employeesNr,
+      role,
       ...userParams
     },
     { publish },
   ) {
     const { UserRepository, AccountRepository } = this;
 
-    if (
-      userParams.role === 'broker' && loanOfficersEmails.length > employeesNr
-    ) {
+    if (role === 'broker' && loanOfficersEmails.length > employeesNr) {
       throw new Error(
         'Employees number is smaller than the provided loan officers emails!',
       );
@@ -121,6 +118,7 @@ export default class NetAlignUserService extends UserService {
       email,
       accountId: account._id,
       isAccountOwner: true,
+      role,
       ...omit(userParams, 'loanApplication'),
     });
 
