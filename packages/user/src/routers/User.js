@@ -13,12 +13,22 @@ export default class NetAlignUserRouter extends UsersRouter {
     {
       User,
       UserRepository,
+      UserLoginRepository,
       Account,
       AccountRepository,
     },
     options = {},
   ) {
-    super(options);
+    super(
+      {
+        User,
+        UserRepository,
+        UserLoginRepository,
+        Account,
+        AccountRepository,
+      },
+      options,
+    );
 
     this.User = User;
     this.UserRepository = UserRepository;

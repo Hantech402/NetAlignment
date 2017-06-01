@@ -11,11 +11,13 @@ class NetAlignAccountRouter extends AccountRouter {
     },
     config = {},
   ) {
-    super({
-      namespace: 'Account',
-      basePath: '/account',
-      ...config,
-    });
+    super(
+      {
+        User,
+        Account,
+      },
+      config,
+    );
 
     this.User = User;
     this.Account = Account;

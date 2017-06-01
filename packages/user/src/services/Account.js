@@ -1,13 +1,12 @@
 /* eslint-disable class-methods-use-this */
-
+import AccountService from 'makeen-user/build/services/Account';
 import Joi from 'joi';
 import Boom from 'boom';
 import { decorators } from 'octobus.js';
-import ServiceContainer from 'makeen-core/build/octobus/ServiceContainer';
 
 const { service, withSchema } = decorators;
 
-class Account extends ServiceContainer {
+class Account extends AccountService {
   setServiceBus(...args) {
     super.setServiceBus(...args);
 

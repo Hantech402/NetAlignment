@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { defaultLabels, labels } from '../constants';
 
 export default {
   _id: Joi.object(),
@@ -16,7 +17,7 @@ export default {
   isDeleted: Joi.boolean().default(false),
   isDeactivated: Joi.boolean().default(false),
   deactivationReason: Joi.string(),
-  isApproved: Joi.boolean().default(true),
+  labels: Joi.array().items(Joi.string().valid(labels)).default(defaultLabels),
   deletedAt: Joi.date(),
 
   createdAt: Joi.date(),

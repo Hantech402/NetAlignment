@@ -1,4 +1,5 @@
 import { UserPlugin } from 'makeen-user/build/index';
+import Joi from 'joi';
 
 import pluginOptionsSchema from './schemas/pluginOptions';
 
@@ -18,36 +19,48 @@ class User extends UserPlugin {
       UserRepository,
       UserLoginRepository,
       AccountRepository,
+      ...options
     },
   ) {
     const userService = this.serviceBus.register(
-      new UserService({ jwtConfig: pluginOptionsSchema.jwt }),
+      new UserService({ jwtConfig: options.jwt }),
     );
 
     const accountService = this.serviceBus.register(new AccountService());
     return this.mountRouters([
-      new UserRouter({
-        User: userService,
-        Account: accountService,
-        UserLoginRepository,
-        UserRepository,
-        AccountRepository,
-      }),
-      new AccountRouter({
-        User: userService,
-        Account: accountService,
-      }),
+      new UserRouter(
+        {
+          User: userService,
+          Account: accountService,
+          UserLoginRepository,
+          UserRepository,
+          AccountRepository,
+        },
+        {
+          entitySchema: userSchema,
+        },
+      ),
+      new AccountRouter(
+        {
+          User: userService,
+          Account: accountService,
+        },
+        {
+          entitySchema: accountSchema,
+        },
+      ),
     ]);
   }
 }
 
 export async function register(server, options, next) {
   try {
+    const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
     await server.register([
       {
         register: new User().register,
         options: {
-          ...options,
+          ...pluginOptions,
           userSchema,
           accountSchema,
         },

@@ -1,5 +1,13 @@
 import Joi from 'joi';
-import { titleOptions, roles } from '../constants';
+import { first } from 'lodash';
+
+import {
+  titleOptions,
+  roles,
+  labels,
+  defaultLabels,
+  defaultRoles,
+} from '../constants';
 
 export default {
   _id: Joi.object(),
@@ -34,7 +42,8 @@ export default {
     })
     .default({}),
   lastLogin: Joi.date(),
-  role: Joi.string().required().valid(roles),
+  labels: Joi.array().items(Joi.string().valid(labels)).default(defaultLabels),
+  role: Joi.string().valid(roles).default(first(defaultRoles)),
   isAccountOwner: Joi.boolean().default(false),
   isActive: Joi.boolean().default(true),
   socialLogin: Joi.object()

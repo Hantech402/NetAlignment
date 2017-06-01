@@ -126,6 +126,8 @@
       }
     }, {
       "plugin": "./storage"
+    }, {
+      "plugin": "./loan"
     }],
     "$default": [],
     "development": [{
