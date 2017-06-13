@@ -3,6 +3,7 @@ import { route } from 'makeen-router';
 import { pick } from 'lodash';
 import Joi from 'joi';
 import Boom from 'boom';
+import { ObjectID as objectId } from 'mongodb';
 
 import userSchema from '../schemas/user';
 import accountSchema from '../schemas/account';
@@ -36,12 +37,37 @@ export default class NetAlignUserRouter extends UsersRouter {
     this.AccountRepository = AccountRepository;
     this.jwtConfig = options.jwtConfig;
   }
+  @route.get({
+    path: '/me',
+    config: {
+      auth: false,
+      description: 'Disabled route please use "/users/profile"!',
+    },
+  })
+  disabledMe() {
+    return Boom.methodNotAllowed();
+  }
+
+  @route.get({
+    path: '/profile',
+    config: {
+      description: 'User profile',
+    },
+  })
+  async getProfile(request) {
+    const userId = objectId(request.auth.credentials.id);
+    const user = await this.UserRepository.findById(userId);
+    return {
+      ...(await this.User.dump(user)),
+      profilePicture: request.server.settings.app.uploadDir,
+    };
+  }
 
   @route.post({
     path: '/signup',
     config: {
       auth: false,
-      description: 'Disabled route please use "/user/register"!',
+      description: 'Disabled route please use "/users/register"!',
     },
   })
   signup() {

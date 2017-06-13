@@ -1,5 +1,5 @@
 import pkg from '../package.json';
-import StorageRouter from './routers/Storage';
+import StorageRouter from './routers/StorageRouter';
 
 export function register(server, options, next) {
   const FileRepository = server.plugins['makeen-storage'].File.extract(

@@ -20,7 +20,7 @@ class LoanApplicationRouter extends MongoResourceRouter {
   ) {
     super(LoanApplicationRepository, {
       namespace: 'LoanApplication',
-      basePath: '/loan-applications',
+      basePath: '/loans',
       scope: 'borrower',
       entitySchema: omit(schema, [
         '_id',

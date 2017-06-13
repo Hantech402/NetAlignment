@@ -7,6 +7,25 @@ const { service } = decorators;
 
 export default class NetAlignUserService extends UserService {
   @service()
+  dump(data) {
+    return pick(data, [
+      'accountId',
+      'username',
+      'firstName',
+      'lastName',
+      'email',
+      '_id',
+      'updatedAt',
+      'createdAt',
+      'token',
+      'labels',
+      'lastLogin',
+      'role',
+      'address',
+    ]);
+  }
+
+  @service()
   async validateLicenseNumber(role, licenseNr) {
     const { AccountRepository } = this;
     if (role === 'broker') {
