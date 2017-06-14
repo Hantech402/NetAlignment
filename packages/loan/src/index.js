@@ -8,9 +8,15 @@ class Loan extends Plugin {
     const LoanApplicationRepository = new LoanApplicationService({
       store: this.createStore({ collectionName: 'LoanApplication' }),
     });
+    const FileRepository = server.plugins['makeen-storage'].File.extract(
+      'FileRepository',
+    );
 
-    const loanApplication = new LoanApplicationRouter(
-      LoanApplicationRepository,
+    const loanApplicationRouter = new LoanApplicationRouter(
+      {
+        LoanApplicationRepository,
+        FileRepository,
+      },
       {
         auth: {
           strategy: 'jwt',
@@ -21,7 +27,7 @@ class Loan extends Plugin {
 
     this.createResource('LoanApplication', {
       repository: LoanApplicationRepository,
-      router: loanApplication,
+      router: loanApplicationRouter,
     });
 
     server.bind({
