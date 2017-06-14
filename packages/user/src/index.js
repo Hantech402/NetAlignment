@@ -27,6 +27,8 @@ class User extends UserPlugin {
     );
 
     const accountService = this.serviceBus.register(new AccountService());
+    const { LoanApplicationRepository } = this.server.plugins['na-loan'];
+
     return this.mountRouters([
       new UserRouter(
         {
@@ -35,6 +37,7 @@ class User extends UserPlugin {
           UserLoginRepository,
           UserRepository,
           AccountRepository,
+          LoanApplicationRepository,
         },
         {
           entitySchema: userSchema,
@@ -75,5 +78,5 @@ export async function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['makeen-core'],
+  dependencies: ['makeen-core', 'na-loan'],
 };

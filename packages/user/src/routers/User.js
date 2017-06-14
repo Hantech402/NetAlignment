@@ -7,7 +7,7 @@ import { ObjectID as objectId } from 'mongodb';
 
 import userSchema from '../schemas/user';
 import accountSchema from '../schemas/account';
-import loanApplication from '../../../loan/src/schemas/loanApplication';
+import loanApplicationSchema from '../../../loan/src/schemas/loanApplication';
 
 export default class NetAlignUserRouter extends UsersRouter {
   constructor(
@@ -17,6 +17,7 @@ export default class NetAlignUserRouter extends UsersRouter {
       UserLoginRepository,
       Account,
       AccountRepository,
+      LoanApplicationRepository,
     },
     options = {},
   ) {
@@ -35,6 +36,8 @@ export default class NetAlignUserRouter extends UsersRouter {
     this.UserRepository = UserRepository;
     this.Account = Account;
     this.AccountRepository = AccountRepository;
+    this.LoanApplicationRepository = LoanApplicationRepository;
+
     this.jwtConfig = options.jwtConfig;
   }
   @route.get({
@@ -95,7 +98,11 @@ export default class NetAlignUserRouter extends UsersRouter {
           loanApplication: Joi.any().when('role', {
             is: 'borrower',
             then: Joi.object().keys(
-              pick(loanApplication, ['financialGoal', 'rate', 'termsByRate']),
+              pick(loanApplicationSchema, [
+                'financialGoal',
+                'rate',
+                'termsByRate',
+              ]),
             ),
           }),
           licenseNr: Joi.any().when('role', {
@@ -109,8 +116,8 @@ export default class NetAlignUserRouter extends UsersRouter {
     },
   })
   async register(request) {
-    const { User } = this;
-    const { role, licenseNr, email } = request.payload;
+    const { User, LoanApplicationRepository } = this;
+    const { role, licenseNr, email, loanApplication } = request.payload;
     const brokerAccount = await User.validateLicenseNumber(role, licenseNr);
     const brokerAccountId = await User.validateLenderRegistration(
       role,
@@ -118,9 +125,19 @@ export default class NetAlignUserRouter extends UsersRouter {
       brokerAccount,
     );
 
-    return User.register({
+    const { user, account } = await User.register({
       ...request.payload,
       brokerAccountId,
     });
+
+    if (user.role === 'borrower' && loanApplication) {
+      await LoanApplicationRepository.createOne({
+        ...loanApplication,
+        status: 'draft',
+        accountId: account._id,
+      });
+    }
+
+    return { user, account };
   }
 }

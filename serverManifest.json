@@ -114,6 +114,8 @@
         }
       }
     }, {
+      "plugin": "./loan"
+    }, {
       "plugin": {
         "register": "./user",
         "options": {
@@ -126,8 +128,6 @@
       }
     }, {
       "plugin": "./storage"
-    }, {
-      "plugin": "./loan"
     }],
     "$default": [],
     "development": [{

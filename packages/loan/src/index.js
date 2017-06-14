@@ -1,6 +1,7 @@
 import { Plugin } from 'makeen-core';
 import LoanApplicationService from './services/LoanApplication';
 import LoanApplicationRouter from './routers/LoanApplication';
+import pkg from '../package.json';
 
 class Loan extends Plugin {
   async boot(server) {
@@ -30,3 +31,7 @@ class Loan extends Plugin {
 }
 
 export const { register } = new Loan();
+
+register.attributes = {
+  pkg,
+};
