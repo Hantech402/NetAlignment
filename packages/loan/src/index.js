@@ -1,7 +1,9 @@
 import { Plugin } from 'makeen-core';
 import LoanApplicationService from './services/LoanApplication';
 import LoanApplicationRouter from './routers/LoanApplication';
+import LoanEstimateRouter from './routers/LoanEstimate';
 import pkg from '../package.json';
+import loanEstimateSchema from './schemas/loanEstimate';
 
 class Loan extends Plugin {
   async boot(server) {
@@ -11,16 +13,24 @@ class Loan extends Plugin {
     const FileRepository = server.plugins['makeen-storage'].File.extract(
       'FileRepository',
     );
+    const LoanEstimateRepository = this.createRepository(
+      'LoanEstimate',
+      loanEstimateSchema,
+    );
 
-    const loanApplicationRouter = new LoanApplicationRouter(
+    const loanApplicationRouter = new LoanApplicationRouter({
+      LoanApplicationRepository,
+      FileRepository,
+      LoanEstimateRepository,
+    });
+    const loanEstimateRouter = new LoanEstimateRouter(
       {
-        LoanApplicationRepository,
-        FileRepository,
+        LoanEstimateRepository,
       },
       {
         auth: {
           strategy: 'jwt',
-          scope: 'borrower',
+          scope: 'lender',
         },
       },
     );
@@ -28,6 +38,11 @@ class Loan extends Plugin {
     this.createResource('LoanApplication', {
       repository: LoanApplicationRepository,
       router: loanApplicationRouter,
+    });
+
+    this.createResource('LoanEstimate', {
+      repository: LoanEstimateRepository,
+      router: loanEstimateRouter,
     });
 
     server.bind({

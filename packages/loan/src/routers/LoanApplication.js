@@ -14,13 +14,14 @@ class LoanApplicationRouter extends MongoResourceRouter {
   constructor(
     {
       LoanApplicationRepository,
+      LoanEstimateRepository,
       FileRepository,
     },
     config = {},
   ) {
     super(LoanApplicationRepository, {
       namespace: 'LoanApplication',
-      basePath: '/loans',
+      basePath: '/loans/applications',
       scope: 'borrower',
       entitySchema: omit(schema, [
         '_id',
@@ -38,6 +39,7 @@ class LoanApplicationRouter extends MongoResourceRouter {
     });
 
     this.LoanApplicationRepository = LoanApplicationRepository;
+    this.LoanEstimateRepository = LoanEstimateRepository;
     this.FileRepository = FileRepository;
   }
 
@@ -126,6 +128,67 @@ class LoanApplicationRouter extends MongoResourceRouter {
     } catch (err) {
       return reply(Boom.wrap(err));
     }
+  }
+
+  @route.get({
+    path: '/open',
+    config: {
+      description: 'Get list of loan applications that have loan estimates assigned',
+    },
+  })
+  async getOpenLoanApplications(request) {
+    const { LoanApplicationRepository, LoanEstimateRepository } = this;
+
+    const allOpenLoanApplications = await LoanApplicationRepository.findMany({
+      query: {
+        status: { $in: ['open'] },
+      },
+    }).then(c => c.toArray());
+    const currentLenderLoanEstimates = await LoanEstimateRepository.findMany({
+      query: {
+        accountId: objectId(request.auth.credentials.accountId),
+      },
+    }).then(c => c.toArray());
+
+    const estimatedApplicationIds = currentLenderLoanEstimates.map(e =>
+      e.loanApplicationId.toString());
+
+    return allOpenLoanApplications.filter(
+      ({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) === -1,
+    );
+  }
+
+  @route.get({
+    path: '/le',
+    config: {
+      description: 'Get list of loan applications containing loan estimates',
+    },
+  })
+  async getLoanEstimateApplications(request) {
+    const { LoanApplicationRepository, LoanEstimateRepository } = this;
+
+    const allOpenLoanApplications = await LoanApplicationRepository.findMany({
+      query: {
+        status: { $in: ['open'] },
+      },
+    }).then(c => c.toArray());
+    const currentLenderLoanEstimates = await LoanEstimateRepository.findMany({
+      query: {
+        accountId: objectId(request.auth.credentials.accountId),
+      },
+    }).then(c => c.toArray());
+
+    const estimatedApplicationIds = currentLenderLoanEstimates.map(e =>
+      e.loanApplicationId.toString());
+
+    return allOpenLoanApplications
+      .filter(({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) > -1)
+      .map(loanApplication => ({
+        ...loanApplication,
+        loanEstimate: currentLenderLoanEstimates.find(
+          e => e.loanApplicationId.toString() === loanApplication._id.toString(),
+        ),
+      }));
   }
 }
 

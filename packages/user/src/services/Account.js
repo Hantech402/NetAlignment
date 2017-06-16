@@ -12,7 +12,7 @@ class Account extends AccountService {
 
     this.AccountRepository = this.extract('AccountRepository');
     this.FileRepository = this.extract('FileRepository');
-    this.LoanApplication = this.extract('LoanApplication');
+    this.LoanApplicationRepository = this.extract('LoanApplicationRepository');
   }
 
   @service()
@@ -26,9 +26,13 @@ class Account extends AccountService {
   )
   async deactivate(_id, reason) {
     const accountId = _id;
-    const { AccountRepository, FileRepository, LoanApplication } = this;
+    const {
+      AccountRepository,
+      FileRepository,
+      LoanApplicationRepository,
+    } = this;
 
-    const activeLoanApplicationsNr = await LoanApplication.count({
+    const activeLoanApplicationsNr = await LoanApplicationRepository.count({
       query: {
         accountId,
         status: 'open',
@@ -54,7 +58,7 @@ class Account extends AccountService {
     });
 
     await Promise.all([
-      LoanApplication.deleteMany({
+      LoanApplicationRepository.deleteMany({
         query: { accountId },
       }),
       FileRepository.deleteMany({
