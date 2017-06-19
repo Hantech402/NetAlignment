@@ -137,25 +137,12 @@ class LoanApplicationRouter extends MongoResourceRouter {
     },
   })
   async getOpenLoanApplications(request) {
-    const { LoanApplicationRepository, LoanEstimateRepository } = this;
+    const { LoanApplicationRepository } = this;
 
-    const allOpenLoanApplications = await LoanApplicationRepository.findMany({
-      query: {
-        status: { $in: ['open'] },
-      },
-    }).then(c => c.toArray());
-    const currentLenderLoanEstimates = await LoanEstimateRepository.findMany({
-      query: {
-        accountId: objectId(request.auth.credentials.accountId),
-      },
-    }).then(c => c.toArray());
-
-    const estimatedApplicationIds = currentLenderLoanEstimates.map(e =>
-      e.loanApplicationId.toString());
-
-    return allOpenLoanApplications.filter(
-      ({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) === -1,
-    );
+    return LoanApplicationRepository.getOpenLoanApplications({
+      accountId: request.auth.credentials.accountId,
+      userId: request.auth.credentials.id,
+    });
   }
 
   @route.get({
@@ -165,30 +152,12 @@ class LoanApplicationRouter extends MongoResourceRouter {
     },
   })
   async getLoanEstimateApplications(request) {
-    const { LoanApplicationRepository, LoanEstimateRepository } = this;
+    const { LoanApplicationRepository } = this;
 
-    const allOpenLoanApplications = await LoanApplicationRepository.findMany({
-      query: {
-        status: { $in: ['open'] },
-      },
-    }).then(c => c.toArray());
-    const currentLenderLoanEstimates = await LoanEstimateRepository.findMany({
-      query: {
-        accountId: objectId(request.auth.credentials.accountId),
-      },
-    }).then(c => c.toArray());
-
-    const estimatedApplicationIds = currentLenderLoanEstimates.map(e =>
-      e.loanApplicationId.toString());
-
-    return allOpenLoanApplications
-      .filter(({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) > -1)
-      .map(loanApplication => ({
-        ...loanApplication,
-        loanEstimate: currentLenderLoanEstimates.find(
-          e => e.loanApplicationId.toString() === loanApplication._id.toString(),
-        ),
-      }));
+    return LoanApplicationRepository.getLoanApplicationsWithEstimates({
+      accountId: request.auth.credentials.accountId,
+      userId: request.auth.credentials.id,
+    });
   }
 }
 
