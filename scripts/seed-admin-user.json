@@ -1,0 +1,36 @@
+{
+    "_id" : "59492a38dcae89dd3093d6a0",
+    "username" : "admin",
+    "email" : "asdz@asda.or",
+    "accountId" : "59492a38dcae89dd3093d69f",
+    "isAccountOwner" : true,
+    "role" : "admin",
+    "title" : "Mr.",
+    "firstName" : "asd",
+    "middleName" : "asd",
+    "lastName" : "asd",
+    "address" : {
+        "streetAddress1" : "asd",
+        "streetAddress2" : "asd",
+        "city" : "asd",
+        "state" : "AL",
+        "zipCode" : "123123",
+        "phoneNumber" : "12313"
+    },
+    "password" : "$2a$10$Ec.8JT3uB0oArMqWGnqXHe44nJoZhndZIZ2KyHZn046z0InzsZdYO",
+    "salt" : "$2a$10$Ec.8JT3uB0oArMqWGnqXHe",
+    "resetPassword" : {
+
+    },
+    "labels" : [
+        "isActive"
+    ],
+    "isActive" : true,
+    "socialLogin" : {
+
+    },
+    "isDeleted" : false,
+    "updatedAt" : "2017-06-20T14:06:15.818+0000",
+    "createdAt" : "2017-06-20T13:59:20.729+0000",
+    "lastLogin" : "2017-06-20T14:06:15.810+0000"
+}

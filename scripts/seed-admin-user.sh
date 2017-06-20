@@ -1,0 +1,1 @@
+mongoimport --db net-alignment --host --collection User --file ./seed-admin-user.json

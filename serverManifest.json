@@ -86,7 +86,7 @@
         "register": "makeen-db",
         "options": {
           "mongoDb" : {
-            "db": "makeen-boilerplate",
+            "db": "net-alignment",
             "port": 27017,
             "host": "127.0.0.1"
           }

@@ -6,7 +6,19 @@ import pkg from '../package.json';
 import loanEstimateSchema from './schemas/loanEstimate';
 
 class Loan extends Plugin {
+  constructor() {
+    super({
+      autoCreateServiceBus: false,
+    });
+  }
+
   async boot(server) {
+    this.serviceBus = this.createServiceBus('loan', [
+      {
+        matcher: /^user/,
+      },
+    ]);
+
     const LoanApplicationRepository = new LoanApplicationService({
       store: this.createStore({ collectionName: 'LoanApplication' }),
     });

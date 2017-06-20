@@ -1,5 +1,5 @@
 import { CRUDServiceContainer } from 'octobus-crud';
-import { decorators, Message } from 'octobus.js';
+import { decorators } from 'octobus.js';
 import { ObjectId as objectId } from 'mongodb';
 
 import schema from '../schemas/loanApplication';
@@ -15,7 +15,7 @@ class LoanApplicationRepository extends CRUDServiceContainer {
     super.setServiceBus(...args);
 
     this.LoanEstimateRepository = this.extract('LoanEstimateRepository');
-    this.UserRepository = this.extract('UserRepository');
+    this.UserRepository = this.extract('user.UserRepository');
   }
 
   @service()
@@ -38,12 +38,16 @@ class LoanApplicationRepository extends CRUDServiceContainer {
       accountId: objectId(accountId),
     };
 
+    /*
     const user = await this.serviceBus.messageBus.send(
       new Message({
         topic: 'user.UserRepository.findById',
         data: objectId(userId),
       }),
     );
+    */
+
+    const user = await this.UserRepository.findById(objectId(userId));
 
     const isBorrower = user.role === 'borrower';
     if (isBorrower) {
@@ -87,10 +91,6 @@ class LoanApplicationRepository extends CRUDServiceContainer {
     } = await this.getAllAplicationsAndEstimates({ accountId, userId });
     const estimatedApplicationIds = loanEstimates.map(e =>
       e.loanApplicationId.toString());
-
-    console.log(
-      ` got ${loanApplications.length} apps and ${loanEstimates.length} estimates`,
-    );
 
     return loanApplications
       .filter(({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) > -1)

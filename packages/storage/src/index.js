@@ -17,5 +17,5 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['makeen-core', 'makeen-storage'],
+  dependencies: ['makeen-core', 'makeen-storage', 'na-user'],
 };

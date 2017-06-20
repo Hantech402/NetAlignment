@@ -7,6 +7,16 @@ const { service } = decorators;
 
 export default class NetAlignUserService extends UserService {
   @service()
+  serialize(data) {
+    return {
+      id: data._id.toString(),
+      username: data.username,
+      accountId: data.accountId,
+      scope: [data.role],
+    };
+  }
+
+  @service()
   dump(data) {
     return pick(data, [
       'accountId',
