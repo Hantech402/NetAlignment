@@ -96,7 +96,7 @@ class LoanApplicationRepository extends CRUDServiceContainer {
       .filter(({ _id }) => estimatedApplicationIds.indexOf(_id.toString()) > -1)
       .map(loanApplication => ({
         ...loanApplication,
-        loanEstimate: loanEstimates.find(
+        loanEstimates: loanEstimates.filter(
           e => e.loanApplicationId.toString() === loanApplication._id.toString(),
         ),
       }));
