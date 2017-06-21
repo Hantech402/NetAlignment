@@ -1,5 +1,6 @@
 import { UserPlugin } from 'makeen-user/build/index';
 import Joi from 'joi';
+import { ObjectId as objectId } from 'mongodb';
 
 import pluginOptionsSchema from './schemas/pluginOptions';
 
@@ -13,7 +14,42 @@ import accountSchema from './schemas/account';
 
 import pkg from '../package.json';
 
-class User extends UserPlugin {
+class NetAlignUserPlugin extends UserPlugin {
+  validateJWT = (decodedToken, request, cb) => {
+    if (!decodedToken || !decodedToken.id) {
+      cb(null, false);
+    } else {
+      this.serviceBus
+        .send('UserRepository.findById', objectId(decodedToken.id))
+        .then(
+          result => {
+            if (!result) {
+              return cb(null, false); // new Error('User not found')
+            }
+
+            if (!result.labels.includes('isActive')) {
+              return cb(null, false); // new Error('User is not active!')
+            }
+
+            return cb(null, true);
+          },
+          cb,
+        );
+    }
+  };
+
+  setupAuthStrategy({ jwt }) {
+    this.server.auth.strategy('jwt', 'jwt', {
+      key: jwt.key,
+      validateFunc: this.validateJWT,
+      verifyOptions: {
+        algorithms: ['HS256'],
+      },
+    });
+
+    this.server.auth.default('jwt');
+  }
+
   setupRouters(
     {
       UserRepository,
@@ -61,7 +97,7 @@ export async function register(server, options, next) {
     const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
     await server.register([
       {
-        register: new User().register,
+        register: new NetAlignUserPlugin().register,
         options: {
           ...pluginOptions,
           userSchema,

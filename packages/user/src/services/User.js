@@ -2,6 +2,7 @@
 import UserService from 'makeen-user/build/services/User';
 import { pick, omit } from 'lodash';
 import { decorators } from 'octobus.js';
+import Boom from 'boom';
 
 const { service } = decorators;
 
@@ -179,5 +180,43 @@ export default class NetAlignUserService extends UserService {
         'createdAt',
       ]),
     };
+  }
+
+  @service()
+  async activateUser({ userId }) {
+    const user = await this.UserRepository.findById(userId);
+    const userIsAlreadyActive = user.labels.indexOf('isActive') > -1;
+
+    if (userIsAlreadyActive) {
+      return Boom.badRequest('User already active!');
+    }
+
+    return this.UserRepository.updateOne({
+      query: { _id: userId },
+      update: {
+        $set: {
+          labels: [...user.labels, 'isActive'],
+        },
+      },
+    });
+  }
+
+  @service()
+  async deactivateUser({ userId }) {
+    const user = await this.UserRepository.findById(userId);
+    const userIsAlreadyInactive = user.labels.indexOf('isActive') === -1;
+
+    if (userIsAlreadyInactive) {
+      return Boom.badRequest('User already inactive!');
+    }
+
+    return this.UserRepository.updateOne({
+      query: { _id: userId },
+      update: {
+        $set: {
+          labels: user.labels.filter(label => label !== 'isActive'),
+        },
+      },
+    });
   }
 }

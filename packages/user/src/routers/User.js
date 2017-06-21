@@ -1,5 +1,5 @@
 import UsersRouter from 'makeen-user/build/routers/Users';
-import { route } from 'makeen-router';
+import { route, mongoHelpers } from 'makeen-router';
 import { pick } from 'lodash';
 import Joi from 'joi';
 import Boom from 'boom';
@@ -8,6 +8,8 @@ import { ObjectID as objectId } from 'mongodb';
 import userSchema from '../schemas/user';
 import accountSchema from '../schemas/account';
 import loanApplicationSchema from '../../../loan/src/schemas/loanApplication';
+
+const { idValidator } = mongoHelpers;
 
 export default class NetAlignUserRouter extends UsersRouter {
   constructor(
@@ -94,7 +96,9 @@ export default class NetAlignUserRouter extends UsersRouter {
             'email',
           ]),
           ...pick(accountSchema, ['loanOfficersEmails']),
-          role: Joi.string().required().valid(['lender', 'borrower', 'broker']),
+          role: Joi.string()
+            .required()
+            .valid(['lender', 'borrower', 'broker', 'admin']),
           loanApplication: Joi.any().when('role', {
             is: 'borrower',
             then: Joi.object().keys(
@@ -139,5 +143,41 @@ export default class NetAlignUserRouter extends UsersRouter {
     }
 
     return { user, account };
+  }
+
+  @route.post({
+    path: '/{id}/deactivate',
+    config: {
+      description: 'deactivate user account',
+      validate: {
+        params: {
+          id: idValidator,
+        },
+      },
+    },
+  })
+  async deactivate(request) {
+    const userId = objectId(request.params.id);
+    const { User } = this;
+
+    return User.deactivateUser({ userId });
+  }
+
+  @route.post({
+    path: '/{id}/activate',
+    config: {
+      description: 'activate user account',
+      validate: {
+        params: {
+          id: idValidator,
+        },
+      },
+    },
+  })
+  async activate(request) {
+    const userId = objectId(request.params.id);
+    const { User } = this;
+
+    return User.activateUser({ userId });
   }
 }
