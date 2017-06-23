@@ -1,0 +1,10 @@
+{
+  "_id" : {"$oid": "59492a38dcae89dd3093d69f"},
+  "isConfirmed" : true,
+  "isActive" : true,
+  "isDeleted" : false,
+  "isDeactivated" : false,
+  "labels" : [ "isActive", "isConfirmed" ],
+  "updatedAt" : "2017-06-20T14:06:15.818+0000",
+  "createdAt" : "2017-06-20T13:59:20.729+0000"
+}
