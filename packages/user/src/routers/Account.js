@@ -10,6 +10,8 @@ class NetAlignAccountRouter extends AccountRouter {
     {
       User,
       Account,
+      AccountRepository,
+      UserRepository,
     },
     config = {},
   ) {
@@ -23,6 +25,8 @@ class NetAlignAccountRouter extends AccountRouter {
 
     this.User = User;
     this.Account = Account;
+    this.UserRepository = UserRepository;
+    this.AccountRepository = AccountRepository;
   }
 
   @route.post({
@@ -82,13 +86,13 @@ class NetAlignAccountRouter extends AccountRouter {
         query.loanOfficersEmails = employeeEmail;
       }
 
-      const account = await this.Account.AccountRepository.findOne({ query });
+      const account = await this.AccountRepository.findOne({ query });
 
       if (!account) {
         return Boom.notFound('Unable to find account!');
       }
 
-      const user = await this.User.UserRepository.findOne({
+      const user = await this.UserRepository.findOne({
         query: {
           accountId: account._id,
           role: 'broker',

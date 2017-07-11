@@ -11,7 +11,7 @@
     "bootstrap": "lerna bootstrap",
     "watch": "makeen-watch --ignoredPackages web-app",
     "build": "makeen-build --ignoredPackages web-app",
-    "start:server": "babel-node server.js --exclude packages/*/src/** packages/web/** packages/web-app/**",
+    "start:server": "nodemon --watch 'packages/*/build/' --ignore packages/web-app/ --exec npm run babel-node -- server.js",
     "start": "npm run build && run-p watch start:*",
     "debug": "babel-node --inspect server.js",
     "babel-node": "babel-node",

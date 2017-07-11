@@ -54,15 +54,15 @@ class NetAlignUserPlugin extends UserPlugin {
     {
       UserRepository,
       UserLoginRepository,
-      AccountRepository,
       ...options
     },
   ) {
     const userService = this.serviceBus.register(
       new UserService({ jwtConfig: options.jwt }),
     );
-
     const accountService = this.serviceBus.register(new AccountService());
+    const AccountRepository = this.serviceBus.extract('AccountRepository');
+
     const { LoanApplicationRepository } = this.server.plugins['na-loan'];
 
     return this.mountRouters([
@@ -83,6 +83,8 @@ class NetAlignUserPlugin extends UserPlugin {
         {
           User: userService,
           Account: accountService,
+          AccountRepository,
+          UserRepository,
         },
         {
           entitySchema: accountSchema,
