@@ -1,86 +1,38 @@
-import Joi from 'joi';
-import * as hbUser from 'hb-user';
-import pick from 'lodash/pick';
-import pkg from '../package.json';
-import pluginOptionsSchema from './schemas/pluginOptions';
-import userSchema from './schemas/user';
-import setupServices from './services/index';
-import routes from './routes';
+import { Module } from 'makeen';
 
-export function register(server, options, next) {
-  const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
-  const { dispatch, lookup } = dispatcher;
-  const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
-  const { mongoDb, refManager } = server.plugins['na-storage'];
+import { userRouter } from './routes/auth';
+import { UserRepositoryService } from './services/UserRepositoryService';
+import { AccountRepositoryServices } from './services/AccountRepositoryService';
 
-  if (pluginOptions.socialPlatforms.facebook) {
-    server.auth.strategy('facebook', 'bell', {
-      provider: 'facebook',
-      isSecure: false,
-      ...pluginOptions.socialPlatforms.facebook,
-    });
+export class UserModule extends Module {
+  name = 'net-aligments.users'
+
+  async setup(config) {
+    const [
+      { bindRepository },
+      { createServiceBus },
+      { addRouter },
+    ] = await this.dependencies([
+      'makeen.mongoDb',
+      'makeen.octobus',
+      'makeen.router',
+    ]);
+
+    this.serviceBus = createServiceBus(this.name);
+
+    const AccountRepository = bindRepository(new AccountRepositoryServices());
+    const UserRepository = bindRepository(new UserRepositoryService({ jwtSecret: config.jwtSecret, AccountRepository }));
+
+    // const services = this.serviceBus.registerServices({ UserRepository });
+
+    addRouter(
+      '/users',
+      'authRouter',
+      userRouter({
+        UserRepository,
+        AccountRepository,
+        config,
+      }),
+    );
   }
-
-  if (pluginOptions.socialPlatforms.google) {
-    server.auth.strategy('google', 'bell', {
-      provider: 'google',
-      isSecure: false,
-      ...pluginOptions.socialPlatforms.google,
-    });
-  }
-
-  server.register([{
-    register: hbUser,
-    options: {
-      jwt: pluginOptions.jwt,
-      serviceOptions: {
-        ...pluginOptions.user,
-        references: [{
-          collectionName: 'Account',
-          refProperty: 'accountId',
-          extractor: (account = {}) => (
-            pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated'])
-          ),
-        }],
-        schema: userSchema,
-        db: mongoDb,
-        refManager,
-      },
-    },
-  }]).then(() => {
-    setupServices({
-      dispatcher,
-      db: mongoDb,
-      pluginOptions,
-      refManager,
-      app: server.settings.app,
-    });
-
-    const UserEntity = lookup('entity.User');
-    const AccountEntity = lookup('entity.Account');
-    const User = lookup('User');
-    const LoanApplicationEntity = lookup('entity.LoanApplication');
-
-    server.expose('UserEntity', UserEntity);
-    server.expose('AccountEntity', AccountEntity);
-    server.expose('User', User);
-
-    server.bind({
-      dispatch,
-      lookup,
-      UserEntity,
-      AccountEntity,
-      User,
-      LoanApplicationEntity,
-    });
-
-    server.route(routes);
-
-    return next();
-  }, next);
 }
-
-register.attributes = {
-  pkg,
-  dependencies: ['na-storage', 'bell', 'na-crud', 'na-loan'],
-};

@@ -1,43 +1,31 @@
-import * as HapiOctobus from 'hapi-octobus';
-import { OctobusWithLogger } from 'octobus.js';
-import pkg from '../package.json';
-import setupServices from './services';
+/* eslint-disable no-console */
+import notifier from 'node-notifier';
+import chalk from 'chalk';
+import Application from './libs/Application';
+import './env';
+import config from './config';
+import loadModules from './modules';
+import loadMiddlewares from './config/loadMiddlewares';
 
-export function register(server, options, next) {
-  process.on('unhandledRejection', (reason, p) => {
-    server.log(['error', 'unhandledRejection'], `Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
-    throw reason;
-  });
+const startTime = Date.now();
+const app = new Application();
 
-  process.once('uncaughtException', (err) => {
-    server.log(['error', 'uncaughtException'], err);
-    process.exit(1);
-  });
+Promise.all([loadMiddlewares(config), loadModules(config), config.get('port')])
+  .then(async ([middlewares, modules, port]) => {
+    app.middlewares.push(...middlewares);
+    app.modules.add(modules);
+    app.listen(port).then(() => {
+      const message = `Server started on port ${port} in ${Date.now() - startTime}ms!`;
 
-  server.register([{
-    register: HapiOctobus,
-    options: {
-      eventDispatcher: new OctobusWithLogger({
-        log(msg) { console.log(msg); }, // eslint-disable-line no-console
-        logParams: false,
-        logSubscriptions: false,
-      }),
-    },
-  }]).then(() => {
-    const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
+      if (app.isDev) {
+        notifier.notify({
+          title: 'Makeen App',
+          message,
+          sound: true,
+        });
+      }
 
-    setupServices(dispatcher);
-
-    return next();
-  }, next);
-}
-
-register.attributes = {
-  pkg,
-  dependencies: [],
-};
-
-export * from './libs';
-export * from './decorators';
-export * as pre from './pre';
-export * as handlers from './handlers';
+      console.log(chalk.bgBlue.white(message));
+    });
+  })
+  .catch(console.log.bind(console));

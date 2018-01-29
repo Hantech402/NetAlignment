@@ -7,3 +7,6 @@ poop.log
 logs/heapdumps
 lerna-debug.log
 logs/errors
+
+.tern-project
+*.swp
