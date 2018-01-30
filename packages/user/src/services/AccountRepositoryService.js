@@ -29,15 +29,5 @@ export class AccountRepositoryServices extends Repository {
       })
       .then(() => acc);
   }
-
-  @service()
-  findOne({ query }) {
-    return super.findOne({ query });
-  }
-
-  @service()
-  deleteOne({ userId }) {
-    return super.deleteOne({ query: { ownerId: userId } });
-  }
 }
 

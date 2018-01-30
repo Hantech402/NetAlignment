@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import Celebrate from 'celebrate';
 import Joi from 'joi';
+import Boom from 'boom';
+import { ObjectID as objectId } from 'mongodb';
+
 // import { helpers } from 'makeen-mongodb';
 
 import { requireAdmin } from '../middlewares';
@@ -19,7 +22,10 @@ export const adminRouter = adminRouterConfig => {
     '/',
     async (req, res, next) => {
       try {
-        const users = await UserRepository.getAllUsers();
+        const users = await UserRepository
+          .findMany({ query: {}, fields: { password: 0 } })
+          .toArray();
+
         res.json(users);
       } catch (err) {
         next(err);
@@ -31,7 +37,7 @@ export const adminRouter = adminRouterConfig => {
     '/count',
     async (req, res, next) => {
       try {
-        const usersCount = await UserRepository.count();
+        const usersCount = await UserRepository.count({ query: req.query.query });
         res.json(usersCount);
       } catch (err) {
         next(err);
@@ -60,7 +66,11 @@ export const adminRouter = adminRouterConfig => {
     '/:id',
     async (req, res, next) => {
       try {
-        const user = await UserRepository.getById(req.params.id);
+        const user = await UserRepository.findOne({
+          query: { _id: objectId(req.params.id) },
+          options: { fields: { password: 0 } },
+        });
+        if (!user) throw Boom.badRequest('Wrong id provided');
         res.json(user);
       } catch (err) {
         next(err);
@@ -75,8 +85,10 @@ export const adminRouter = adminRouterConfig => {
     }).required() }),
     async (req, res, next) => {
       try {
-        const userId = await UserRepository.deleteOne({ query: req.body.query });
-        await AccountRepository.deleteOne({ userId });
+        const user = await UserRepository.findOne({ query: req.body.query });
+        if (!user) throw Boom.notFound('User not found');
+        await UserRepository.deleteOne({ query: { _id: user._id } });
+        await AccountRepository.deleteOne({ query: { ownerId: user._id } });
         res.sendStatus(200);
       } catch (err) {
         next(err);

@@ -14,7 +14,6 @@ async function hashPassword(password) {
 }
 
 const { service } = decorators;
-// const { idToQuery } = helpers;
 
 export class UserRepositoryService extends Repository {
   constructor({ jwtSecret, AccountRepository }) {
@@ -93,30 +92,6 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  getAllUsers() {
-    return super.findMany({
-      query: {},
-      fields: { password: 0 },
-    }).toArray();
-  }
-
-  @service()
-  getById(id) {
-    return super.findOne({
-      query: { _id: objectId(id) },
-      options: {
-        fields: {
-          password: 0,
-        },
-      },
-    })
-      .then(user => {
-        if (!user) throw Boom.badRequest('Wrong id provided');
-        return user;
-      });
-  }
-
-  @service()
   updateProfile({ userId, data }) {
     return super.updateOne({
       query: { _id: objectId(userId) },
@@ -132,26 +107,5 @@ export class UserRepositoryService extends Repository {
       query: { _id: objectId(userId) },
       update: { $set: { password: hashedPassword } },
     }));
-  }
-
-  @service()
-  count() {
-    return super.count({ query: {} });
-  }
-
-  @service()
-  deleteOne({ query }) {
-    let userId;
-    return super.findOne({ query })
-      .then(user => {
-        userId = user._id;
-        return super.deleteOne({ query });
-      })
-      .then(() => userId);
-  }
-
-  @service()
-  findOne({ query }) {
-    return super.findOne({ query, options: { fields: { password: 0 } } });
   }
 }
