@@ -4,7 +4,7 @@ import Joi from 'joi';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 
-import { requireAdmin } from '../middlewares';
+import { requireAdmin, requireAuth } from '../middlewares';
 import userSchema from '../schemas/userSchema';
 
 export const userRouter = configRouter => {
@@ -90,6 +90,29 @@ export const userRouter = configRouter => {
       try {
         const user = await UserRepository.getById(req.params.id);
         res.json(user);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.patch(
+    '/me',
+    requireAuth(config),
+    Celebrate({ body: {
+      ...pick(userSchema, [
+        'title', 'firstName', 'middleName', 'lastName', 'address',
+      ]),
+      address: userSchema.address.optional(),
+    } }),
+    async (req, res, next) => {
+      try {
+        const updatedUser = await UserRepository.updateProfile({
+          userId: req.user._id,
+          newData: req.body,
+        });
+
+        res.json(updatedUser);
       } catch (err) {
         next(err);
       }

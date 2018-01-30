@@ -115,4 +115,13 @@ export class UserRepositoryService extends Repository {
         return user;
       });
   }
+
+  @service()
+  updateProfile({ userId, newData }) {
+    return super.updateOne({
+      query: { _id: objectId(userId) },
+      update: { $set: newData },
+      options: { new: true, projection: { password: 0 } },
+    });
+  }
 }

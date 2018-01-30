@@ -10,3 +10,14 @@ export const requireAdmin = config => async (req, res, next) => { // eslint-disa
     return next();
   });
 };
+
+export const requireAuth = config => async (req, res, next) => { // eslint-disable-line
+  const token = req.headers.authorization;
+  if (!token) return next(Boom.badRequest('You need authorization headers'));
+  jwt.verify(token, config.jwtSecret, (err, decoded) => {
+    if (err) return next(Boom.unauthorized('Your token has expired'));
+    req.user = decoded;
+    return next();
+  });
+};
+
