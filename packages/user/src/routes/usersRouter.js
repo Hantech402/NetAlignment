@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import Celebrate from 'celebrate';
+import crypto from 'crypto';
 import Joi from 'joi';
+import Boom from 'boom';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 
@@ -15,6 +17,9 @@ export const userRouter = configRouter => {
     router = Router(),
   } = configRouter;
 
+  const setUserInfo = user =>
+    pick(user, ['accountId', 'lastLogin', '_id', 'title', 'email', 'username', 'role', 'address', 'isActive', 'createdAt', 'updatedAt']);
+
   router.post(
     '/register',
     Celebrate({ body: userSchema }),
@@ -22,7 +27,7 @@ export const userRouter = configRouter => {
       try {
         const user = await UserRepository.register(req.body);
         const account = await AccountRepository.createOne(user._id);
-        const userResponse = pick(user, ['accountId', '_id', 'title', 'email', 'username', 'role', 'address', 'isActive', 'createdAt', 'updatedAt']);
+        const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
         res.json({ user: userResponse, account: accountReponse });
       } catch (err) {
@@ -104,6 +109,44 @@ export const userRouter = configRouter => {
       try {
         await UserRepository.changePassword({ userId: req.user._id, password: req.body.password });
         res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/reset-password',
+    Celebrate({ body: Joi.object().keys({
+      usernameOrEmail: Joi.string().required(),
+    }) }),
+    async (req, res, next) => {
+      try {
+        const user = await UserRepository.findOne({
+          query: {
+            $or: [{
+              username: req.body.usernameOrEmail,
+            }, {
+              email: req.body.usernameOrEmail,
+            }],
+          },
+          options: {
+            fields: { password: 0 },
+          },
+        });
+
+        if (!user) throw Boom.badRequest('Wrong username ro email');
+        const resetPassword = {
+          token: crypto.randomBytes(20).toString('hex'),
+          resetAt: new Date(),
+        };
+
+        /* const updateResult = */ await UserRepository.updateOne({
+          query: { _id: user._id },
+          update: { $set: { resetPassword } },
+        });
+
+        res.json({ user: { ...setUserInfo(user) } /* , updateResult */ });
       } catch (err) {
         next(err);
       }
