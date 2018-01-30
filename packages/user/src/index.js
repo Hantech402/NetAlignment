@@ -1,6 +1,6 @@
 import { Module } from 'makeen';
 
-import { userRouter } from './routes/auth';
+import { indexRouter } from './routes';
 import { UserRepositoryService } from './services/UserRepositoryService';
 import { AccountRepositoryServices } from './services/AccountRepositoryService';
 
@@ -21,14 +21,17 @@ export class UserModule extends Module {
     this.serviceBus = createServiceBus(this.name);
 
     const AccountRepository = bindRepository(new AccountRepositoryServices());
-    const UserRepository = bindRepository(new UserRepositoryService({ jwtSecret: config.jwtSecret, AccountRepository }));
+    const UserRepository = bindRepository(new UserRepositoryService({
+      jwtSecret: config.jwtSecret,
+      AccountRepository,
+    }));
 
     // const services = this.serviceBus.registerServices({ UserRepository });
 
     addRouter(
       '/users',
       'authRouter',
-      userRouter({
+      indexRouter({
         UserRepository,
         AccountRepository,
         config,

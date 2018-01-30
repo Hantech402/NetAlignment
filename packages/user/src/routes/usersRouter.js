@@ -4,7 +4,7 @@ import Joi from 'joi';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 
-import { requireAdmin, requireAuth } from '../middlewares';
+import { requireAuth } from '../middlewares';
 import userSchema from '../schemas/userSchema';
 
 export const userRouter = configRouter => {
@@ -64,32 +64,6 @@ export const userRouter = configRouter => {
         const account = await AccountRepository.getAccount(userProfile._id);
         const accountReponse = pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated']);
         res.json({ ...userProfile, _account: accountReponse });
-      } catch (err) {
-        next(err);
-      }
-    },
-  );
-
-  router.get(
-    '/',
-    requireAdmin(config),
-    async (req, res, next) => {
-      try {
-        const users = await UserRepository.getAllUsers();
-        res.json(users);
-      } catch (err) {
-        next(err);
-      }
-    },
-  );
-
-  router.get(
-    '/:id',
-    requireAdmin(config),
-    async (req, res, next) => {
-      try {
-        const user = await UserRepository.getById(req.params.id);
-        res.json(user);
       } catch (err) {
         next(err);
       }

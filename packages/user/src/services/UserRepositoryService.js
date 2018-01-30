@@ -133,4 +133,9 @@ export class UserRepositoryService extends Repository {
       update: { $set: { password: hashedPassword } },
     }));
   }
+
+  @service()
+  count() {
+    return super.count({ query: {} });
+  }
 }
