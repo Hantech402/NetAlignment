@@ -40,7 +40,7 @@ export const userRouter = configRouter => {
     async (req, res, next) => {
       try {
         const user = await UserRepository.login(req.body);
-        const account = await AccountRepository.getAccount(user._id);
+        const account = await AccountRepository.findOne({ query: { ownerId: user._id } });
         const token = await UserRepository.generateToken({
           userData: user,
           accountId: account._id.toString(),
@@ -61,7 +61,7 @@ export const userRouter = configRouter => {
     async (req, res, next) => {
       try {
         const userProfile = await UserRepository.getUserProfile(req.headers.authorization);
-        const account = await AccountRepository.getAccount(userProfile._id);
+        const account = await AccountRepository.findOne({ query: { ownerId: userProfile._id } });
         const accountReponse = pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated']);
         res.json({ ...userProfile, _account: accountReponse });
       } catch (err) {

@@ -138,4 +138,20 @@ export class UserRepositoryService extends Repository {
   count() {
     return super.count({ query: {} });
   }
+
+  @service()
+  deleteOne({ query }) {
+    let userId;
+    return super.findOne({ query })
+      .then(user => {
+        userId = user._id;
+        return super.deleteOne({ query });
+      })
+      .then(() => userId);
+  }
+
+  @service()
+  findOne({ query }) {
+    return super.findOne({ query, options: { fields: { password: 0 } } });
+  }
 }

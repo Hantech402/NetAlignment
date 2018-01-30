@@ -31,8 +31,13 @@ export class AccountRepositoryServices extends Repository {
   }
 
   @service()
-  getAccount(userId) {
-    return super.findOne({ query: { ownerId: userId } });
+  findOne({ query }) {
+    return super.findOne({ query });
+  }
+
+  @service()
+  deleteOne({ userId }) {
+    return super.deleteOne({ query: { ownerId: userId } });
   }
 }
 
