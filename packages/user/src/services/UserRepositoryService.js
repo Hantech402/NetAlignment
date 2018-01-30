@@ -117,11 +117,20 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  updateProfile({ userId, newData }) {
+  updateProfile({ userId, data }) {
     return super.updateOne({
       query: { _id: objectId(userId) },
-      update: { $set: newData },
+      update: { $set: data },
       options: { new: true, projection: { password: 0 } },
     });
+  }
+
+  @service()
+  changePassword({ userId, password }) {
+    return hashPassword(password)
+    .then(hashedPassword => super.updateOne({
+      query: { _id: objectId(userId) },
+      update: { $set: { password: hashedPassword } },
+    }));
   }
 }

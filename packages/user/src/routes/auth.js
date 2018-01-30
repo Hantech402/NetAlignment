@@ -109,10 +109,27 @@ export const userRouter = configRouter => {
       try {
         const updatedUser = await UserRepository.updateProfile({
           userId: req.user._id,
-          newData: req.body,
+          data: req.body,
         });
 
         res.json(updatedUser);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/change-password',
+    requireAuth(config),
+    Celebrate({ body: Joi.object().keys({
+      password: Joi.string().required(),
+      oldPassword: Joi.string().required(),
+    }) }),
+    async (req, res, next) => {
+      try {
+        await UserRepository.changePassword({ userId: req.user._id, password: req.body.password });
+        res.sendStatus(200);
       } catch (err) {
         next(err);
       }
