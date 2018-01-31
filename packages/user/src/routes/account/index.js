@@ -2,13 +2,16 @@ import { Router } from 'express';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import Celebrate from 'celebrate';
+import pick from 'lodash/pick';
 import Joi from 'joi';
 
 import { requireAuth } from '../../middlewares';
+import userSchema from '../../schemas/userSchema';
+import { setUserInfo } from '../../utils';
 
 export const accountRouter = indexRouterConfig => {
   const {
-    // UserRepository,
+    UserRepository,
     AccountRepository,
     config,
     router = Router(),
@@ -51,6 +54,27 @@ export const accountRouter = indexRouterConfig => {
           update: { $set: { isDeactivated: true } },
         });
         res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/reactivate',
+    Celebrate({ body: Joi.object().keys({
+      ...pick(userSchema, ['username', 'password']),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const { username, password } = req.body;
+        const user = await UserRepository.verifyCredentials({ username, password });
+        await AccountRepository.updateOne({
+          query: { ownerId: user._id },
+          update: { $set: { isDeactivated: false } },
+        });
+
+        res.json(setUserInfo(user));
       } catch (err) {
         next(err);
       }

@@ -53,7 +53,7 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  login({ username, password }) {
+  verifyCredentials({ username, password }) {
     let userObj;
     return super.findOne({ query: { username } })
       .then(user => {
@@ -63,6 +63,16 @@ export class UserRepositoryService extends Repository {
       })
       .then(validPassword => {
         if (!validPassword) throw Boom.badRequest('Wrong password');
+        return userObj;
+      });
+  }
+
+  @service()
+  login({ username, password }) {
+    let userObj;
+    return this.verifyCredentials({ username, password })
+      .then(user => {
+        userObj = user;
         return this.AccountRepository.findOne({ query: { ownerId: userObj._id } });
       })
       .then(account => {
