@@ -96,5 +96,27 @@ export const adminRouter = adminRouterConfig => {
     },
   );
 
+  router.patch(
+    '/:id',
+    Celebrate({
+      params: Joi.object().keys({
+        id: Joi.string().required(),
+      }).required(),
+      body: Joi.object().required(),
+    }),
+    async (req, res, next) => {
+      try {
+        await UserRepository.updateOne({
+          query: { _id: objectId(req.params.id) },
+          update: { $set: req.body },
+        });
+        res.sendStatus(200);
+      } catch (err) {
+        if (err.message.includes('24 hex')) next(Boom.badRequest('Wrong id format provided'));
+        next(err.message || err);
+      }
+    },
+  );
+
   return router;
 };
