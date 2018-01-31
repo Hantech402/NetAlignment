@@ -1,6 +1,7 @@
 import { Module } from 'makeen';
 
-import { indexRouter } from './routes';
+import { usersRouter } from './routes/users';
+import { accountRouter } from './routes/account';
 import { UserRepositoryService } from './services/UserRepositoryService';
 import { AccountRepositoryServices } from './services/AccountRepositoryService';
 
@@ -31,7 +32,17 @@ export class UserModule extends Module {
     addRouter(
       '/users',
       'authRouter',
-      indexRouter({
+      usersRouter({
+        UserRepository,
+        AccountRepository,
+        config,
+      }),
+    );
+
+    addRouter(
+      '/account',
+      'accountRouter',
+      accountRouter({
         UserRepository,
         AccountRepository,
         config,

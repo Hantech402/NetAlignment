@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
-import { userRouter } from './usersRouter';
+import { commonUserRouter } from './usersRouter';
 import { adminRouter } from './adminRouter';
 
-export const indexRouter = indexRouterConfig => {
+export const usersRouter = indexRouterConfig => {
   const {
     UserRepository,
     AccountRepository,
@@ -12,7 +12,8 @@ export const indexRouter = indexRouterConfig => {
   } = indexRouterConfig;
 
   // user (common) router
-  router.use(userRouter({ UserRepository, AccountRepository, config }));
+  router.use(commonUserRouter({ UserRepository, AccountRepository, config }));
+  // admin router
   router.use(adminRouter({ UserRepository, AccountRepository, config }));
 
   return router;

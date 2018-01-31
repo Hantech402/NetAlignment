@@ -6,10 +6,10 @@ import Boom from 'boom';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 
-import { requireAuth } from '../middlewares';
-import userSchema from '../schemas/userSchema';
+import { requireAuth } from '../../middlewares';
+import userSchema from '../../schemas/userSchema';
 
-export const userRouter = configRouter => {
+export const commonUserRouter = configRouter => {
   const {
     UserRepository,
     AccountRepository,
@@ -27,6 +27,10 @@ export const userRouter = configRouter => {
       try {
         const user = await UserRepository.register(req.body);
         const account = await AccountRepository.createOne(user._id);
+        await UserRepository.updateOne({
+          query: { _id: user._id },
+          update: { $set: { accountId: user._id.toString() } },
+        });
         const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
         res.json({ user: userResponse, account: accountReponse });
