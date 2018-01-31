@@ -135,7 +135,7 @@ export const userRouter = configRouter => {
           },
         });
 
-        if (!user) throw Boom.badRequest('Wrong username ro email');
+        if (!user) throw Boom.notFound('Wrong username ro email');
         const resetPassword = {
           token: crypto.randomBytes(20).toString('hex'),
           resetAt: new Date(),
@@ -147,6 +147,30 @@ export const userRouter = configRouter => {
         });
 
         res.json({ user: { ...setUserInfo(user) } /* , updateResult */ });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/recover-password/:token',
+    Celebrate({
+      params: Joi.object().keys({
+        token: Joi.string().required(),
+      }).required(),
+      body: Joi.object().keys({
+        password: Joi.string().required(),
+      }).required(),
+    }),
+    async (req, res, next) => {
+      try {
+        const user = await UserRepository.updatePasswordWithToken({
+          token: req.params.token,
+          password: req.body.password,
+        });
+        const userResponse = setUserInfo(user);
+        res.json({ user: userResponse });
       } catch (err) {
         next(err);
       }

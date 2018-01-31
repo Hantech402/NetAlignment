@@ -108,5 +108,23 @@ export class UserRepositoryService extends Repository {
       update: { $set: { password: hashedPassword } },
     }));
   }
-}
 
+  @service()
+  updatePasswordWithToken({ token, password }) {
+    let userObj;
+    return super.findOne({ query: { 'resetPassword.token': token } })
+      .then(user => {
+        if (!user) throw Boom.badRequest('Wrong token');
+        userObj = user;
+        return bcrypt.compare(password, user.password);
+      })
+      .then(samePassword => {
+        if (samePassword) throw Boom.badRequest('You can\'t use the same password');
+        return hashPassword(password);
+      })
+      .then(hashedPassword => super.updateOne({
+        query: { _id: userObj._id },
+        update: { $set: { password: hashedPassword, resetPassword: {} } },
+      }));
+  }
+}
