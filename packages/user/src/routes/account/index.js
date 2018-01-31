@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
+import Celebrate from 'celebrate';
+import Joi from 'joi';
 
+import { requireAuth } from '../../middlewares';
 
 export const accountRouter = indexRouterConfig => {
   const {
     // UserRepository,
     AccountRepository,
-    // config,
+    config,
     router = Router(),
   } = indexRouterConfig;
 
@@ -30,6 +33,26 @@ export const accountRouter = indexRouterConfig => {
       } catch (err) {
         if (err.message.includes('24 hex')) next(Boom.badRequest('Wrong id format provided'));
         next(err.message || err);
+      }
+    },
+  );
+
+  router.post(
+    '/deactivate',
+    requireAuth(config),
+    Celebrate({ body: Joi.object().keys({
+      reason: Joi.string().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        if (req.user.scope === 'admin') throw Boom.forbidden('Insufficient scope');
+        await AccountRepository.updateOne({
+          query: { ownerId: objectId(req.user._id) },
+          update: { $set: { isDeactivated: true } },
+        });
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
       }
     },
   );
