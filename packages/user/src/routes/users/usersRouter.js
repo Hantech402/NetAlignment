@@ -5,6 +5,7 @@ import Joi from 'joi';
 import Boom from 'boom';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
+import { ObjectID as objectId } from 'mongodb';
 
 import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
@@ -50,14 +51,25 @@ export const commonUserRouter = configRouter => {
     }) }),
     async (req, res, next) => {
       try {
-        const user = await UserRepository.login(req.body);
-        const account = await AccountRepository.findOne({ query: { ownerId: user._id } });
-        const token = await UserRepository.generateToken({
-          userData: user,
-          accountId: account._id.toString(),
-        });
-        const userResponse = pick(user, 'accountId', 'username', 'email', '_id', 'updatedAt', 'createdAt', 'lastLogin', 'role');
-        res.json({ ...userResponse, token, accountId: account._id.toString() });
+        const userData = await UserRepository.login(req.body);
+        const token = await UserRepository.generateToken({ userData });
+        const userResponse = pick(userData, 'accountId', 'username', 'email', '_id', 'updatedAt', 'createdAt', 'lastLogin', 'role');
+        res.json({ ...userResponse, token });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/refresh-token',
+    Celebrate({ body: Joi.object().keys({
+      token: Joi.string().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const token = await UserRepository.refreshToken({ token: req.body.token });
+        res.json({ token });
       } catch (err) {
         next(err);
       }
@@ -66,12 +78,16 @@ export const commonUserRouter = configRouter => {
 
   router.get(
     '/me',
+    requireAuth(config),
     Celebrate({ headers: Joi.object({
       authorization: Joi.string().required(),
     }).unknown() }),
     async (req, res, next) => {
       try {
-        const userProfile = await UserRepository.getUserProfile(req.headers.authorization);
+        const userProfile = await UserRepository.findOne({
+          query: { _id: objectId(req.user._id) },
+          options: { fields: { password: 0 } },
+        });
         const account = await AccountRepository.findOne({ query: { ownerId: userProfile._id } });
         const accountReponse = pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated']);
         res.json({ ...userProfile, _account: accountReponse });

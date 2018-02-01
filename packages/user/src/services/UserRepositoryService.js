@@ -4,11 +4,13 @@ import bcrypt from 'bcrypt';
 import Boom from 'boom';
 import jwt from 'jsonwebtoken';
 import pick from 'lodash/pick';
-import omit from 'lodash/omit';
+import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 
 import userSchema from '../schemas/userSchema';
+
+const verifyJwt = bluebird.promisify(jwt.verify);
 
 async function hashPassword(password) {
   return bcrypt.hash(password, 10);
@@ -23,6 +25,7 @@ export class UserRepositoryService extends Repository {
     this.AccountRepository = AccountRepository;
     this.transport = nodemailer.createTransport(config.nodemailerConfig);
     this.apiUrl = config.rootURL;
+    this.jwtExpiresIn = config.jwtExpiresIn;
   }
 
   setServiceBus(serviceBus) {
@@ -30,14 +33,12 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  generateToken({ userData, accountId }) { // eslint-disable-line class-methods-use-this
-    const user = { ...userData, _id: userData._id.toString() };
+  generateToken({ userData }) { // eslint-disable-line class-methods-use-this
     return new Promise((resolve, reject) => {
       jwt.sign({
-        ...pick(user, ['_id', 'username', 'accountId']),
-        scope: user.role,
-        accountId,
-      }, this.jwtSecret, { expiresIn: '1d' }, (err, token) => {
+        ...pick(userData, ['_id', 'username', 'accountId']),
+        scope: userData.role,
+      }, this.jwtSecret, { expiresIn: this.jwtExpiresIn }, (err, token) => {
         if (err) reject(err);
         resolve(token);
       });
@@ -90,17 +91,13 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  getUserProfile(token) {
+  refreshToken({ token }) {
     return new Promise((resolve, reject) => {
-      jwt.verify(token, this.jwtSecret, (err, decoded) => {
-        if (err) reject(err);
-        const userId = objectId(decoded._id);
-        super.findOne({ query: { _id: userId } })
-          .then(user => {
-            if (!user) reject(Boom.badRequest('Something went wrong. This user doesn\'t exits'));
-            resolve(omit(user, ['password']));
-          })
-          .catch(reject);
+      jwt.verify(token, this.jwtSecret, (jwtErr, decoded) => {
+        if (!jwtErr) return resolve(this.generateToken({ userData: decoded }));
+        if (jwtErr.name !== 'TokenExpiredError') return reject(jwtErr);
+        const userData = jwt.decode(token);
+        return resolve(this.generateToken({ userData }));
       });
     });
   }
@@ -117,10 +114,10 @@ export class UserRepositoryService extends Repository {
   @service()
   changePassword({ userId, password }) {
     return hashPassword(password)
-    .then(hashedPassword => super.updateOne({
-      query: { _id: objectId(userId) },
-      update: { $set: { password: hashedPassword } },
-    }));
+      .then(hashedPassword => super.updateOne({
+        query: { _id: objectId(userId) },
+        update: { $set: { password: hashedPassword } },
+      }));
   }
 
   @service()

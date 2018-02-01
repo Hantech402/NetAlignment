@@ -31,5 +31,6 @@ export default async config => [
     jwtSecret: await config.get('secrets.jwt'),
     nodemailerConfig: await config.get('nodemailerConfig'),
     rootURL: await config.get('rootURL'),
+    jwtExpiresIn: await config.get('modules.user.jwtConfig.expiresIn'),
   }),
 ];
