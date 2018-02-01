@@ -8,6 +8,7 @@ import pick from 'lodash/pick';
 
 import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
+import { setUserInfo } from '../../utils';
 
 export const commonUserRouter = configRouter => {
   const {
@@ -16,9 +17,6 @@ export const commonUserRouter = configRouter => {
     config,
     router = Router(),
   } = configRouter;
-
-  const setUserInfo = user =>
-    pick(user, ['accountId', 'lastLogin', '_id', 'title', 'email', 'username', 'role', 'address', 'isActive', 'createdAt', 'updatedAt']);
 
   router.post(
     '/register',
@@ -126,18 +124,8 @@ export const commonUserRouter = configRouter => {
     }) }),
     async (req, res, next) => {
       try {
-        const user = await UserRepository.findOne({
-          query: {
-            $or: [{
-              username: req.body.usernameOrEmail,
-            }, {
-              email: req.body.usernameOrEmail,
-            }],
-          },
-          options: {
-            fields: { password: 0 },
-          },
-        });
+        const usernameOrEmail = req.body.usernameOrEmail;
+        const user = await UserRepository.findByUsernameOrEmail({ usernameOrEmail });
 
         if (!user) throw Boom.notFound('Wrong username ro email');
         const resetPassword = {

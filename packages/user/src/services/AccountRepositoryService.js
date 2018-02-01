@@ -21,7 +21,7 @@ export class AccountRepositoryServices extends Repository {
   @service()
   createOne(userId) {
     // let acc;
-    super.createOne({ ownerId: userId });
+    return super.createOne({ ownerId: userId });
       // .then(account => {
       //   acc = account;
       //   const accountId = account._id.toString();

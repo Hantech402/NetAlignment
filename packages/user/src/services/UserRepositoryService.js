@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import { ObjectID as objectId } from 'mongodb';
+import nodemailer from 'nodemailer';
 
 import userSchema from '../schemas/userSchema';
 
@@ -16,10 +17,12 @@ async function hashPassword(password) {
 const { service } = decorators;
 
 export class UserRepositoryService extends Repository {
-  constructor({ jwtSecret, AccountRepository }) {
+  constructor({ config, AccountRepository }) {
     super(userSchema);
-    this.jwtSecret = jwtSecret;
+    this.jwtSecret = config.jwtSecret;
     this.AccountRepository = AccountRepository;
+    this.transport = nodemailer.createTransport(config.nodemailerConfig);
+    this.apiUrl = config.rootURL;
   }
 
   setServiceBus(serviceBus) {
@@ -137,5 +140,31 @@ export class UserRepositoryService extends Repository {
         query: { _id: userObj._id },
         update: { $set: { password: hashedPassword, resetPassword: {} } },
       }));
+  }
+
+  @service()
+  findByUsernameOrEmail({ usernameOrEmail }) {
+    return super.findOne({ query: {
+      $or: [{
+        username: usernameOrEmail,
+      }, {
+        email: usernameOrEmail,
+      }],
+    } });
+  }
+
+  @service()
+  sendEmail(options) {
+    return this.transport.sendMail(options);
+  }
+
+  @service()
+  sendConfirmationEmail({ email, accountId }) {
+    return this.sendEmail({
+      from: 'no-reply@mail.com',
+      to: email,
+      subject: 'Email confirmation',
+      html: `Please confirm your email <a href='${this.apiUrl}/account/${accountId}/confirm'>Click here to confirm</a>`,
+    });
   }
 }

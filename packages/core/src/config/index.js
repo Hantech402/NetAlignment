@@ -3,7 +3,7 @@ import Config from 'makeen-config';
 import MemoryStore from 'makeen-config/build/stores/Memory';
 import ENVStore from 'makeen-config/build/stores/Env';
 import AliasStore from 'makeen-config/build/stores/Alias';
-import randomstring from 'randomstring';
+// import randomstring from 'randomstring';
 import StdoutStore from 'makeen-octobus/build/libs/EventStore/Stdout';
 import NullStore from 'makeen-octobus/build/libs/EventStore/Null';
 
@@ -34,6 +34,14 @@ config.addStore(
       format: 'dev',
     },
     maxUploadSize: '20mb',
+    nodemailerConfig: {
+      host: 'smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: '07a92525f92455',
+        pass: '959fd2517f9ea8',
+      },
+    },
     modules: {
       mongodb: {
         connections: [
@@ -66,7 +74,8 @@ config.addStore(
         transport: {
           jsonTransport: true,
         },
-        saveToDisk: true,
+
+        saveToDisk: false,
         emailsDir: '',
         templatesDir: '',
         middlewarePivot: {
@@ -103,14 +112,14 @@ config.addStore(
     'modules.user.jwtSecret': 'secrets.jwt',
     'modules.user.rootURL': 'rootURL',
     'modules.logger.logsDir': async c =>
-      path.resolve(await c.get('rootDir'), './logs'),
+    path.resolve(await c.get('rootDir'), './logs'),
     'paths.web': async c => path.resolve(await c.get('rootDir'), './web'),
     'modules.mailer.emailsDir': async c =>
-      path.resolve(await c.get('rootDir'), './emails'),
+    path.resolve(await c.get('rootDir'), './emails'),
     'modules.mailer.templatesDir': async c =>
-      path.resolve(await c.get('rootDir'), './build/modules/mailer/templates'),
+    path.resolve(await c.get('rootDir'), './build/modules/mailer/templates'),
     'modules.fileStorage.uploadDir': async c =>
-      path.resolve(await c.get('rootDir'), './uploads'),
+    path.resolve(await c.get('rootDir'), './uploads'),
     'modules.octobus.messageStore': async c => {
       const isDev = await c.get('isDev');
       return isDev ? new StdoutStore() : new NullStore();

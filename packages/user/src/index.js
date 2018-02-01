@@ -23,7 +23,7 @@ export class UserModule extends Module {
 
     const AccountRepository = bindRepository(new AccountRepositoryServices());
     const UserRepository = bindRepository(new UserRepositoryService({
-      jwtSecret: config.jwtSecret,
+      config,
       AccountRepository,
     }));
 

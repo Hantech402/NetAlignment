@@ -27,5 +27,9 @@ export default async config => [
   new RouterModule(await config.get('modules.router')),
   new SecurityModule(await config.get('modules.security')),
 
-  new UserModule({ jwtSecret: await config.get('secrets.jwt') }),
+  new UserModule({
+    jwtSecret: await config.get('secrets.jwt'),
+    nodemailerConfig: await config.get('nodemailerConfig'),
+    rootURL: await config.get('rootURL'),
+  }),
 ];

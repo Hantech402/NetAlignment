@@ -81,5 +81,29 @@ export const accountRouter = indexRouterConfig => {
     },
   );
 
+  router.post(
+    '/resend-activation-email',
+    Celebrate({ body: Joi.object().keys({
+      usernameOrEmail: Joi.string().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const usernameOrEmail = req.body.usernameOrEmail;
+        const user = await UserRepository.findByUsernameOrEmail({ usernameOrEmail });
+
+        if (!user) throw Boom.notFound('Wrong username or email. User not found');
+        const account = await AccountRepository.findOne({ query: { ownerId: user._id } });
+        if (account.isConfirmed) throw Boom.badRequest('Your account is already confirmed');
+        await UserRepository.sendConfirmationEmail({
+          email: user.email,
+          accountId: account._id.toString(),
+        });
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };
