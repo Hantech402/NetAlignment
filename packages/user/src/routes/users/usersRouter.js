@@ -29,6 +29,10 @@ export const commonUserRouter = configRouter => {
           query: { _id: user._id },
           update: { $set: { accountId: user._id.toString() } },
         });
+        await UserRepository.sendConfirmationEmail({
+          email: user.email,
+          accountId: account._id.toString(),
+        });
         const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
         res.json({ user: userResponse, account: accountReponse });
