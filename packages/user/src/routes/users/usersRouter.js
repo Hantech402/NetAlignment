@@ -9,7 +9,8 @@ import { ObjectID as objectId } from 'mongodb';
 
 import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
-import { setUserInfo } from '../../utils';
+import accountSchema from '../../schemas/accountSchema';
+import { setUserInfo } from '../../utils'; // pick needed information from object
 
 export const commonUserRouter = configRouter => {
   const {
@@ -21,7 +22,22 @@ export const commonUserRouter = configRouter => {
 
   router.post(
     '/register',
-    Celebrate({ body: userSchema }),
+    Celebrate({
+      body: {
+        ...userSchema,
+        loanApplication: Joi.any().when('role', {
+          is: 'borrower',
+          then: Joi.object().keys(
+            pick(accountSchema, ['financialGoal', 'rate', 'termsByRate']),
+          ),
+          licenseNr: Joi.any().when('role', {
+            is: Joi.any().valid(['lender', 'broker']),
+            then: Joi.string().required(),
+          }),
+          employeesNr: Joi.number().allow(null),
+        }),
+      },
+    }),
     async (req, res, next) => {
       try {
         const user = await UserRepository.register(req.body);
@@ -51,6 +67,7 @@ export const commonUserRouter = configRouter => {
     }) }),
     async (req, res, next) => {
       try {
+        debugger;
         const userData = await UserRepository.login(req.body);
         const token = await UserRepository.generateToken({ userData });
         const userResponse = pick(userData, 'accountId', 'username', 'email', '_id', 'updatedAt', 'createdAt', 'lastLogin', 'role');

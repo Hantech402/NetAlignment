@@ -12,6 +12,7 @@ import PlayModule from './play';
 import AdminModule from './admin';
 
 import { UserModule } from '../../../user/src';
+import { AuthModule } from '../../../auth/src';
 
 export default async config => [
   new OctobusModule(await config.get('modules.octobus')),
@@ -33,4 +34,5 @@ export default async config => [
     rootURL: await config.get('rootURL'),
     jwtExpiresIn: await config.get('modules.user.jwtConfig.expiresIn'),
   }),
+  new AuthModule({ jwtSecret: await config.get('secrets.jwt') }),
 ];

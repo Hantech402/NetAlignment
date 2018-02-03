@@ -6,17 +6,18 @@ import { ObjectID as objectId } from 'mongodb';
 
 // import { helpers } from 'makeen-mongodb';
 
-import { requireAdmin } from '../../middlewares';
+// import { requireAdmin } from '../../middlewares';
 
 export const adminRouter = adminRouterConfig => {
   const {
     UserRepository,
     AccountRepository,
-    config,
+    // config,
+    permissions,
     router = Router(),
   } = adminRouterConfig;
 
-  router.use(requireAdmin(config));
+  router.use(permissions.requireAdmin);
 
   router.get(
     '/',

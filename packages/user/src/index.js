@@ -6,17 +6,19 @@ import { UserRepositoryService } from './services/UserRepositoryService';
 import { AccountRepositoryServices } from './services/AccountRepositoryService';
 
 export class UserModule extends Module {
-  name = 'net-aligments.users'
+  name = 'net-alignments.users'
 
   async setup(config) {
     const [
       { bindRepository },
       { createServiceBus },
       { addRouter },
+      { permissions },
     ] = await this.dependencies([
       'makeen.mongoDb',
       'makeen.octobus',
       'makeen.router',
+      'net-alignments.auth',
     ]);
 
     this.serviceBus = createServiceBus(this.name);
@@ -36,6 +38,7 @@ export class UserModule extends Module {
         UserRepository,
         AccountRepository,
         config,
+        permissions,
       }),
     );
 
@@ -46,7 +49,10 @@ export class UserModule extends Module {
         UserRepository,
         AccountRepository,
         config,
+        permissions,
       }),
     );
+
+    this.export({ AccountRepository, UserRepository });
   }
 }

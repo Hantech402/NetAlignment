@@ -4,13 +4,10 @@ import bcrypt from 'bcrypt';
 import Boom from 'boom';
 import jwt from 'jsonwebtoken';
 import pick from 'lodash/pick';
-import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 
 import userSchema from '../schemas/userSchema';
-
-const verifyJwt = bluebird.promisify(jwt.verify);
 
 async function hashPassword(password) {
   return bcrypt.hash(password, 10);
@@ -51,6 +48,10 @@ export class UserRepositoryService extends Repository {
       .then(user => {
         if (user && user.username === userData.username) throw Boom.badRequest('This username is already taken');
         if (user && user.email === userData.email) throw Boom.badRequest('This email is already taken');
+        return this.AccountRepository.findOne({ query: userData.licenseNr });
+      })
+      .then(account => {
+        if (account && userData.role === 'lender') throw Boom.badRequest('License nr already registered!');
         return hashPassword(userData.password);
       })
       .then(hashedPassword => super.createOne({ ...userData, password: hashedPassword }));

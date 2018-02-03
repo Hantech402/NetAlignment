@@ -1,0 +1,23 @@
+{
+  "name": "net-alignments",
+  "private": true,
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "scripts": {},
+  "author": "Yurii Shevtsov <yurii.shevtsov@wirestorm.us>",
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "bluebird": "^3.5.1",
+    "boom": "^7.1.1",
+    "celebrate": "^4.0.3",
+    "crypto": "^1.0.1",
+    "express": "4.15.4",
+    "joi": "10.6.0",
+    "jsonwebtoken": "^8.1.1",
+    "lodash": "4.17.4",
+    "makeen": "^1.4.5",
+    "makeen-mongodb": "^1.4.6",
+    "mongodb": "2.2.27",
+    "octobus.js": "1.1.2"
+  }
+}

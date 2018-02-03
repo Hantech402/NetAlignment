@@ -8,13 +8,14 @@ export const usersRouter = indexRouterConfig => {
     UserRepository,
     AccountRepository,
     config,
+    permissions,
     router = Router(),
   } = indexRouterConfig;
 
   // user (common) router
-  router.use(commonUserRouter({ UserRepository, AccountRepository, config }));
+  router.use(commonUserRouter({ UserRepository, AccountRepository, config, permissions }));
   // admin router
-  router.use(adminRouter({ UserRepository, AccountRepository, config }));
+  router.use(adminRouter({ UserRepository, AccountRepository, config, permissions }));
 
   return router;
 };
