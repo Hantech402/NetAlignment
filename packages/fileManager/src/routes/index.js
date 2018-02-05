@@ -15,10 +15,11 @@ export const fileManagerRouter = indexRouterConfig => {
     router = Router(),
   } = indexRouterConfig;
 
+  router.use(permissions.requireAuth);
+
   router.post(
     '/upload',
     fileUpload({ safeFileNames: true, preserveExtension: true }),
-    permissions.requireAuth,
     async (req, res, next) => {
       try {
         if (!req.files) return next(Boom.badRequest('No files were uploaded'));
@@ -50,7 +51,6 @@ export const fileManagerRouter = indexRouterConfig => {
 
   router.get(
     '/',
-    permissions.requireAuth,
     async (req, res, next) => {
       try {
         const files = await FileManagerService.findMany({
@@ -66,12 +66,11 @@ export const fileManagerRouter = indexRouterConfig => {
 
   router.delete(
     '/:id',
-    permissions.requireAuth,
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
         const file = await FileManagerService.findOne({ query: { _id } });
-        if (!file) return next(Boom.badRequest('File not found. Probably wrong file id.'));
+        if (!file) return next(Boom.notFound('File not found. Probably wrong file id.'));
         if (req.user._id !== file.userId) {
           return next(Boom.forbidden('You don\'t have permission to delete this file'));
         }
@@ -80,6 +79,22 @@ export const fileManagerRouter = indexRouterConfig => {
         res.sendStatus(200);
       } catch (err) {
         if (err.message.includes('24 hex')) next(Boom.badRequest('Wrong id format provided'));
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/:id/download',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const dbFile = await FileManagerService.findOne({ query: { _id } });
+
+        if (!dbFile) return next(Boom.notFound('File not found. Probably wrong file id.'));
+        if (req.user._id !== dbFile.userId) return next(Boom.forbidden('You don\'t have permission to download this file'));
+        res.sendFile(dbFile.filename);
+      } catch (err) {
         next(err);
       }
     },
