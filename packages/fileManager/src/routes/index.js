@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import Boom from 'boom';
+import fs from 'fs';
+import bluebird from 'bluebird';
+
+const getFileStats = bluebird.promisify(fs.stat);
 
 export const fileManagerRouter = indexRouterConfig => {
   const {
@@ -10,10 +14,9 @@ export const fileManagerRouter = indexRouterConfig => {
     router = Router(),
   } = indexRouterConfig;
 
-  router.use(fileUpload({ safeFileNames: true, preserveExtension: true }));
-
   router.post(
     '/upload',
+    fileUpload({ safeFileNames: true, preserveExtension: true }),
     permissions.requireAuth,
     async (req, res, next) => {
       try {
@@ -24,17 +27,36 @@ export const fileManagerRouter = indexRouterConfig => {
         const filePath = `${config.usersFilesPath}/${req.user.accountId}/${file.name}`;
 
         await file.mv(filePath);
+        const fileStats = await getFileStats(filePath);
+        fileStats.size /= 1000000.0;
+
         await FileManagerService.createOne({
           accountId: req.user.accountId,
           userId: req.user._id,
           filename: filePath,
           extension: fileExt,
-          size: 5,
+          size: fileStats.size,
           contentType: req.headers['content-type'],
           uploadedAt: new Date(),
         });
 
         res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/',
+    permissions.requireAuth,
+    async (req, res, next) => {
+      try {
+        const files = await FileManagerService.findMany({
+          query: { userId: req.user._id },
+        }).toArray();
+
+        res.json({ files });
       } catch (err) {
         next(err);
       }
