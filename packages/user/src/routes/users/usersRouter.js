@@ -7,7 +7,7 @@ import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 import { ObjectID as objectId } from 'mongodb';
 
-import { requireAuth } from '../../middlewares';
+// import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
 import accountSchema from '../../schemas/accountSchema';
 import { setUserInfo } from '../../utils'; // pick needed information from object
@@ -16,8 +16,9 @@ export const commonUserRouter = configRouter => {
   const {
     UserRepository,
     AccountRepository,
-    config,
+    // config,
     router = Router(),
+    permissions,
   } = configRouter;
 
   router.post(
@@ -38,6 +39,7 @@ export const commonUserRouter = configRouter => {
         }),
       },
     }),
+
     async (req, res, next) => {
       try {
         const user = await UserRepository.register(req.body);
@@ -67,7 +69,6 @@ export const commonUserRouter = configRouter => {
     }) }),
     async (req, res, next) => {
       try {
-        debugger;
         const userData = await UserRepository.login(req.body);
         const token = await UserRepository.generateToken({ userData });
         const userResponse = pick(userData, 'accountId', 'username', 'email', '_id', 'updatedAt', 'createdAt', 'lastLogin', 'role');
@@ -95,7 +96,7 @@ export const commonUserRouter = configRouter => {
 
   router.get(
     '/me',
-    requireAuth(config),
+    permissions.requireAuth,
     Celebrate({ headers: Joi.object({
       authorization: Joi.string().required(),
     }).unknown() }),
@@ -116,7 +117,7 @@ export const commonUserRouter = configRouter => {
 
   router.patch(
     '/me',
-    requireAuth(config),
+    permissions.requireAuth,
     Celebrate({ body: {
       ...pick(userSchema, [
         'title', 'firstName', 'middleName', 'lastName', 'address',
@@ -139,7 +140,7 @@ export const commonUserRouter = configRouter => {
 
   router.post(
     '/change-password',
-    requireAuth(config),
+    permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
       password: Joi.string().required(),
       oldPassword: Joi.string().required(),

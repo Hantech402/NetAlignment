@@ -17,6 +17,7 @@
     "lodash": "4.17.4",
     "makeen": "^1.4.5",
     "makeen-mongodb": "^1.4.6",
+    "makeen-security": "^0.5.8",
     "mongodb": "2.2.27",
     "octobus.js": "1.1.2"
   }
