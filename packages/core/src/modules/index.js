@@ -13,6 +13,7 @@ import AdminModule from './admin';
 
 import { UserModule } from '../../../user/src';
 import { AuthModule } from '../../../auth/src';
+import { FileManager } from '../../../fileManager/src';
 
 export default async config => [
   new OctobusModule(await config.get('modules.octobus')),
@@ -35,4 +36,5 @@ export default async config => [
     jwtExpiresIn: await config.get('modules.user.jwtConfig.expiresIn'),
   }),
   new AuthModule({ jwtSecret: await config.get('secrets.jwt') }),
+  new FileManager(await config.get('modules.fileManager')),
 ];

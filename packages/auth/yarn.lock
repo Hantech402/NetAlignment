@@ -714,6 +714,19 @@ makeen-mongodb@^1.4.6:
     octobus-crud "0.6.0"
     octobus-mongodb-store "0.5.0"
 
+makeen-security@^0.5.8:
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/makeen-security/-/makeen-security-0.5.12.tgz#ff7f698dff75a6d460bef6c5f8181e516f8b0c0e"
+  dependencies:
+    boom "5.1.0"
+    express "4.15.3"
+    joi "10.5.1"
+    lodash "4.17.4"
+    makeen "^1.4.5"
+    makeen-mongodb "^1.4.6"
+    mongodb "2.2.27"
+    octobus.js "1.1.2"
+
 makeen@^1.4.5:
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/makeen/-/makeen-1.4.5.tgz#eb5b35dcd492a3b2d7da8668f32a077d5a942fc2"

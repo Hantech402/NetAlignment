@@ -43,6 +43,9 @@ config.addStore(
       },
     },
     modules: {
+      fileManager: {
+        usersFilesPath: path.join(__dirname, '../../../../', 'usersFiles'),
+      },
       mongodb: {
         connections: [
           {
