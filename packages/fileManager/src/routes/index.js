@@ -3,6 +3,7 @@ import fileUpload from 'express-fileupload';
 import Boom from 'boom';
 import fs from 'fs';
 import bluebird from 'bluebird';
+import { ObjectID as objectId } from 'mongodb';
 
 const getFileStats = bluebird.promisify(fs.stat);
 
@@ -58,6 +59,27 @@ export const fileManagerRouter = indexRouterConfig => {
 
         res.json({ files });
       } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.delete(
+    '/:id',
+    permissions.requireAuth,
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const file = await FileManagerService.findOne({ query: { _id } });
+        if (!file) return next(Boom.badRequest('File not found. Probably wrong file id.'));
+        if (req.user._id !== file.userId) {
+          return next(Boom.forbidden('You don\'t have permission to delete this file'));
+        }
+
+        await FileManagerService.deleteOne({ query: { _id } });
+        res.sendStatus(200);
+      } catch (err) {
+        if (err.message.includes('24 hex')) next(Boom.badRequest('Wrong id format provided'));
         next(err);
       }
     },
