@@ -6,6 +6,7 @@
   "scripts": {},
   "author": "Yurii Shevtsov <yurii.shevtsov@wirestorm.us>",
   "dependencies": {
+    "archiver": "^2.1.1",
     "bluebird": "^3.5.1",
     "boom": "^7.1.1",
     "celebrate": "^4.0.3",

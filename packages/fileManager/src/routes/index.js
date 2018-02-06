@@ -4,6 +4,7 @@ import Boom from 'boom';
 import fs from 'fs';
 import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
+import archiver from 'archiver';
 
 const getFileStats = bluebird.promisify(fs.stat);
 
@@ -89,11 +90,30 @@ export const fileManagerRouter = indexRouterConfig => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const dbFile = await FileManagerService.findOne({ query: { _id } });
+        const userId = objectId(req.user._id);
+        const dbFile = await FileManagerService.findOne({ query: { _id, userId } });
 
         if (!dbFile) return next(Boom.notFound('File not found. Probably wrong file id.'));
-        if (req.user._id !== dbFile.userId) return next(Boom.forbidden('You don\'t have permission to download this file'));
         res.sendFile(dbFile.filename);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/archive',
+    async (req, res, next) => {
+      try {
+        const files = await FileManagerService.count({
+          query: { userId: req.user._id },
+        });
+        if (!files) return next(Boom.notFound('You do not have any file'));
+
+        const archive = archiver('zip');
+        archive.on('error', err => { throw err; });
+        archive.pipe(res);
+        archive.directory(`${config.usersFilesPath}/${req.user.accountId}`, false).finalize();
       } catch (err) {
         next(err);
       }

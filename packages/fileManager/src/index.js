@@ -23,7 +23,7 @@ export class FileManager extends Module {
     const FileManagerService = bindRepository(new FileManagerRepository());
 
     addRouter(
-      '/file',
+      '/files',
       'fileRouter',
       fileManagerRouter({
         FileManagerService,
