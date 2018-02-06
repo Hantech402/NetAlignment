@@ -5,8 +5,11 @@ import fs from 'fs';
 import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
 import archiver from 'archiver';
+import rimraf from 'rimraf';
 
 const getFileStats = bluebird.promisify(fs.stat);
+const deleteFile = bluebird.promisify(fs.unlink);
+const rmdir = bluebird.promisify(rimraf);
 
 export const fileManagerRouter = indexRouterConfig => {
   const {
@@ -34,8 +37,8 @@ export const fileManagerRouter = indexRouterConfig => {
         fileStats.size /= 1000000.0;
 
         await FileManagerService.createOne({
-          accountId: req.user.accountId,
-          userId: req.user._id,
+          accountId: objectId(req.user.accountId),
+          userId: objectId(req.user._id),
           filename: filePath,
           extension: fileExt,
           size: fileStats.size,
@@ -55,7 +58,7 @@ export const fileManagerRouter = indexRouterConfig => {
     async (req, res, next) => {
       try {
         const files = await FileManagerService.findMany({
-          query: { userId: req.user._id },
+          query: { userId: objectId(req.user._id) },
         }).toArray();
 
         res.json({ files });
@@ -72,10 +75,11 @@ export const fileManagerRouter = indexRouterConfig => {
         const _id = objectId(req.params.id);
         const file = await FileManagerService.findOne({ query: { _id } });
         if (!file) return next(Boom.notFound('File not found. Probably wrong file id.'));
-        if (req.user._id !== file.userId) {
+        if (req.user._id !== file.userId.toString()) {
           return next(Boom.forbidden('You don\'t have permission to delete this file'));
         }
 
+        await deleteFile(file.name);
         await FileManagerService.deleteOne({ query: { _id } });
         res.sendStatus(200);
       } catch (err) {
@@ -106,7 +110,7 @@ export const fileManagerRouter = indexRouterConfig => {
     async (req, res, next) => {
       try {
         const files = await FileManagerService.count({
-          query: { userId: req.user._id },
+          query: { userId: objectId(req.user._id) },
         });
         if (!files) return next(Boom.notFound('You do not have any file'));
 
@@ -114,6 +118,22 @@ export const fileManagerRouter = indexRouterConfig => {
         archive.on('error', err => { throw err; });
         archive.pipe(res);
         archive.directory(`${config.usersFilesPath}/${req.user.accountId}`, false).finalize();
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/empty',
+    async (req, res, next) => {
+      try {
+        await rmdir(`${config.usersFilesPath}/${req.user.accountId}/*`);
+        await FileManagerService.deleteMany({
+          query: { userId: objectId(req.user._id) },
+        });
+
+        res.sendStatus(200);
       } catch (err) {
         next(err);
       }

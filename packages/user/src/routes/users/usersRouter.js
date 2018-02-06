@@ -46,11 +46,11 @@ export const commonUserRouter = configRouter => {
         const account = await AccountRepository.createOne(user._id);
         await UserRepository.updateOne({
           query: { _id: user._id },
-          update: { $set: { accountId: user._id.toString() } },
+          update: { $set: { accountId: account._id } },
         });
         await UserRepository.sendConfirmationEmail({
           email: user.email,
-          accountId: account._id.toString(),
+          accountId: account._id,
         });
         const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);

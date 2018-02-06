@@ -17,6 +17,7 @@
     "makeen": "^1.4.5",
     "makeen-mongodb": "^1.4.6",
     "mongodb": "2.2.27",
-    "octobus.js": "1.1.2"
+    "octobus.js": "1.1.2",
+    "rimraf": "^2.6.2"
   }
 }
