@@ -6,6 +6,9 @@ import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
 import archiver from 'archiver';
 import rimraf from 'rimraf';
+import Joi from 'joi';
+import Celebrate from 'celebrate';
+import Hawk from 'hawk';
 
 const getFileStats = bluebird.promisify(fs.stat);
 const deleteFile = bluebird.promisify(fs.unlink);
@@ -18,6 +21,31 @@ export const fileManagerRouter = indexRouterConfig => {
     permissions,
     router = Router(),
   } = indexRouterConfig;
+
+  router.get(
+    '/:id/download',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        let accountId;
+        if (req.query.bewit) {
+          req.url = req.originalUrl;
+          const credentialsFunc = (id) => ({ ...config.bewitCredentials, id });
+          const { credentials } = await Hawk.uri.authenticate(req, credentialsFunc);
+          accountId = objectId(credentials.id);
+        } else {
+          config.decodeAndVerifyToken(req, res, next);
+          accountId = objectId(req.user.accountId);
+        }
+        const dbFile = await FileManagerService.findOne({ query: { _id, accountId } });
+
+        if (!dbFile) return next(Boom.notFound('File not found. Probably wrong file id.'));
+        res.sendFile(dbFile.filename);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
 
   router.use(permissions.requireAuth);
 
@@ -89,21 +117,6 @@ export const fileManagerRouter = indexRouterConfig => {
     },
   );
 
-  router.get(
-    '/:id/download',
-    async (req, res, next) => {
-      try {
-        const _id = objectId(req.params.id);
-        const userId = objectId(req.user._id);
-        const dbFile = await FileManagerService.findOne({ query: { _id, userId } });
-
-        if (!dbFile) return next(Boom.notFound('File not found. Probably wrong file id.'));
-        res.sendFile(dbFile.filename);
-      } catch (err) {
-        next(err);
-      }
-    },
-  );
 
   router.get(
     '/archive',
@@ -134,6 +147,28 @@ export const fileManagerRouter = indexRouterConfig => {
         });
 
         res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    '/sign-url',
+    Celebrate({ body: Joi.object().keys({
+      url: Joi.string().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const options = {
+          credentials: {
+            id: req.user.accountId,
+            ...config.bewitCredentials,
+          },
+          ttlSec: 60,
+        };
+        const bewit = Hawk.uri.getBewit(req.body.url, options);
+        res.json({ url: `${req.body.url}?bewit=${bewit}` });
       } catch (err) {
         next(err);
       }

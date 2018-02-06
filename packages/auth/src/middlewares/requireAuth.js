@@ -4,6 +4,19 @@ import Boom from 'boom';
 
 const verify = bluebird.promisify(jwt.verify);
 
+export const decodeAndVerifyToken = ({ jwtSecret }) =>
+  async (req, res, next) => {
+    try {
+      const token = req.headers.authorization;
+      const decoded = await verify(token, jwtSecret);
+
+      req.user = decoded;
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') throw Boom.unauthorized('Token has expired');
+      next(err);
+    }
+  };
+
 export const requireAuth = ({ jwtSecret, permissionsManager }) =>
   async (req, res, next) => {
     try {

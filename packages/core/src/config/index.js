@@ -45,6 +45,10 @@ config.addStore(
     modules: {
       fileManager: {
         usersFilesPath: path.join(__dirname, '../../../../', 'usersFiles'),
+        bewitCredentials: {
+          key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+          algorithm: 'sha256',
+        },
       },
       mongodb: {
         connections: [
