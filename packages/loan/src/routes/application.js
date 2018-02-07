@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ObjectID as objectId } from 'mongodb';
+import Boom from 'boom';
 
 export const applicationRouter = config => {
   const {
@@ -35,6 +36,27 @@ export const applicationRouter = config => {
         }).toArray();
 
         res.json(loanApps);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.patch(
+    '/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id } });
+        if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
+        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('It is not your loan app');
+
+        await LoanApplicationRepository.updateOne({
+          query: { _id },
+          update: { $set: req.body },
+        });
+
+        res.sendStatus(200);
       } catch (err) {
         next(err);
       }
