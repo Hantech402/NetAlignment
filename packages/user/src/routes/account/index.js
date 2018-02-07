@@ -5,7 +5,6 @@ import Celebrate from 'celebrate';
 import pick from 'lodash/pick';
 import Joi from 'joi';
 
-import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
 import { setUserInfo } from '../../utils';
 
@@ -13,7 +12,8 @@ export const accountRouter = indexRouterConfig => {
   const {
     UserRepository,
     AccountRepository,
-    config,
+    // config,
+    permissions,
     router = Router(),
   } = indexRouterConfig;
 
@@ -42,7 +42,7 @@ export const accountRouter = indexRouterConfig => {
 
   router.post(
     '/deactivate',
-    requireAuth(config),
+    permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
       reason: Joi.string().required(),
     }).required() }),

@@ -8,7 +8,7 @@ export const applicationRouter = config => {
     LoanApplicationRepository,
   } = config;
 
-  router.use(permissions.requireAuth);
+  router.use(permissions.requireAuth, permissions.requireBorrower);
 
   router.post(
     '/',

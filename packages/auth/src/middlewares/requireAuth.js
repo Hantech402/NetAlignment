@@ -12,15 +12,16 @@ export const decodeAndVerifyToken = ({ jwtSecret }) =>
 
       req.user = decoded;
     } catch (err) {
-      if (err.name === 'TokenExpiredError') throw Boom.unauthorized('Token has expired');
+      if (err.name === 'TokenExpiredError') return next(Boom.unauthorized('Token has expired'));
       next(err);
     }
   };
 
-export const requireAuth = ({ jwtSecret, permissionsManager }) =>
+export const requireAuth = ({ jwtSecret }) =>
   async (req, res, next) => {
     try {
       const token = req.headers.authorization;
+      if (!token) return next(Boom.unauthorized('Token must be provided'));
       const decoded = await verify(token, jwtSecret);
 
       // const havePermission = await permissionsManager.can(decoded, 'isAdmin');
@@ -28,7 +29,8 @@ export const requireAuth = ({ jwtSecret, permissionsManager }) =>
       req.user = decoded;
       next();
     } catch (err) {
-      if (err.name === 'TokenExpiredError') throw Boom.unauthorized('Token has expired');
+      if (err.message === 'invalid signature') return next(Boom.unauthorized('Invalid token signature'));
+      if (err.name === 'TokenExpiredError') return next(Boom.unauthorized('Token has expired'));
       next(err);
     }
   };

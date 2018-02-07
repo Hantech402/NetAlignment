@@ -4,10 +4,6 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 
-// import { helpers } from 'makeen-mongodb';
-
-// import { requireAdmin } from '../../middlewares';
-
 export const adminRouter = adminRouterConfig => {
   const {
     UserRepository,
@@ -17,7 +13,7 @@ export const adminRouter = adminRouterConfig => {
     router = Router(),
   } = adminRouterConfig;
 
-  router.use(permissions.requireAdmin);
+  router.use(permissions.requireAuth, permissions.requireAdmin);
 
   router.get(
     '/',

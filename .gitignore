@@ -11,3 +11,5 @@ logs/errors
 .tern-project
 *.swp
 *.swo
+
+usersFiles/*

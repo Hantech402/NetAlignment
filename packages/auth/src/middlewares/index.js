@@ -1,11 +1,12 @@
-import { requireAdmin } from './requrieAdmin';
+// import { requireAdmin } from './requrieAdmin';
 import { requireAuth, decodeAndVerifyToken } from './requireAuth';
+import { requireAdmin, requireBroker, requireLender, requireBorrower } from './requireRole';
 
-export const setupMiddleware = ({ UserRepository, jwtSecret, permissionsManager }) => {
-  // permissionsManager.define('admin');
-  return {
-    requireAdmin: requireAdmin({ UserRepository, jwtSecret, permissionsManager }),
-    requireAuth: requireAuth({ UserRepository, jwtSecret, permissionsManager }),
-    decodeAndVerifyToken: decodeAndVerifyToken({ jwtSecret }),
-  };
-};
+export const setupMiddleware = ({ UserRepository, jwtSecret, permissionsManager }) => ({
+  requireAuth: requireAuth({ UserRepository, jwtSecret, permissionsManager }),
+  requireAdmin,
+  requireBroker,
+  requireLender,
+  requireBorrower,
+  decodeAndVerifyToken: decodeAndVerifyToken({ jwtSecret }),
+});
