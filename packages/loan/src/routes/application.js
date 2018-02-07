@@ -25,5 +25,21 @@ export const applicationRouter = config => {
     },
   );
 
+  router.get(
+    '/',
+    async (req, res, next) => {
+      try {
+        const accountId = objectId(req.user.accountId);
+        const loanApps = await LoanApplicationRepository.findMany({
+          query: { accountId },
+        }).toArray();
+
+        res.json(loanApps);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };
