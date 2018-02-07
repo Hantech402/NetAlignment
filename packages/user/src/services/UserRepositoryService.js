@@ -48,7 +48,7 @@ export class UserRepositoryService extends Repository {
       .then(user => {
         if (user && user.username === userData.username) throw Boom.badRequest('This username is already taken');
         if (user && user.email === userData.email) throw Boom.badRequest('This email is already taken');
-        return this.AccountRepository.findOne({ query: userData.licenseNr });
+        return this.AccountRepository.findOne({ query: { licenseNr: userData.licenseNr } });
       })
       .then(account => {
         if (account && userData.role === 'lender') throw Boom.badRequest('License nr already registered!');

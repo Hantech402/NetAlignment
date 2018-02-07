@@ -7,7 +7,6 @@ import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
 import { ObjectID as objectId } from 'mongodb';
 
-// import { requireAuth } from '../../middlewares';
 import userSchema from '../../schemas/userSchema';
 import accountSchema from '../../schemas/accountSchema';
 import { setUserInfo } from '../../utils'; // pick needed information from object
@@ -24,20 +23,20 @@ export const commonUserRouter = configRouter => {
   router.post(
     '/register',
     Celebrate({
-      body: {
+      body: Joi.object().keys({
         ...userSchema,
+        licenseNr: Joi.any().when('role', {
+          is: Joi.any().valid(['lender', 'broker']),
+          then: Joi.string().required(),
+        }),
+        employeesNr: Joi.number().allow(null),
         loanApplication: Joi.any().when('role', {
           is: 'borrower',
           then: Joi.object().keys(
             pick(accountSchema, ['financialGoal', 'rate', 'termsByRate']),
           ),
-          licenseNr: Joi.any().when('role', {
-            is: Joi.any().valid(['lender', 'broker']),
-            then: Joi.string().required(),
-          }),
-          employeesNr: Joi.number().allow(null),
         }),
-      },
+      }).required(),
     }),
 
     async (req, res, next) => {
@@ -201,6 +200,23 @@ export const commonUserRouter = configRouter => {
         });
         const userResponse = setUserInfo(user);
         res.json({ user: userResponse });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/lenders',
+    permissions.requireAuth, permissions.requireBorrower,
+    async (req, res, next) => {
+      try {
+        const lenders = await UserRepository.findMany({
+          query: { role: 'lender' },
+          fields: { password: 0 },
+        }).toArray();
+
+        res.json(lenders);
       } catch (err) {
         next(err);
       }
