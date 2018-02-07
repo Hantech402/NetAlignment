@@ -116,6 +116,24 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    '/findOne',
+    Celebrate({ query: Joi.object().keys({
+      query: Joi.object().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const query = req.query.query;
+        const loan = await LoanApplicationRepository.findOne({ query });
+        if (!loan) throw Boom.notFound('Unable to find loan application');
+
+        res.json(loan);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
     '/:id',
     async (req, res, next) => {
       try {
