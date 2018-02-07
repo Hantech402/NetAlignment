@@ -51,8 +51,6 @@ export default {
   }).default({
   }),
 
-  licenseNr: Joi.string(),
-
   _account: Joi.object(),
 
   isDeleted: Joi.boolean().default(false),

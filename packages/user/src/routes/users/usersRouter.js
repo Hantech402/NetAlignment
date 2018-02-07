@@ -42,7 +42,7 @@ export const commonUserRouter = configRouter => {
     async (req, res, next) => {
       try {
         const user = await UserRepository.register(req.body);
-        const account = await AccountRepository.createOne(user._id);
+        const account = await AccountRepository.createOne({ userId: user._id, ...req.body });
         await UserRepository.updateOne({
           query: { _id: user._id },
           update: { $set: { accountId: account._id } },

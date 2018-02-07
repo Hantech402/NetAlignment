@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import Boom from 'boom';
 import jwt from 'jsonwebtoken';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import { ObjectID as objectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 
@@ -54,7 +55,7 @@ export class UserRepositoryService extends Repository {
         if (account && userData.role === 'lender') throw Boom.badRequest('License nr already registered!');
         return hashPassword(userData.password);
       })
-      .then(hashedPassword => super.createOne({ ...userData, password: hashedPassword }));
+      .then(hashedPassword => super.createOne({ ...omit(userData, ['licenseNr']), password: hashedPassword }));
   }
 
   @service()
