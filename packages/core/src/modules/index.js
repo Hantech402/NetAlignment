@@ -15,6 +15,7 @@ import { UserModule } from '../../../user/src';
 import { AuthModule } from '../../../auth/src';
 import { FileManager } from '../../../fileManager/src';
 import { LoanApplicationModule } from '../../../loan/src';
+import { MaintenanceModule } from '../../../maintenance/src';
 
 export default async config => [
   new OctobusModule(await config.get('modules.octobus')),
@@ -39,4 +40,5 @@ export default async config => [
   new AuthModule({ jwtSecret: await config.get('secrets.jwt') }),
   new FileManager(await config.get('modules.fileManager')),
   new LoanApplicationModule(),
+  new MaintenanceModule({ usersFilesPath: await config.get('modules.fileManager.usersFilesPath') }),
 ];
