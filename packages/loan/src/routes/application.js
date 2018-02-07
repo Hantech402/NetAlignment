@@ -63,5 +63,22 @@ export const applicationRouter = config => {
     },
   );
 
+  router.delete(
+    '/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id } });
+        if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
+        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('It is not your loan app');
+
+        await LoanApplicationRepository.deleteOne({ query: { _id } });
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };
