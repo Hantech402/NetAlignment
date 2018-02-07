@@ -47,12 +47,12 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const loanApp = await LoanApplicationRepository.findOne({ query: { _id } });
+        const accountId = objectId(req.user.accountId);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
         if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
-        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('It is not your loan app');
 
         await LoanApplicationRepository.updateOne({
-          query: { _id },
+          query: { _id, accountId },
           update: { $set: req.body },
         });
 
@@ -68,12 +68,28 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const loanApp = await LoanApplicationRepository.findOne({ query: { _id } });
+        const accountId = objectId(req.user.accountId);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
         if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
-        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('It is not your loan app');
 
-        await LoanApplicationRepository.deleteOne({ query: { _id } });
+        await LoanApplicationRepository.deleteOne({ query: { _id, accountId } });
         res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const accountId = objectId(req.user.accountId);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
+
+        if (!loanApp) throw Boom.notFound(`Cannot found loan application with id ${req.params.id}`);
+        res.json(loanApp);
       } catch (err) {
         next(err);
       }
