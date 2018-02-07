@@ -4,6 +4,8 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 
+import userSchema from '../../schemas/userSchema';
+
 export const adminRouter = adminRouterConfig => {
   const {
     UserRepository,
@@ -115,5 +117,23 @@ export const adminRouter = adminRouterConfig => {
     },
   );
 
+  // router.put(
+  //   '/:id',
+  //   // Celebrate({ body: { ...userSchema } }),
+  //   async (req, res, next) => {
+  //     try {
+  //       const _id = objectId(req.params.id);
+  //       await UserRepository.replaceOne({
+  //         query: { _id },
+  //         replace: req.body,
+  //       });
+  //
+  //       res.sendStatus(200);
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   },
+  // );
+  //
   return router;
 };

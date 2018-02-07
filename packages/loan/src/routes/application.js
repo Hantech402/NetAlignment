@@ -81,6 +81,19 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    '/count',
+    async (req, res, next) => {
+      try {
+        const accountId = objectId(req.user.accountId);
+        const loanAppsCount = await LoanApplicationRepository.count({ query: { accountId } });
+        res.json(loanAppsCount);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
     '/:id',
     async (req, res, next) => {
       try {
