@@ -1,10 +1,10 @@
 import { Repository } from 'makeen-mongodb';
 
-import fileSchema from '../schemas/file';
+import { loanApplication } from '../schemas';
 
-export class FileManagerRepository extends Repository {
+export class LoanApplicationRepositoryService extends Repository {
   constructor() {
-    super(fileSchema);
+    super(loanApplication);
   }
 
   setServiceBus(serviceBus) {
