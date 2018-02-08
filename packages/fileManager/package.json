@@ -1,10 +1,13 @@
 {
-  "name": "phone-log-privacypolicies",
-  "private": true,
-  "version": "0.1.0",
-  "main": "build/index.js",
-  "scripts": {},
-  "author": "Yurii Shevtsov <yurii.shevtsov@wirestorm.us>",
+  "name": "net-alignments-fileManager",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Panchenko ALeksey <aleksei.panchenko@wirestorm.us>",
+  "license": "ISC",
   "dependencies": {
     "archiver": "^2.1.1",
     "bluebird": "^3.5.1",

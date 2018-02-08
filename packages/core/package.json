@@ -1,10 +1,10 @@
 {
   "name": "makeen-boilerplate-core",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.1",
   "main": "build/index.js",
   "scripts": {},
-  "author": "Victor Zamfir <victor@makeen.io>",
+  "author": "Panchenko ALeksey <aleksei.panchenko@wirestorm.us>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/makeen-project/makeen/issues"
@@ -52,6 +52,11 @@
     "randomstring": "1.1.5",
     "raven": "2.0.2",
     "react": "15.5.4",
-    "react-dom": "15.5.4"
+    "react-dom": "15.5.4",
+    "net-alignments-auth": "*",
+    "net-alignments-fileManager": "*",
+    "net-alignments-loan": "*",
+    "net-alignments-maintenance": "*",
+    "net-alignments-users": "*"
   }
 }

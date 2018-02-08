@@ -4,18 +4,18 @@ import RouterModule from 'makeen-router';
 import MongoDBModule from 'makeen-mongodb';
 import MakeenUserModule from 'makeen-user';
 import GQLModule from 'makeen-graphql';
-import MailerModule from 'makeen-mailer';
-import FileStorageModule from 'makeen-file-storage';
+import MailerModule from 'makeen-mailer'; import FileStorageModule from 'makeen-file-storage';
 import SecurityModule from 'makeen-security';
 import HealthModule from 'makeen-health';
+
+import { UserModule } from 'net-alignments-users';
+import { AuthModule } from 'net-alignments-auth';
+import { FileManager } from 'net-alignments-fileManager';
+import { LoanApplicationModule } from 'net-alignments-loan';
+import { MaintenanceModule } from 'net-alignments-maintenance';
+
 import PlayModule from './play';
 import AdminModule from './admin';
-
-import { UserModule } from '../../../user/src';
-import { AuthModule } from '../../../auth/src';
-import { FileManager } from '../../../fileManager/src';
-import { LoanApplicationModule } from '../../../loan/src';
-import { MaintenanceModule } from '../../../maintenance/src';
 
 export default async config => [
   new OctobusModule(await config.get('modules.octobus')),

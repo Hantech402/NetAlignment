@@ -16,11 +16,10 @@
     "debug": "babel-node --inspect src/index.js",
     "babel-node": "babel-node",
     "lint": "eslint .",
-    "precommit": "lint-staged",
     "watch:files": "makeen-watch",
     "watch:server": "nodemon packages/core/build/index.js",
     "build": "makeen-build",
-    "dev": "yarn run build && run-p watch:*",
+    "dev": "babel-node packages/core/src/index.js",
     "publish-packages": "npm run build && lerna publish"
   },
   "author": "Victor Zamfir <victor@makeen.io>",
