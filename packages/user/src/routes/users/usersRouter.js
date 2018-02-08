@@ -21,6 +21,15 @@ export const commonUserRouter = configRouter => {
   } = configRouter;
 
   router.post(
+    /**
+     * Register new user
+     * @route POST /users/resgister
+     * @param {string} username.body.requried
+     * @param {string} password.body.required
+     * @param {string} email.body.required
+     * @param {string} streetAddress1.address.body.required
+     * @param {string} role.body.required
+     */
     '/register',
     Celebrate({
       body: Joi.object().keys({
@@ -65,6 +74,13 @@ export const commonUserRouter = configRouter => {
   );
 
   router.post(
+    /**
+     * User login
+     * @route GET /users/login
+     * @param {string} username.body.required
+     * @param {string} password.body.required
+     * @returns {object} - user information
+     */
     '/login',
     Celebrate({ body: Joi.object().keys({
       username: Joi.string().required(),
@@ -83,6 +99,12 @@ export const commonUserRouter = configRouter => {
   );
 
   router.post(
+    /**
+     * Refresh token
+     * @route POST /users/refresh-token
+     * @param {string} token.body.required
+     * @returns {string} - refreshed token
+     */
     '/refresh-token',
     Celebrate({ body: Joi.object().keys({
       token: Joi.string().required(),
@@ -98,6 +120,12 @@ export const commonUserRouter = configRouter => {
   );
 
   router.get(
+    /**
+     * Get my (user's) profile
+     * @route GET /users/me
+     * @security jwtToken
+     * @returns {object} 200 - user's profile
+     */
     '/me',
     permissions.requireAuth,
     Celebrate({ headers: Joi.object({
@@ -119,6 +147,16 @@ export const commonUserRouter = configRouter => {
   );
 
   router.patch(
+    /**
+     * Update user's profile
+     * @route PATCH /users/me
+     * @param {string} title.body
+     * @param {string} firstName.body
+     * @param {string} middleName.body
+     * @param {string} lastName.body
+     * @param {object} address.body
+     * @returns {object} 200 - user's profile
+     */
     '/me',
     permissions.requireAuth,
     Celebrate({ body: {
@@ -142,6 +180,13 @@ export const commonUserRouter = configRouter => {
   );
 
   router.post(
+    /**
+     * Change user's password
+     * @route POST /users/change-password
+     * @param {string} password.body.required
+     * @param {string} oldPassword.body.required
+     * @returns {object} 200
+    */
     '/change-password',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -159,6 +204,11 @@ export const commonUserRouter = configRouter => {
   );
 
   router.post(
+    /**
+     * Create user token for password reset
+     * @route POST /users/reset-password
+    * @param {string} usernameOrEmail.body.required
+    */
     '/reset-password',
     Celebrate({ body: Joi.object().keys({
       usernameOrEmail: Joi.string().required(),
@@ -187,6 +237,12 @@ export const commonUserRouter = configRouter => {
   );
 
   router.post(
+    /**
+     * Recover user's password
+     * @route POST /users/recover-password/{token}
+     * @param {string} password.body.required
+     * @param {string} token.path.required
+    */
     '/recover-password/:token',
     Celebrate({
       params: Joi.object().keys({
@@ -211,6 +267,12 @@ export const commonUserRouter = configRouter => {
   );
 
   router.get(
+    /**
+    * Get all lenders
+    * @route GET /lenders
+    * @returns {array} 200
+    * @security jwtToken
+    */
     '/lenders',
     permissions.requireAuth, permissions.requireBorrower,
     async (req, res, next) => {

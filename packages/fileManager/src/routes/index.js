@@ -22,6 +22,14 @@ export const fileManagerRouter = indexRouterConfig => {
   } = indexRouterConfig;
 
   router.get(
+    /**
+     * Download file by id
+     * @route GET /files/{id}/download
+     * @param {string} id.path.required
+     * @returns {file} 200 - downloads a file
+     * @security jwtToken
+    */
+
     '/:id/download',
     async (req, res, next) => {
       try {
@@ -49,6 +57,12 @@ export const fileManagerRouter = indexRouterConfig => {
   router.use(permissions.requireAuth);
 
   router.post(
+    /**
+     * Upload file
+     * @route POST
+     * @param file.formData.required
+     * @security jwtToken
+    */
     '/upload',
     fileUpload({ safeFileNames: true, preserveExtension: true }),
     async (req, res, next) => {
@@ -81,6 +95,14 @@ export const fileManagerRouter = indexRouterConfig => {
   );
 
   router.get(
+    /**
+     * Get all user's files objects (db)
+     * @route GET /files
+     * @param {string} query.query.required
+     * @returns {object} 200
+     * @security jwtToken
+    */
+
     '/',
     async (req, res, next) => {
       try {
@@ -96,6 +118,12 @@ export const fileManagerRouter = indexRouterConfig => {
   );
 
   router.delete(
+    /**
+     * Delete file
+     * @route DELETE /files/:id
+     * @param {string} id.path.required
+     * @security jwtToken
+    */
     '/:id',
     async (req, res, next) => {
       try {
@@ -118,6 +146,13 @@ export const fileManagerRouter = indexRouterConfig => {
 
 
   router.get(
+    /**
+     * archive all user's files
+     * @route GET /files/archive
+     * @returns {file} 200 - zip archive of all user's files
+     * @security jwtToken
+    */
+
     '/archive',
     async (req, res, next) => {
       try {
@@ -135,6 +170,12 @@ export const fileManagerRouter = indexRouterConfig => {
   );
 
   router.post(
+    /**
+     * Delete all users files
+     * @route POST
+     * @security jwtToken
+    */
+
     '/empty',
     async (req, res, next) => {
       try {
@@ -151,6 +192,14 @@ export const fileManagerRouter = indexRouterConfig => {
   );
 
   router.post(
+    /**
+    * Sign file for save download (60seconds)
+    * @route POST /files/sign-url
+    * @param {string} url.body.required
+    * @returns {string} url.body.required
+    * @security jwtToken
+    */
+
     '/sign-url',
     Celebrate({ body: Joi.object().keys({
       url: Joi.string().required(),

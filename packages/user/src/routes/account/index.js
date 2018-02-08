@@ -18,6 +18,13 @@ export const accountRouter = indexRouterConfig => {
   } = indexRouterConfig;
 
   router.get(
+    /**
+    * Confirm user's account
+    * @route GET /account/{id}/confirm
+    * @param {string} id.path.required
+    * @returns {object} 200 - updated account object
+    */
+
     '/:id/confirm',
     async (req, res, next) => { // eslint-disable-line consistent-return
       try {
@@ -41,6 +48,12 @@ export const accountRouter = indexRouterConfig => {
   );
 
   router.post(
+    /**
+     * Deactivate account
+     * @route POST /account/deactivate
+     * @param {string} reason.body.required
+     * @security jwtToken
+    */
     '/deactivate',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -61,6 +74,14 @@ export const accountRouter = indexRouterConfig => {
   );
 
   router.post(
+    /**
+     * Reactivate account
+     * @route POST /account/reactivate
+     * @param {string} username.body.required
+     * @param {string} password.body.required
+     * @returns {object} 200 - user's object
+    */
+
     '/reactivate',
     Celebrate({ body: Joi.object().keys({
       ...pick(userSchema, ['username', 'password']),
@@ -82,6 +103,11 @@ export const accountRouter = indexRouterConfig => {
   );
 
   router.post(
+    /**
+     * Resend activation email
+     * @route POST /account/resend-activation-email
+     * @param {string} usernameOrEmail.body.required
+    */
     '/resend-activation-email',
     Celebrate({ body: Joi.object().keys({
       usernameOrEmail: Joi.string().required(),
@@ -106,6 +132,13 @@ export const accountRouter = indexRouterConfig => {
   );
 
   router.get(
+    /**
+     * Find broker
+     * @route GET /account/find-broker
+     * @param {string} licenseNr.query.required
+     * @param {string} employeeEmail.query.required
+     * @returns {object} 200 - user's object
+    */
     '/find-broker',
     Celebrate({ query: Joi.object().keys({
       licenseNr: Joi.string().allow(null),

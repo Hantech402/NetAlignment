@@ -28,6 +28,11 @@ export const maintenanceRouter = routerConfig => {
   router.use(permissions.requireAuth, permissions.requireAdmin);
 
   router.post(
+    /**
+    * Create upload dirs for all accounts
+    * @route POST /maintenance/create-upload-dirs
+    * @security jwtToken
+    */
     '/create-upload-dirs',
     async (req, res, next) => {
       try {

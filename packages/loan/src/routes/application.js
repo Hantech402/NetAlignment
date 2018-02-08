@@ -15,6 +15,13 @@ export const applicationRouter = config => {
   router.use(permissions.requireAuth, permissions.requireBorrower);
 
   router.post(
+    /**
+    * Create loan application
+    * @route POST /loans/applications
+    * @returns {object} 200 - loan object
+    * @security jwtToken
+    */
+
     '/',
     async (req, res, next) => {
       try {
@@ -30,6 +37,13 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+    * Find all user's loan apps
+    * @route GET /loans/applications
+    * @returns {object} 200 - loan obj
+    * @security jwtToken
+    */
+
     '/',
     async (req, res, next) => {
       try {
@@ -46,6 +60,13 @@ export const applicationRouter = config => {
   );
 
   router.patch(
+    /**
+    * Update loan application
+    * @route PATCH
+    * @param {string} id.path.required
+    * @security jwtToken
+    */
+
     '/:id',
     async (req, res, next) => {
       try {
@@ -67,6 +88,13 @@ export const applicationRouter = config => {
   );
 
   router.delete(
+    /**
+     * Delete loan application
+     * @route DELETE /loans/application
+     * @param {string} query.query.required
+     * @security jwtToken
+    */
+
     '/deleteOne',
     Celebrate({ body: Joi.object().keys({
       query: Joi.object().required(),
@@ -87,6 +115,13 @@ export const applicationRouter = config => {
   );
 
   router.delete(
+    /**
+     * Delete loan application by id
+     * @route DELETE /loans/applications
+     * @param {string} id.path.required
+     * @security jwtToken
+    */
+
     '/:id',
     async (req, res, next) => {
       try {
@@ -104,6 +139,13 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+     * Count all user's loan applications
+     * @route GET /loans/applications
+     * @returns {number} 200
+     * @security jwtToken
+    */
+
     '/count',
     async (req, res, next) => {
       try {
@@ -117,6 +159,14 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+     * Find user's loan application
+     * @route GET /loans/applications/findOne
+     * @param {object} object.query.required - mongo query object
+     * @returns {object} 200
+     * @security jwtToken
+    */
+
     '/findOne',
     Celebrate({ query: Joi.object().keys({
       query: Joi.object().required(),
@@ -135,6 +185,14 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+    * Find loan app by id
+    * @route GET /loans/applications
+    * @param {string} id.path.required
+    * @returns {object} 200 - loan object
+    * @security jwtToken
+    */
+
     '/:id',
     async (req, res, next) => {
       try {
@@ -151,6 +209,14 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+     * Get loan's app files objects by loan app id
+     * @route GET /loans/applications/{id}/files
+     * @param {string} id.path.required
+     * @returns {array} 200 - array of files objects
+     * @security jwtToken
+    */
+
     '/:id/files',
     async (req, res, next) => {
       try {
@@ -178,6 +244,14 @@ export const applicationRouter = config => {
   );
 
   router.get(
+    /**
+    * Download files by loan id
+    * @route GET /loans/applications/{id}/files/archive
+    * @param {string} id.path.required
+    * @returns {file} 200 - zip file
+    * @security jwtToken
+    */
+
     '/:id/files/archive',
     async (req, res, next) => {
       try {

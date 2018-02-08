@@ -4,7 +4,7 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 
-import userSchema from '../../schemas/userSchema';
+// import userSchema from '../../schemas/userSchema';
 
 export const adminRouter = adminRouterConfig => {
   const {
@@ -18,6 +18,12 @@ export const adminRouter = adminRouterConfig => {
   router.use(permissions.requireAuth, permissions.requireAdmin);
 
   router.get(
+    /**
+     * Get all users
+     * @route GET /users
+     * @returns {array} 200
+     * @security jwtToken
+    */
     '/',
     async (req, res, next) => {
       try {
@@ -33,6 +39,12 @@ export const adminRouter = adminRouterConfig => {
   );
 
   router.get(
+    /**
+     * Count all users
+     * @route GET /users/count
+     * @returns {number} 200
+     * @security jwtToken
+    */
     '/count',
     async (req, res, next) => {
       try {
@@ -45,6 +57,13 @@ export const adminRouter = adminRouterConfig => {
   );
 
   router.get(
+    /**
+    * Get user's obj
+    * @route GET /users/findOne
+    * @param {object} query.query.required - mongo query object
+    * @returns {object} 200 - user's object
+    * @security jwtToken
+    */
     '/findOne',
     Celebrate({ query: Joi.object().keys({
       query: Joi.object().required(),
@@ -62,6 +81,13 @@ export const adminRouter = adminRouterConfig => {
   );
 
   router.get(
+    /**
+    * Get user by id
+    * @route GET /users/{id}
+    * @param {string} id.path.required - mongoId
+    * @returns {object} 200 - user's object
+    * @security jwtToken
+    */
     '/:id',
     async (req, res, next) => {
       try {
@@ -78,6 +104,12 @@ export const adminRouter = adminRouterConfig => {
   );
 
   router.delete(
+    /**
+     * Delete user
+     * @route DELETE /users/deleteOne
+     * @param {string} query.query.required
+     * @security jwtToken
+    */
     '/deleteOne',
     Celebrate({ body: Joi.object().keys({
       query: Joi.object().required(),
@@ -96,6 +128,12 @@ export const adminRouter = adminRouterConfig => {
   );
 
   router.patch(
+    /**
+     * Update user's profile
+     * @route PATCH /users/{id}
+     * @param {string} id.path.required
+     * @security jwtToken
+    */
     '/:id',
     Celebrate({
       params: Joi.object().keys({
