@@ -4,7 +4,6 @@ import Boom from 'boom';
 import fs from 'fs';
 import bluebird from 'bluebird';
 import { ObjectID as objectId } from 'mongodb';
-import archiver from 'archiver';
 import rimraf from 'rimraf';
 import Joi from 'joi';
 import Celebrate from 'celebrate';
@@ -122,15 +121,13 @@ export const fileManagerRouter = indexRouterConfig => {
     '/archive',
     async (req, res, next) => {
       try {
-        const files = await FileManagerService.count({
+        const files = await FileManagerService.findOne({
           query: { userId: objectId(req.user._id) },
         });
         if (!files) return next(Boom.notFound('You do not have any file'));
 
-        const archive = archiver('zip');
-        archive.on('error', err => { throw err; });
-        archive.pipe(res);
-        archive.directory(`${config.usersFilesPath}/${req.user.accountId}`, false).finalize();
+        const dirPath = `${config.usersFilesPath}/${req.user.accountId}`;
+        FileManagerService.archiveDirs({ dirPath, res });
       } catch (err) {
         next(err);
       }

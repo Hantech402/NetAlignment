@@ -30,5 +30,7 @@ export class FileManager extends Module {
         config,
         permissions,
       }));
+
+    this.export({ FileManagerService });
   }
 }

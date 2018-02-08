@@ -157,9 +157,10 @@ export const applicationRouter = config => {
         const _id = objectId(req.params.id);
         const loanApp = await LoanApplicationRepository.findOne({
           query: { _id },
-          options: { fields: { fileIds: 1 } },
+          options: { fields: { fileIds: 1, accountId: 1 } },
         });
         if (!loanApp) throw Boom.notFound('Unable to find loan application');
+        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('Missing permissions');
 
         const files = await FileManagerService.findMany({
           query: {
@@ -170,6 +171,36 @@ export const applicationRouter = config => {
         }).toArray();
 
         res.json(files);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/:id/files/archive',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const loanApp = await LoanApplicationRepository.findOne({
+          query: { _id },
+          options: { fields: { fileIds: 1, accountId: 1 } },
+        });
+        if (!loanApp) throw Boom.notFound('Unable to find loan application');
+        if (loanApp.accountId.toString() !== req.user.accountId) throw Boom.forbidden('Missing permissions');
+
+        const files = await FileManagerService.findMany({
+          query: {
+            _id: {
+              $in: loanApp.fileIds,
+            },
+          },
+        }).toArray();
+
+        if (!files.length) throw Boom.notFound('Unable to find any file for this loan application');
+
+        const filesPath = files.map(file => file.filename);
+        FileManagerService.archiveFiles({ filesPath, res });
       } catch (err) {
         next(err);
       }
