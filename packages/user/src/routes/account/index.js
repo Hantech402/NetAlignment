@@ -105,5 +105,43 @@ export const accountRouter = indexRouterConfig => {
     },
   );
 
+  router.get(
+    '/find-broker',
+    Celebrate({ query: Joi.object().keys({
+      licenseNr: Joi.string().allow(null),
+      employeeEmail: Joi.string().email().allow(null),
+    }) }),
+    async (req, res, next) => {
+      try {
+        const { licenseNr, employeeEmail } = req.query;
+        const query = { isActive: true, isDeactivated: false, isConfirmed: true };
+
+        if (licenseNr) query.licenseNr = licenseNr;
+        if (employeeEmail) query.employeeEmail = employeeEmail;
+
+        const account = await AccountRepository.findOne({ query });
+        if (!account) throw Boom.notFound('Unable to find account');
+
+        const user = await UserRepository.findOne({
+          query: {
+            accountId: account._id,
+            role: 'broker',
+            isAccountOwner: true,
+          },
+        });
+
+        if (!user) throw Boom.notFound('Unable to find user account');
+
+        res.json({
+          accountId: account._id,
+          userId: user._id,
+          ...pick(user, ['firstName', 'middleName', 'lastName']),
+        });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };

@@ -29,6 +29,7 @@ export const commonUserRouter = configRouter => {
           is: Joi.any().valid(['lender', 'broker']),
           then: Joi.string().required(),
         }),
+
         employeesNr: Joi.number().allow(null),
         loanApplication: Joi.any().when('role', {
           is: 'borrower',
@@ -43,14 +44,17 @@ export const commonUserRouter = configRouter => {
       try {
         const user = await UserRepository.register(req.body);
         const account = await AccountRepository.createOne({ userId: user._id, ...req.body });
+
         await UserRepository.updateOne({
           query: { _id: user._id },
           update: { $set: { accountId: account._id } },
         });
+
         await UserRepository.sendConfirmationEmail({
           email: user.email,
           accountId: account._id,
         });
+
         const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
         res.json({ user: userResponse, account: accountReponse });

@@ -55,7 +55,11 @@ export class UserRepositoryService extends Repository {
         if (account && userData.role === 'lender') throw Boom.badRequest('License nr already registered!');
         return hashPassword(userData.password);
       })
-      .then(hashedPassword => super.createOne({ ...omit(userData, ['licenseNr']), password: hashedPassword }));
+      .then(hashedPassword => super.createOne({
+        ...omit(userData, ['licenseNr']),
+        password: hashedPassword,
+        isAccountOwner: true,
+      }));
   }
 
   @service()
