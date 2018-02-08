@@ -13,11 +13,13 @@ export class LoanApplicationModule extends Module {
       { createServiceBus },
       { addRouter },
       { permissions },
+      { FileManagerService },
     ] = await this.dependencies([
       'makeen.mongoDb',
       'makeen.octobus',
       'makeen.router',
       'net-alignments.auth',
+      'net-alignments.fileManager',
     ]);
 
     this.serviceBus = createServiceBus(this.name);
@@ -30,6 +32,7 @@ export class LoanApplicationModule extends Module {
       loanRouter({
         LoanApplicationRepository,
         permissions,
+        FileManagerService,
       }),
     );
   }

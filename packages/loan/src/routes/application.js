@@ -9,6 +9,7 @@ export const applicationRouter = config => {
     router = Router(),
     permissions,
     LoanApplicationRepository,
+    FileManagerService,
   } = config;
 
   router.use(permissions.requireAuth, permissions.requireBorrower);
@@ -143,6 +144,32 @@ export const applicationRouter = config => {
 
         if (!loanApp) throw Boom.notFound(`Cannot found loan application with id ${req.params.id}`);
         res.json(loanApp);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/:id/files',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const loanApp = await LoanApplicationRepository.findOne({
+          query: { _id },
+          options: { fields: { fileIds: 1 } },
+        });
+        if (!loanApp) throw Boom.notFound('Unable to find loan application');
+
+        const files = await FileManagerService.findMany({
+          query: {
+            _id: {
+              $in: loanApp.fileIds,
+            },
+          },
+        }).toArray();
+
+        res.json(files);
       } catch (err) {
         next(err);
       }
