@@ -3,8 +3,10 @@ import Celebrate from 'celebrate';
 import Joi from 'joi';
 import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
+import pick from 'lodash/pick';
 
-// import userSchema from '../../schemas/userSchema';
+import userSchema from '../../schemas/userSchema';
+import { setUserInfo } from '../../utils';
 
 export const adminRouter = adminRouterConfig => {
   const {
@@ -22,6 +24,7 @@ export const adminRouter = adminRouterConfig => {
      * Get all users
      * @route GET /users
      * @group Users
+     * @param {object} query.query.required - mongo query obj
      * @returns {array} 200
      * @security jwtToken
     */
@@ -29,7 +32,7 @@ export const adminRouter = adminRouterConfig => {
     async (req, res, next) => {
       try {
         const users = await UserRepository
-          .findMany({ query: {}, fields: { password: 0 } })
+          .findMany({ query: req.query.query, fields: { password: 0 } })
           .toArray();
 
         res.json(users);
@@ -161,23 +164,77 @@ export const adminRouter = adminRouterConfig => {
     },
   );
 
-  // router.put(
-  //   '/:id',
-  //   // Celebrate({ body: { ...userSchema } }),
-  //   async (req, res, next) => {
-  //     try {
-  //       const _id = objectId(req.params.id);
-  //       await UserRepository.replaceOne({
-  //         query: { _id },
-  //         replace: req.body,
-  //       });
-  //
-  //       res.sendStatus(200);
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   },
-  // );
-  //
+  router.post(
+    /**
+     * Register new admin by another admin
+     * @route POST /users/resgister
+     * @group Users
+     * @param {string} username.body.requried
+     * @param {string} password.body.required
+     * @param {string} email.body.required
+     * @param {string} streetAddress1.address.body.required
+     * @returns {object} 200 - user's object
+     */
+
+    '/register-admin',
+    Celebrate({ body:
+      Joi.object().keys({
+        ...userSchema,
+        role: Joi.string(),
+      }).required() }),
+    async (req, res, next) => {
+      try {
+        const user = await UserRepository.register({ ...req.body, role: 'admin' });
+        const account = await AccountRepository.createOne({
+          userId: user._id,
+          ...req.body,
+          isConfirmed: true,
+        });
+
+        await UserRepository.updateOne({
+          query: { _id: user._id },
+          update: { $set: { accountId: account._id } },
+        });
+
+        const userResponse = setUserInfo(user);
+        const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
+        res.json({ user: userResponse, account: accountReponse });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.patch(
+    /**
+     * Change user's account status ({ isActive: true/false })
+     * @route PATCH / users/:userId/change-status
+     * @param {string} userId.path.required
+     * @param {boolean} isActive.body.required
+     * @security jwtToken
+    */
+
+    '/:userId/change-status',
+    Celebrate({ body: Joi.object().keys({
+      isActive: Joi.bool().required(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.userId);
+        const user = await UserRepository.findOne({ query: { _id } });
+        if (!user) throw Boom.notFound('Unable to find user');
+
+        await AccountRepository.updateOne({
+          query: { _id: user.accountId },
+          update: { $set: { isActive: req.body.isActive } },
+        });
+
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };

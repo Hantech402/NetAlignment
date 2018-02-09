@@ -28,7 +28,6 @@ export const requireAuth = ({ jwtSecret }) =>
 
       const _id = objectId(decoded.accountId);
       const account = await AccountRepository.findOne({ query: { _id } });
-      debugger
       if (!account.isActive) return next(Boom.unauthorized('Your account is disabled'));
 
       req.user = decoded;

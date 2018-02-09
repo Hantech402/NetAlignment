@@ -24,7 +24,7 @@ export class AccountRepositoryServices extends Repository {
     let acc;
     return super.createOne({
       ownerId: userId,
-      ...pick(userData, ['licenseNr']),
+      ...pick(userData, ['licenseNr', 'isConfirmed']),
     })
       .then(account => {
         acc = account;

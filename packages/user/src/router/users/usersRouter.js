@@ -37,6 +37,7 @@ export const commonUserRouter = configRouter => {
     Celebrate({
       body: Joi.object().keys({
         ...userSchema,
+        role: Joi.string().required().valid(['borrower', 'lender']),
         licenseNr: Joi.any().when('role', {
           is: Joi.any().valid(['lender', 'broker']),
           then: Joi.string().required(),
