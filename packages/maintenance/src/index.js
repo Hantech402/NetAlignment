@@ -1,6 +1,6 @@
 import { Module } from 'makeen';
 
-import { maintenanceRouter } from './routes';
+import { maintenanceRouter } from './router';
 
 export class MaintenanceModule extends Module {
   name = 'net-alignment.maintenance';

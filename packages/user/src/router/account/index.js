@@ -21,6 +21,7 @@ export const accountRouter = indexRouterConfig => {
     /**
     * Confirm user's account
     * @route GET /account/{id}/confirm
+    * @group Account
     * @param {string} id.path.required
     * @returns {object} 200 - updated account object
     */
@@ -51,9 +52,10 @@ export const accountRouter = indexRouterConfig => {
     /**
      * Deactivate account
      * @route POST /account/deactivate
+     * @group Account
      * @param {string} reason.body.required
      * @security jwtToken
-    */
+     */
     '/deactivate',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -77,10 +79,11 @@ export const accountRouter = indexRouterConfig => {
     /**
      * Reactivate account
      * @route POST /account/reactivate
+     * @group Account
      * @param {string} username.body.required
      * @param {string} password.body.required
      * @returns {object} 200 - user's object
-    */
+     */
 
     '/reactivate',
     Celebrate({ body: Joi.object().keys({
@@ -106,8 +109,9 @@ export const accountRouter = indexRouterConfig => {
     /**
      * Resend activation email
      * @route POST /account/resend-activation-email
+     * @group Account
      * @param {string} usernameOrEmail.body.required
-    */
+     */
     '/resend-activation-email',
     Celebrate({ body: Joi.object().keys({
       usernameOrEmail: Joi.string().required(),
@@ -135,10 +139,11 @@ export const accountRouter = indexRouterConfig => {
     /**
      * Find broker
      * @route GET /account/find-broker
+     * @group Account
      * @param {string} licenseNr.query.required
      * @param {string} employeeEmail.query.required
      * @returns {object} 200 - user's object
-    */
+     */
     '/find-broker',
     Celebrate({ query: Joi.object().keys({
       licenseNr: Joi.string().allow(null),

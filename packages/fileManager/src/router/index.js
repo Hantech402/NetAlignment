@@ -25,6 +25,7 @@ export const fileManagerRouter = indexRouterConfig => {
     /**
      * Download file by id
      * @route GET /files/{id}/download
+     * @group FileManager
      * @param {string} id.path.required
      * @returns {file} 200 - downloads a file
      * @security jwtToken
@@ -59,7 +60,8 @@ export const fileManagerRouter = indexRouterConfig => {
   router.post(
     /**
      * Upload file
-     * @route POST
+     * @route POST /files/upload
+     * @group FileManager
      * @param file.formData.required
      * @security jwtToken
     */
@@ -98,6 +100,7 @@ export const fileManagerRouter = indexRouterConfig => {
     /**
      * Get all user's files objects (db)
      * @route GET /files
+     * @group FileManager
      * @param {string} query.query.required
      * @returns {object} 200
      * @security jwtToken
@@ -121,6 +124,7 @@ export const fileManagerRouter = indexRouterConfig => {
     /**
      * Delete file
      * @route DELETE /files/:id
+     * @group FileManager
      * @param {string} id.path.required
      * @security jwtToken
     */
@@ -149,6 +153,7 @@ export const fileManagerRouter = indexRouterConfig => {
     /**
      * archive all user's files
      * @route GET /files/archive
+     * @group FileManager
      * @returns {file} 200 - zip archive of all user's files
      * @security jwtToken
     */
@@ -172,7 +177,8 @@ export const fileManagerRouter = indexRouterConfig => {
   router.post(
     /**
      * Delete all users files
-     * @route POST
+     * @route POST /files/empty
+     * @group FileManager
      * @security jwtToken
     */
 
@@ -195,6 +201,7 @@ export const fileManagerRouter = indexRouterConfig => {
     /**
     * Sign file for save download (60seconds)
     * @route POST /files/sign-url
+    * @group FileManager
     * @param {string} url.body.required
     * @returns {string} url.body.required
     * @security jwtToken

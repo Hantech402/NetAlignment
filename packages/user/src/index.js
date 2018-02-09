@@ -1,7 +1,7 @@
 import { Module } from 'makeen';
 
-import { usersRouter } from './routes/users';
-import { accountRouter } from './routes/account';
+import { usersRouter } from './router/users';
+import { accountRouter } from './router/account';
 import { UserRepositoryService } from './services/UserRepositoryService';
 import { AccountRepositoryServices } from './services/AccountRepositoryService';
 

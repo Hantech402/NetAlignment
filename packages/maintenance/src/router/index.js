@@ -31,6 +31,7 @@ export const maintenanceRouter = routerConfig => {
     /**
     * Create upload dirs for all accounts
     * @route POST /maintenance/create-upload-dirs
+    * @group Maintenance
     * @security jwtToken
     */
     '/create-upload-dirs',

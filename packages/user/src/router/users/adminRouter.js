@@ -21,6 +21,7 @@ export const adminRouter = adminRouterConfig => {
     /**
      * Get all users
      * @route GET /users
+     * @group Users
      * @returns {array} 200
      * @security jwtToken
     */
@@ -42,6 +43,7 @@ export const adminRouter = adminRouterConfig => {
     /**
      * Count all users
      * @route GET /users/count
+     * @group Users
      * @returns {number} 200
      * @security jwtToken
     */
@@ -60,6 +62,7 @@ export const adminRouter = adminRouterConfig => {
     /**
     * Get user's obj
     * @route GET /users/findOne
+     * @group Users
     * @param {object} query.query.required - mongo query object
     * @returns {object} 200 - user's object
     * @security jwtToken
@@ -83,7 +86,8 @@ export const adminRouter = adminRouterConfig => {
   router.get(
     /**
     * Get user by id
-    * @route GET /users/{id}
+    * @route GET /users/:id
+    * @group Users
     * @param {string} id.path.required - mongoId
     * @returns {object} 200 - user's object
     * @security jwtToken
@@ -107,9 +111,10 @@ export const adminRouter = adminRouterConfig => {
     /**
      * Delete user
      * @route DELETE /users/deleteOne
+     * @group Users
      * @param {string} query.query.required
      * @security jwtToken
-    */
+     */
     '/deleteOne',
     Celebrate({ body: Joi.object().keys({
       query: Joi.object().required(),
@@ -130,10 +135,11 @@ export const adminRouter = adminRouterConfig => {
   router.patch(
     /**
      * Update user's profile
-     * @route PATCH /users/{id}
+     * @route PATCH /users/{id}/
+     * @group Users
      * @param {string} id.path.required
      * @security jwtToken
-    */
+     */
     '/:id',
     Celebrate({
       params: Joi.object().keys({

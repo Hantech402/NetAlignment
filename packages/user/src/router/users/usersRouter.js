@@ -24,12 +24,15 @@ export const commonUserRouter = configRouter => {
     /**
      * Register new user
      * @route POST /users/resgister
+     * @group Users
      * @param {string} username.body.requried
      * @param {string} password.body.required
      * @param {string} email.body.required
      * @param {string} streetAddress1.address.body.required
      * @param {string} role.body.required
+     * @returns {object} 200 - user's object
      */
+
     '/register',
     Celebrate({
       body: Joi.object().keys({
@@ -77,6 +80,7 @@ export const commonUserRouter = configRouter => {
     /**
      * User login
      * @route GET /users/login
+     * @group Users
      * @param {string} username.body.required
      * @param {string} password.body.required
      * @returns {object} - user information
@@ -102,6 +106,7 @@ export const commonUserRouter = configRouter => {
     /**
      * Refresh token
      * @route POST /users/refresh-token
+     * @group Users
      * @param {string} token.body.required
      * @returns {string} - refreshed token
      */
@@ -123,6 +128,7 @@ export const commonUserRouter = configRouter => {
     /**
      * Get my (user's) profile
      * @route GET /users/me
+     * @group Users
      * @security jwtToken
      * @returns {object} 200 - user's profile
      */
@@ -149,7 +155,8 @@ export const commonUserRouter = configRouter => {
   router.patch(
     /**
      * Update user's profile
-     * @route PATCH /users/me
+     * @route PATCH /users/me/
+     * @group Users
      * @param {string} title.body
      * @param {string} firstName.body
      * @param {string} middleName.body
@@ -183,6 +190,7 @@ export const commonUserRouter = configRouter => {
     /**
      * Change user's password
      * @route POST /users/change-password
+     * @group Users
      * @param {string} password.body.required
      * @param {string} oldPassword.body.required
      * @returns {object} 200
@@ -207,6 +215,7 @@ export const commonUserRouter = configRouter => {
     /**
      * Create user token for password reset
      * @route POST /users/reset-password
+     * @group Users
     * @param {string} usernameOrEmail.body.required
     */
     '/reset-password',
@@ -240,6 +249,7 @@ export const commonUserRouter = configRouter => {
     /**
      * Recover user's password
      * @route POST /users/recover-password/{token}
+     * @group Users
      * @param {string} password.body.required
      * @param {string} token.path.required
     */
@@ -268,11 +278,12 @@ export const commonUserRouter = configRouter => {
 
   router.get(
     /**
-    * Get all lenders
-    * @route GET /lenders
-    * @returns {array} 200
-    * @security jwtToken
-    */
+     * Get all lenders
+     * @route GET /lenders
+     * @group Users
+     * @returns {array} 200
+     * @security jwtToken
+     */
     '/lenders',
     permissions.requireAuth, permissions.requireBorrower,
     async (req, res, next) => {

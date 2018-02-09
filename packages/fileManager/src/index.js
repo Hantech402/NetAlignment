@@ -1,7 +1,7 @@
 import { Module } from 'makeen';
 
 import { FileManagerRepository } from './services/filesManagerService';
-import { fileManagerRouter } from './routes';
+import { fileManagerRouter } from './router';
 
 export class FileManager extends Module {
   name = 'net-alignments.fileManager';

@@ -17,7 +17,8 @@ export const applicationRouter = config => {
   router.post(
     /**
     * Create loan application
-    * @route POST /loans/applications
+    * @route POST /loans/applications/
+    * @group LoanApp
     * @returns {object} 200 - loan object
     * @security jwtToken
     */
@@ -40,6 +41,7 @@ export const applicationRouter = config => {
     /**
     * Find all user's loan apps
     * @route GET /loans/applications
+    * @group LoanApp
     * @returns {object} 200 - loan obj
     * @security jwtToken
     */
@@ -62,7 +64,8 @@ export const applicationRouter = config => {
   router.patch(
     /**
     * Update loan application
-    * @route PATCH
+    * @route PATCH /loans/applications/:id
+    * @group LoanApp
     * @param {string} id.path.required
     * @security jwtToken
     */
@@ -90,7 +93,8 @@ export const applicationRouter = config => {
   router.delete(
     /**
      * Delete loan application
-     * @route DELETE /loans/application
+     * @route DELETE /loans/application/deleteOne
+     * @group LoanApp
      * @param {string} query.query.required
      * @security jwtToken
     */
@@ -117,7 +121,8 @@ export const applicationRouter = config => {
   router.delete(
     /**
      * Delete loan application by id
-     * @route DELETE /loans/applications
+     * @route DELETE /loans/applications/{id}/
+     * @group LoanApp
      * @param {string} id.path.required
      * @security jwtToken
     */
@@ -141,7 +146,8 @@ export const applicationRouter = config => {
   router.get(
     /**
      * Count all user's loan applications
-     * @route GET /loans/applications
+     * @route GET /loans/applications/count
+     * @group LoanApp
      * @returns {number} 200
      * @security jwtToken
     */
@@ -162,6 +168,7 @@ export const applicationRouter = config => {
     /**
      * Find user's loan application
      * @route GET /loans/applications/findOne
+     * @group LoanApp
      * @param {object} object.query.required - mongo query object
      * @returns {object} 200
      * @security jwtToken
@@ -187,7 +194,8 @@ export const applicationRouter = config => {
   router.get(
     /**
     * Find loan app by id
-    * @route GET /loans/applications
+    * @route GET /loans/applications/{id}
+    * @group LoanApp
     * @param {string} id.path.required
     * @returns {object} 200 - loan object
     * @security jwtToken
@@ -212,6 +220,7 @@ export const applicationRouter = config => {
     /**
      * Get loan's app files objects by loan app id
      * @route GET /loans/applications/{id}/files
+     * @group LoanApp
      * @param {string} id.path.required
      * @returns {array} 200 - array of files objects
      * @security jwtToken
@@ -247,6 +256,7 @@ export const applicationRouter = config => {
     /**
     * Download files by loan id
     * @route GET /loans/applications/{id}/files/archive
+    * @group LoanApp
     * @param {string} id.path.required
     * @returns {file} 200 - zip file
     * @security jwtToken
