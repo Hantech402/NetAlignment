@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bluebird from 'bluebird';
 import Boom from 'boom';
+import { ObjectID as objectId } from 'mongodb';
 
 const verify = bluebird.promisify(jwt.verify);
 
@@ -20,12 +21,16 @@ export const decodeAndVerifyToken = ({ jwtSecret }) =>
 export const requireAuth = ({ jwtSecret }) =>
   async (req, res, next) => {
     try {
+      const { AccountRepository } = req.app.modules.get('net-alignments.users');
       const token = req.headers.authorization;
       if (!token) return next(Boom.unauthorized('Token must be provided'));
       const decoded = await verify(token, jwtSecret);
 
-      // const havePermission = await permissionsManager.can(decoded, 'isAdmin');
-      // if (!havePermission) throw Boom.unauthorized('You do not have enough permissions');
+      const _id = objectId(decoded.accountId);
+      const account = await AccountRepository.findOne({ query: { _id } });
+      debugger
+      if (!account.isActive) return next(Boom.unauthorized('Your account is disabled'));
+
       req.user = decoded;
       next();
     } catch (err) {

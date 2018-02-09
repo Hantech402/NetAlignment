@@ -35,7 +35,7 @@ export class UserRepositoryService extends Repository {
     return new Promise((resolve, reject) => {
       jwt.sign({
         ...pick(userData, ['_id', 'username', 'accountId']),
-        scope: userData.role,
+        role: userData.role,
       }, this.jwtSecret, { expiresIn: this.jwtExpiresIn }, (err, token) => {
         if (err) reject(err);
         resolve(token);
@@ -88,6 +88,7 @@ export class UserRepositoryService extends Repository {
       .then(account => {
         if (!account.isConfirmed) throw Boom.unauthorized('Your account is not confirmed');
         if (account.isDeactivated) throw Boom.unauthorized('Your account is deactivated');
+        if (!account.isActive) throw Boom.unauthorized('Your account is deactivated');
       })
       .then(() => super.updateOne({
         query: { _id: userObj._id },

@@ -2,8 +2,8 @@
 import { requireAuth, decodeAndVerifyToken } from './requireAuth';
 import { requireAdmin, requireBroker, requireLender, requireBorrower } from './requireRole';
 
-export const setupMiddleware = ({ UserRepository, jwtSecret, permissionsManager }) => ({
-  requireAuth: requireAuth({ UserRepository, jwtSecret, permissionsManager }),
+export const setupMiddleware = ({ jwtSecret }) => ({
+  requireAuth: requireAuth({ jwtSecret }),
   requireAdmin,
   requireBroker,
   requireLender,
