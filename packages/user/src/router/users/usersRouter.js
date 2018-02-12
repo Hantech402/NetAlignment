@@ -15,7 +15,7 @@ export const commonUserRouter = configRouter => {
   const {
     UserRepository,
     AccountRepository,
-    // config,
+    config,
     router = Router(),
     permissions,
   } = configRouter;
@@ -55,6 +55,7 @@ export const commonUserRouter = configRouter => {
 
     async (req, res, next) => {
       try {
+        permissions.decodeAndVerifyToken(req, res, next);
         const user = await UserRepository.register(req.body);
         const account = await AccountRepository.createOne({ userId: user._id, ...req.body });
 
@@ -63,10 +64,18 @@ export const commonUserRouter = configRouter => {
           update: { $set: { accountId: account._id } },
         });
 
-        await UserRepository.sendConfirmationEmail({
+        const email = {
           email: user.email,
           accountId: account._id,
-        });
+        };
+
+        if (req.user && req.user.role === 'admin') {
+          email.subject = 'Your credentials';
+          email.html = `<p>Your login: <b>${user.username}</b>. Password: <b>${req.body.password}</b></p>
+                        <p>Please confirm your account <a href='${config.rootURL}/account/${account._id.toString()}/confirm'>here</a></p>`;
+        }
+
+        await UserRepository.sendConfirmationEmail(email);
 
         const userResponse = setUserInfo(user);
         const accountReponse = pick(account, ['isConfirmed', 'isActive', '_id', 'updatedAt', 'createdAt']);
@@ -195,7 +204,7 @@ export const commonUserRouter = configRouter => {
      * @param {string} password.body.required
      * @param {string} oldPassword.body.required
      * @returns {object} 200
-    */
+     */
     '/change-password',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -217,8 +226,8 @@ export const commonUserRouter = configRouter => {
      * Create user token for password reset
      * @route POST /users/reset-password
      * @group Users
-    * @param {string} usernameOrEmail.body.required
-    */
+     * @param {string} usernameOrEmail.body.required
+     */
     '/reset-password',
     Celebrate({ body: Joi.object().keys({
       usernameOrEmail: Joi.string().required(),
@@ -253,7 +262,8 @@ export const commonUserRouter = configRouter => {
      * @group Users
      * @param {string} password.body.required
      * @param {string} token.path.required
-    */
+     */
+
     '/recover-password/:token',
     Celebrate({
       params: Joi.object().keys({

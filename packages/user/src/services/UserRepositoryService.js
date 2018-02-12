@@ -163,12 +163,12 @@ export class UserRepositoryService extends Repository {
   }
 
   @service()
-  sendConfirmationEmail({ email, accountId }) {
+  sendConfirmationEmail({ email, accountId, subject, html }) {
     return this.sendEmail({
       from: 'no-reply@mail.com',
       to: email,
-      subject: 'Email confirmation',
-      html: `Please confirm your email <a href='${this.apiUrl}/account/${accountId}/confirm'>Click here to confirm</a>`,
+      subject: subject || 'Email confirmation',
+      html: html || `Please confirm your email <a href='${this.apiUrl}/account/${accountId}/confirm'>Click here to confirm</a>`,
     });
   }
 }
