@@ -24,7 +24,7 @@ export const adminRouter = adminRouterConfig => {
      * Get all users
      * @route GET /users
      * @group Users
-     * @param {object} query.query.required - mongo query obj
+     * @param {object} query.query - mongo query obj
      * @returns {array} 200
      * @security jwtToken
     */
@@ -32,7 +32,7 @@ export const adminRouter = adminRouterConfig => {
     async (req, res, next) => {
       try {
         const users = await UserRepository
-          .findMany({ query: req.query.query, fields: { password: 0 } })
+          .findMany({ query: req.query.query || {}, fields: { password: 0 } })
           .toArray();
 
         res.json(users);
