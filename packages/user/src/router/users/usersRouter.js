@@ -179,6 +179,7 @@ export const commonUserRouter = configRouter => {
     Celebrate({ body: {
       ...pick(userSchema, [
         'title', 'firstName', 'middleName', 'lastName', 'address',
+        'country', 'county', 'zipCode', 'phoneNumber',
       ]),
       address: userSchema.address.optional(),
     } }),
