@@ -2,7 +2,7 @@ import { Repository } from 'makeen-mongodb';
 
 import loanEstimateSchema from '../schemas/loanEstimate';
 
-export class EstimateRepositoryService extends Repository {
+export class LoanEstimateRepositoryService extends Repository {
   constructor() {
     super(loanEstimateSchema);
   }

@@ -2,13 +2,15 @@ import { Router } from 'express';
 import Celebrate from 'celebrate';
 import Joi from 'joi';
 import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 import { ObjectID as objectId } from 'mongodb';
+import Boom from 'boom';
 
 import loanEstimateSchema from '../schemas/loanEstimate';
 
 export const estimateRouter = config => {
   const {
-    EstimateRepository,
+    LoanEstimateRepository,
     LoanApplicationRepository,
     permissions,
     FileManagerService,
@@ -37,7 +39,7 @@ export const estimateRouter = config => {
     } }),
     async (req, res, next) => {
       try {
-        const loanEstimate = await EstimateRepository.createOne({
+        const loanEstimate = await LoanEstimateRepository.createOne({
           ...req.body,
           loanApplicationId: objectId(req.body.loanApplicationId),
           accountId: objectId(req.user.accountId),
@@ -62,11 +64,47 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const accountId = objectId(req.user.accountId);
-        const loanEstimates = await EstimateRepository.findMany({
+        const loanEstimates = await LoanEstimateRepository.findMany({
           query: { accountId },
         }).toArray();
 
         res.json({ loanEstimates });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.patch(
+    /**
+     * Update loan estimate
+     * @route PATCH /loans/estimates/:id
+     * @param {string} amortizationType.body.required
+     * @param {number} interestRate.body.required
+     * @param {number} nrOfMonths.body.required
+     * @security jwtToken
+    */
+
+    '/:id',
+    Celebrate({ body: Joi.object().keys({
+      amortizationType: Joi.string(),
+      interestRate: Joi.number(),
+      nrOfMonths: Joi.number(),
+    }).required() }),
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const accountId = objectId(req.user.accountId);
+
+        const loanEstimate = await LoanEstimateRepository.findOne({ query: { _id, accountId } });
+        if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
+
+        await LoanEstimateRepository.updateOne({
+          query: { _id },
+          update: { $set: req.body },
+        });
+
+        res.sendStatus(200);
       } catch (err) {
         next(err);
       }

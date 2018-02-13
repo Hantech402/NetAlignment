@@ -5,7 +5,7 @@ import { estimateRouter } from './estimates';
 
 export const loanRouter = config => {
   const {
-    EstimateRepository,
+    LoanEstimateRepository,
     LoanApplicationRepository,
     permissions,
     FileManagerService,
@@ -23,7 +23,7 @@ export const loanRouter = config => {
     LoanApplicationRepository,
     permissions,
     FileManagerService,
-    EstimateRepository,
+    LoanEstimateRepository,
   }));
 
   return router;

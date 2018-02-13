@@ -1,7 +1,7 @@
 import { Module } from 'makeen';
 
 import { LoanApplicationRepositoryService } from './services/LoanRepositoryService';
-import { EstimateRepositoryService } from './services/EstimateRepositoryService';
+import { LoanEstimateRepositoryService } from './services/EstimateRepositoryService';
 
 import { loanRouter } from './router';
 
@@ -26,14 +26,14 @@ export class LoanApplicationModule extends Module {
     this.serviceBus = createServiceBus(this.name);
 
     const LoanApplicationRepository = bindRepository(new LoanApplicationRepositoryService());
-    const EstimateRepository = bindRepository(new EstimateRepositoryService());
+    const LoanEstimateRepository = bindRepository(new LoanEstimateRepositoryService());
 
     addRouter(
       '/loans',
       'loanRouter',
       loanRouter({
         LoanApplicationRepository,
-        EstimateRepository,
+        LoanEstimateRepository,
         permissions,
         FileManagerService,
       }),
