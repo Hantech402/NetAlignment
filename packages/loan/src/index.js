@@ -1,7 +1,9 @@
 import { Module } from 'makeen';
-import { LoanApplicationRepositoryService } from './services/LoanRepositoryService';
 
-import { applicationRouter } from './router/application';
+import { LoanApplicationRepositoryService } from './services/LoanRepositoryService';
+import { EstimateRepositoryService } from './services/EstimateRepositoryService';
+
+import { loanRouter } from './router';
 
 export class LoanApplicationModule extends Module {
   name = 'net-alignments.loan';
@@ -24,12 +26,14 @@ export class LoanApplicationModule extends Module {
     this.serviceBus = createServiceBus(this.name);
 
     const LoanApplicationRepository = bindRepository(new LoanApplicationRepositoryService());
+    const EstimateRepository = bindRepository(new EstimateRepositoryService());
 
     addRouter(
-      '/loans/applications',
+      '/loans',
       'loanRouter',
-      applicationRouter({
+      loanRouter({
         LoanApplicationRepository,
+        EstimateRepository,
         permissions,
         FileManagerService,
       }),

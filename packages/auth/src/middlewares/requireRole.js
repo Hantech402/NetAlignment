@@ -14,8 +14,3 @@ export const requireLender = (req, res, next) => {
   if (req.user.role !== 'lender') throw Boom.unauthorized('You have not enough permissions');
   next();
 };
-
-export const requireBroker = (req, res, next) => {
-  if (req.user.role !== 'broker') throw Boom.unauthorized('You have not enough permissions');
-  next();
-};
