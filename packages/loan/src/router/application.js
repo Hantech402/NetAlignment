@@ -10,6 +10,7 @@ export const applicationRouter = config => {
     permissions,
     LoanApplicationRepository,
     FileManagerService,
+    LoanEstimateRepository,
   } = config;
 
   router.use(permissions.requireAuth, permissions.requireBorrower);
@@ -285,6 +286,39 @@ export const applicationRouter = config => {
 
         const filesPath = files.map(file => file.filename);
         FileManagerService.archiveFiles({ filesPath, res });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
+    * Get loan estimates for auction id
+    * @route GET /loans/applications/estimates/:id
+    * @group LoanApp
+    * @param {string} id.path.required - id of loan application
+    * @returns {array} 200 - loanEstimates array
+    * @security jwtToken
+    */
+
+    '/estimates/:id',
+    async (req, res, next) => {
+      try {
+        const accountId = objectId(req.user.accountId);
+        const loanApplicationId = objectId(req.params.id);
+
+        const loanApp = await LoanApplicationRepository.findOne({
+          query: { _id: loanApplicationId, accountId },
+        });
+        if (!loanApp) throw Boom.notFound('Unable to find loan app with such id');
+
+        const loanEstimates = await LoanEstimateRepository.findMany({
+          query: { loanApplicationId },
+        }).toArray();
+        if (!loanEstimates.length) throw Boom.notFound('Unable to find loan estimates for this auction');
+
+        res.json({ loanEstimates });
       } catch (err) {
         next(err);
       }

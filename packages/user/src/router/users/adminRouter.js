@@ -208,9 +208,11 @@ export const adminRouter = adminRouterConfig => {
   router.patch(
     /**
      * Change user's account status ({ isActive: true/false })
-     * @route PATCH / users/:userId/change-status
+     * @route PATCH /users/:userId/change-status
+     * @group Users
      * @param {string} userId.path.required
      * @param {boolean} isActive.body.required
+     * @returns 200
      * @security jwtToken
     */
 

@@ -15,6 +15,7 @@ export const loanRouter = config => {
 
   router.use('/applications', applicationRouter({
     LoanApplicationRepository,
+    LoanEstimateRepository,
     permissions,
     FileManagerService,
   }));
