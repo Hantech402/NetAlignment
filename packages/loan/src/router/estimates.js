@@ -24,6 +24,7 @@ export const estimateRouter = config => {
     /**
      * Create new loan estimate
      * @route POST /loans/estimates
+     * @group LoanApp
      * @param {string} loanApplicationId.body.required
      * @param {string} amortizationType.body.required
      * @param {number} interestRate.body.required
@@ -57,6 +58,7 @@ export const estimateRouter = config => {
     /**
      * Get all user's loan estimates
      * @route GET /loans/estimates/
+     * @group LoanApp
      * @returns {array} 200 - array of loan estimates with name loanEstimates
      * @security jwtToken
     */
@@ -80,6 +82,7 @@ export const estimateRouter = config => {
     /**
      * Count enitities of loan estimates
      * @route GET /loans/estimates/count
+     * @group LoanApp
      * @param {object} query.query - mongo query
      * @returns {number} 200 - number of entities
      * @security jwtToken
@@ -106,6 +109,7 @@ export const estimateRouter = config => {
     /**
      * Find 1 loan estimate by provided query
      * @route GET /loans/esitmates/findOne
+     * @group LoanApp
      * @param {object} query.query
      * @returns {object} 200 - loan estimate object
      * @security jwtToken
@@ -130,7 +134,8 @@ export const estimateRouter = config => {
   router.get(
     /**
      * Get all user's loan estimates
-     * @route GET /loans/estimates/:id
+     * @route GET /loans/estimates/{id}
+     * @group LoanApp
      * @param {string} id.path.required
      * @returns {object} 200 - loan estimate object
      * @security jwtToken
@@ -155,6 +160,7 @@ export const estimateRouter = config => {
     /**
      * Update loan estimate
      * @route PATCH /loans/estimates/:id
+     * @group LoanApp
      * @param {string} amortizationType.body.required
      * @param {number} interestRate.body.required
      * @param {number} nrOfMonths.body.required
@@ -191,6 +197,7 @@ export const estimateRouter = config => {
     /**
      * Delete loan estimate
      * @route DELETE /loans/estimates/:id/
+     * @group LoanApp
      * @param {string} id.path.required - mongo id
      * @security jwtToken
     */
