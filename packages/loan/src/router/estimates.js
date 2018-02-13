@@ -52,6 +52,7 @@ export const estimateRouter = config => {
     },
   );
 
+
   router.get(
     /**
      * Get all user's loan estimates
@@ -69,6 +70,30 @@ export const estimateRouter = config => {
         }).toArray();
 
         res.json({ loanEstimates });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
+     * Get all user's loan estimates
+     * @route GET /loans/estimates/:id
+     * @param {string} id.path.required
+     * @returns {object} 200 - loan estimate object
+     * @security jwtToken
+    */
+
+    '/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const accountId = objectId(req.user.accountId);
+        const loanEstimate = await LoanEstimateRepository.findOne({ query: { accountId, _id } });
+        if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
+
+        res.json({ loanEstimate });
       } catch (err) {
         next(err);
       }
