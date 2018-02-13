@@ -136,5 +136,29 @@ export const estimateRouter = config => {
     },
   );
 
+  router.delete(
+    /**
+     * Delete loan estimate
+     * @route DELETE /loans/estimates/:id/
+     * @param {string} id.path.required - mongo id
+     * @security jwtToken
+    */
+
+    '/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const accountId = objectId(req.user.accountId);
+
+        const result = await LoanEstimateRepository.deleteOne({ query: { _id, accountId } });
+        if (!result) throw Boom.notFound('Unable to find loan estimate');
+
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };
