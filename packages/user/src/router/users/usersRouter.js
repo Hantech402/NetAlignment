@@ -290,20 +290,41 @@ export const commonUserRouter = configRouter => {
 
   router.get(
     /**
-     * Get all lenders
+     * Get all lenders for borrower
      * @route GET /lenders
      * @group Users
      * @returns {array} 200
      * @security jwtToken
      */
+
     '/lenders',
     permissions.requireAuth, permissions.requireBorrower,
     async (req, res, next) => {
       try {
-        const lenders = await UserRepository.findMany({
-          query: { role: 'lender' },
+        let lenders = await UserRepository.findMany({
+          query: { role: 'lender', isActive: true, isDeleted: false },
           fields: { password: 0 },
         }).toArray();
+
+        const lendersAccountIds = lenders.map(lender => lender.accountId);
+        const accountsToOmit = await AccountRepository.findMany({
+          query: {
+            _id: { $in: lendersAccountIds },
+            $or: [
+              { isConfirmed: false },
+              { isActive: false },
+              { isDeleted: true },
+              { isDeactivated: true },
+              { isApproved: false },
+            ],
+          },
+        }).toArray();
+
+        // filter lenders that have disabled account
+        if (accountsToOmit.length) {
+          lenders = lenders.filter(lender =>
+            !accountsToOmit.find(acc => lender.accountId.toString() === acc._id.toString()));
+        }
 
         res.json(lenders);
       } catch (err) {
