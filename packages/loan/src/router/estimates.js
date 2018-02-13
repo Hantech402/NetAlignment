@@ -50,5 +50,28 @@ export const estimateRouter = config => {
     },
   );
 
+  router.get(
+    /**
+     * Get all user's loan estimates
+     * @route GET /loans/estimates/
+     * @returns {array} 200 - array of loan estimates with name loanEstimates
+     * @security jwtToken
+    */
+
+    '/',
+    async (req, res, next) => {
+      try {
+        const accountId = objectId(req.user.accountId);
+        const loanEstimates = await EstimateRepository.findMany({
+          query: { accountId },
+        }).toArray();
+
+        res.json({ loanEstimates });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };
