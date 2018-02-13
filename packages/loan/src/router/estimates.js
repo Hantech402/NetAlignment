@@ -78,6 +78,32 @@ export const estimateRouter = config => {
 
   router.get(
     /**
+     * Count enitities of loan estimates
+     * @route GET /loans/estimates/count
+     * @param {object} query.query - mongo query
+     * @returns {number} 200 - number of entities
+     * @security jwtToken
+    */
+
+    '/count',
+    Celebrate({ query: Joi.object().required() }),
+    async (req, res, next) => {
+      try {
+        const accountId = objectId(req.user.accountId);
+        const query = req.query.query || {};
+        const loanEstimates = await LoanEstimateRepository.count({
+          query: { ...query, accountId },
+        });
+
+        res.json(loanEstimates);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
      * Get all user's loan estimates
      * @route GET /loans/estimates/:id
      * @param {string} id.path.required
