@@ -104,6 +104,31 @@ export const estimateRouter = config => {
 
   router.get(
     /**
+     * Find 1 loan estimate by provided query
+     * @route GET /loans/esitmates/findOne
+     * @param {object} query.query
+     * @returns {object} 200 - loan estimate object
+     * @security jwtToken
+    */
+
+    '/findOne',
+    Celebrate({ query: Joi.object().required() }),
+    async (req, res, next) => {
+      try {
+        const query = req.query.query ? JSON.parse(req.query.query) : {};
+        query.accountId = objectId(req.user.accountId);
+        const loanEstimate = await LoanEstimateRepository.findOne({ query });
+        if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
+
+        res.json(loanEstimate);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
      * Get all user's loan estimates
      * @route GET /loans/estimates/:id
      * @param {string} id.path.required
