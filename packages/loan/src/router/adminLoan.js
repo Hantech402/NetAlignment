@@ -20,7 +20,7 @@ export const adminLoanRouter = config => {
      * Get loan applications (by admin only)
      * @route GET /loans/admin/applications
      * @group LoanAppAdmin
-     * @param {string} status.query.required - valid 'open' and 'accepted' or nothing
+     * @param {string} status.query.required - valid 'open', 'closed', 'accepted' or nothing
      * @returns {array} 200 - array of loan apps
      * @security jwtToken
      */
@@ -91,6 +91,32 @@ export const adminLoanRouter = config => {
         if (result.fileIds.length) {
           await FileManagerService.deleteMany({ query: { _id: { $in: result.fileIds } } });
         }
+
+        await LoanEstimateRepository.deleteMany({ query: { loanApplicationId: result._id } });
+
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.delete(
+    /**
+    * Delete lender's estimate by id
+    * @route DELETE /loans/admin/estimates/:id
+    * @grpoup LoanAppAmin
+    * @param {string} id.path.required - id of loan esitmate
+    * @returns 200
+    * @security jwtToken
+    */
+
+    '/estimates/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const result = await LoanEstimateRepository.deleteOne({ query: { _id } });
+        if (!result) throw Boom.notFound('Unable to find loan estimate with provided id');
 
         res.sendStatus(200);
       } catch (err) {
