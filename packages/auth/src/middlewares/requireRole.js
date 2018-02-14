@@ -1,16 +1,19 @@
 import Boom from 'boom';
 
 export const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') throw Boom.unauthorized('You have not enough permissions');
+  const role = req.user.role;
+  if (role !== 'admin' && role !== 'admin') throw Boom.unauthorized('You have not enough permissions');
   next();
 };
 
 export const requireBorrower = (req, res, next) => {
-  if (req.user.role !== 'borrower') throw Boom.unauthorized('You have not enough permissions');
+  const role = req.user.role;
+  if (role !== 'admin' && role !== 'borrower') throw Boom.unauthorized('You have not enough permissions');
   next();
 };
 
 export const requireLender = (req, res, next) => {
-  if (req.user.role !== 'lender') throw Boom.unauthorized('You have not enough permissions');
+  const role = req.user.role;
+  if (role !== 'admin' && role !== 'lender') throw Boom.unauthorized('You have not enough permissions');
   next();
 };
