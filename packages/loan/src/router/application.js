@@ -40,10 +40,9 @@ export const applicationRouter = config => {
 
   router.get(
     /**
-    * Find all user's loan apps - if request by admin - all entities
+    * Find all user's loan apps
     * @route GET /loans/applications
     * @group LoanApp
-    * @param {string} status.query.required - search by auction status
     * @returns {object} 200 - loan obj
     * @security jwtToken
     */
@@ -51,10 +50,10 @@ export const applicationRouter = config => {
     '/',
     async (req, res, next) => {
       try {
-        const query = {};
-        if (req.user.role === 'admin' && req.query.status) query.status = req.query.status;
-        if (req.user.role === 'borrower') query.accountId = objectId(req.user.accountId);
-        const loanApps = await LoanApplicationRepository.findMany({ query }).toArray();
+        const accountId = objectId(req.user.accountId);
+        const loanApps = await LoanApplicationRepository.findMany({
+          query: { accountId },
+        }).toArray();
 
         res.json(loanApps);
       } catch (err) {

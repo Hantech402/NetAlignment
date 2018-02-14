@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { applicationRouter } from './application';
 import { estimateRouter } from './estimates';
+import { adminLoanRouter } from './adminLoan';
 
 export const loanRouter = config => {
   const {
@@ -21,6 +22,13 @@ export const loanRouter = config => {
   }));
 
   router.use('/estimates', estimateRouter({
+    LoanApplicationRepository,
+    permissions,
+    FileManagerService,
+    LoanEstimateRepository,
+  }));
+
+  router.use('/admin', adminLoanRouter({
     LoanApplicationRepository,
     permissions,
     FileManagerService,
