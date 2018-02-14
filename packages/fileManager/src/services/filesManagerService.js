@@ -2,8 +2,12 @@ import { Repository } from 'makeen-mongodb';
 import { decorators } from 'octobus.js';
 import archiver from 'archiver';
 import fs from 'fs';
+import bluebird from 'bluebird';
 
 import fileSchema from '../schemas/file';
+
+const unlink = bluebird.promisify(fs.unlink);
+
 
 const { service } = decorators;
 
@@ -37,5 +41,18 @@ export class FileManagerRepository extends Repository {
     });
 
     archive.finalize();
+  }
+
+  @service()
+  deleteMany({ query }) {
+    const filesToDelete = [];
+    return super.findMany({ query }).toArray()
+      .then(files => {
+        files.forEach(file => {
+          filesToDelete.push(unlink(file.filename));
+        });
+        return Promise.all(filesToDelete);
+      })
+      .then(() => super.deleteMany({ query }));
   }
 }

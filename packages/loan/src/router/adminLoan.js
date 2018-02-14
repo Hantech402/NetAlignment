@@ -27,7 +27,7 @@ export const adminLoanRouter = config => {
 
     '/applications',
     Celebrate({ query: Joi.object().keys({
-      status: Joi.string().valid(['open', 'accepted']),
+      status: Joi.string().valid(['open', 'accepted', 'closed']),
     }) }),
     async (req, res, next) => {
       try {
@@ -64,6 +64,34 @@ export const adminLoanRouter = config => {
         });
 
         if (!result) throw Boom.notFound('Unable to find loan app');
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.delete(
+    /**
+     * Delete open auction by admin
+     * @route DELETE /loans/admin/applications/{id}
+     * @group LoanAppAdmin
+     * @param {string} id.path.required - loan app id
+     * @returns 200 - status code
+     * @security jwtToken
+    */
+
+    '/applications/:id',
+    async (req, res, next) => {
+      try {
+        const _id = objectId(req.params.id);
+        const result = await LoanApplicationRepository.deleteOne({ query: { _id, status: 'open' } });
+        if (!result) throw Boom.notFound('Unable to find open auction with provided id');
+
+        if (result.fileIds.length) {
+          await FileManagerService.deleteMany({ query: { _id: { $in: result.fileIds } } });
+        }
+
         res.sendStatus(200);
       } catch (err) {
         next(err);
