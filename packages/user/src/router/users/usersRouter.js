@@ -120,6 +120,7 @@ export const commonUserRouter = configRouter => {
      * @param {string} token.body.required
      * @returns {string} - refreshed token
      */
+
     '/refresh-token',
     Celebrate({ body: Joi.object().keys({
       token: Joi.string().required(),
@@ -142,6 +143,7 @@ export const commonUserRouter = configRouter => {
      * @security jwtToken
      * @returns {object} 200 - user's profile
      */
+
     '/me',
     permissions.requireAuth,
     Celebrate({ headers: Joi.object({
@@ -174,6 +176,7 @@ export const commonUserRouter = configRouter => {
      * @param {object} address.body
      * @returns {object} 200 - user's profile
      */
+
     '/me',
     permissions.requireAuth,
     Celebrate({ body: {
@@ -206,6 +209,7 @@ export const commonUserRouter = configRouter => {
      * @param {string} oldPassword.body.required
      * @returns {object} 200
      */
+
     '/change-password',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -229,6 +233,7 @@ export const commonUserRouter = configRouter => {
      * @group Users
      * @param {string} usernameOrEmail.body.required
      */
+
     '/reset-password',
     Celebrate({ body: Joi.object().keys({
       usernameOrEmail: Joi.string().required(),
@@ -293,18 +298,28 @@ export const commonUserRouter = configRouter => {
      * Get all lenders for borrower
      * @route GET /lenders
      * @group Users
+     * @param {object} sort.query.required
+     * @param {object} filter.query.required
      * @returns {array} 200
      * @security jwtToken
      */
 
     '/lenders',
+    Celebrate({ query: Joi.object().keys({
+      sort: Joi.object(),
+      filter: Joi.object(),
+    }) }),
+
     permissions.requireAuth, permissions.requireBorrower,
     async (req, res, next) => {
       try {
+        const query = { role: 'lender', isActive: true, isDeleted: false };
+        if (req.query.filter) Object.assign(query, req.query.filter);
+        const sort = req.query.sort || {};
+
         let lenders = await UserRepository.findMany({
-          query: { role: 'lender', isActive: true, isDeleted: false },
-          fields: { password: 0 },
-        }).toArray();
+          query, fields: { password: 0, accountId: 0 },
+        }).sort(sort).toArray();
 
         const lendersAccountIds = lenders.map(lender => lender.accountId);
         const accountsToOmit = await AccountRepository.findMany({
