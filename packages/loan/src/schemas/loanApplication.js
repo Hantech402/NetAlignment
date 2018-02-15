@@ -18,6 +18,7 @@ export default {
 
   invitedLenders: Joi.array().items(Joi.string().required()),
   acceptedLenderAccount: Joi.object(),
+  lenderRate: Joi.number(),
 
   status: Joi.string().valid(statuses).default('draft'),
   financialGoal: Joi.string().valid(financialGoals),

@@ -53,6 +53,8 @@ export default {
 
   _account: Joi.object(),
 
+  rate: Joi.number().min(1).max(10),
+
   isDeleted: Joi.boolean().default(false),
   deletedAt: Joi.date(),
 

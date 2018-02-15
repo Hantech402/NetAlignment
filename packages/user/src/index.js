@@ -14,11 +14,13 @@ export class UserModule extends Module {
       { createServiceBus },
       { addRouter },
       { permissions },
+      { LoanApplicationRepository },
     ] = await this.dependencies([
       'makeen.mongoDb',
       'makeen.octobus',
       'makeen.router',
       'net-alignments.auth',
+      'net-alignments.loan',
     ]);
 
     this.serviceBus = createServiceBus(this.name);
@@ -39,6 +41,7 @@ export class UserModule extends Module {
         AccountRepository,
         config,
         permissions,
+        LoanApplicationRepository,
       }),
     );
 
@@ -46,6 +49,7 @@ export class UserModule extends Module {
       '/account',
       'accountRouter',
       accountRouter({
+        LoanApplicationRepository,
         UserRepository,
         AccountRepository,
         config,

@@ -38,5 +38,7 @@ export class LoanApplicationModule extends Module {
         FileManagerService,
       }),
     );
+
+    this.export({ LoanApplicationRepository });
   }
 }

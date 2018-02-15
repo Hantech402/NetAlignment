@@ -11,6 +11,7 @@ import { setUserInfo } from '../../utils';
 export const accountRouter = indexRouterConfig => {
   const {
     UserRepository,
+    LoanApplicationRepository,
     AccountRepository,
     // config,
     permissions,
@@ -50,12 +51,13 @@ export const accountRouter = indexRouterConfig => {
 
   router.post(
     /**
-     * Deactivate account
+     * Deactivate account and all loan applications
      * @route POST /account/deactivate
      * @group Account
      * @param {string} reason.body.required
      * @security jwtToken
      */
+
     '/deactivate',
     permissions.requireAuth,
     Celebrate({ body: Joi.object().keys({
@@ -68,6 +70,12 @@ export const accountRouter = indexRouterConfig => {
           query: { ownerId: objectId(req.user._id) },
           update: { $set: { isDeactivated: true } },
         });
+
+        await LoanApplicationRepository.updateMany({
+          query: { accountId: objectId(req.user.accountId) },
+          update: { $set: { status: 'canceled' } },
+        });
+
         res.sendStatus(200);
       } catch (err) {
         next(err);
