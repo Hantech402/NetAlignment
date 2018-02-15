@@ -84,7 +84,9 @@ export const applicationRouter = config => {
         const _id = objectId(req.params.id);
         const accountId = objectId(req.user.accountId);
         const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
+
         if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
+        if (!loanApp.status !== 'draft') throw Boom.badRequest('Only draft auction could be edited');
 
         await LoanApplicationRepository.updateOne({
           query: { _id, accountId },
@@ -334,6 +336,43 @@ export const applicationRouter = config => {
         if (!loanEstimates.length) throw Boom.notFound('Unable to find loan estimates for this auction');
 
         res.json({ loanEstimates });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
+     * Accept LE for borrower's auctions by LE id
+     * @route GET /loans/applications/:leId/accept
+     * @group LoanApp
+     * @param {string} leId.path.required
+     * @security jwtToken
+     * @returns 200
+    */
+
+    '/:leId/accept',
+    async (req, res, next) => {
+      try {
+        const leId = objectId(req.params.leId);
+        const loanEstimate = await LoanEstimateRepository.findOne({ query: { _id: leId } });
+        if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
+
+        const loanApp = await LoanApplicationRepository.findOne({
+          query: { _id: loanEstimate.loanApplicationId },
+        });
+
+        if (loanApp.accountId.toString() !== req.user.accountId) {
+          throw Boom.forbidden('Missing permissions. Its not your auction');
+        }
+
+        if (loanApp.status !== 'open') throw Boom.badRequest('LE could be accepted only on open auctions');
+        await LoanApplicationRepository.updateOne({
+          update: { $set: { status: 'accepted', acceptedLenderAccount: loanEstimate.accountId } },
+        });
+
+        res.sendStatus(200);
       } catch (err) {
         next(err);
       }
