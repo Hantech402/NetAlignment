@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Celebrate from 'celebrate';
 import Joi from 'joi';
 import omit from 'lodash/omit';
-import pick from 'lodash/pick';
+// import pick from 'lodash/pick';
 import { ObjectID as objectId } from 'mongodb';
 import Boom from 'boom';
 
@@ -11,9 +11,9 @@ import loanEstimateSchema from '../schemas/loanEstimate';
 export const estimateRouter = config => {
   const {
     LoanEstimateRepository,
-    LoanApplicationRepository,
+    // LoanApplicationRepository,
     permissions,
-    FileManagerService,
+    // FileManagerService,
   } = config;
 
   const router = Router();
@@ -56,7 +56,7 @@ export const estimateRouter = config => {
 
   router.get(
     /**
-     * Get all user's loan estimates
+     * Get all lender's loan estimates
      * @route GET /loans/estimates/
      * @group LoanApp
      * @returns {array} 200 - array of loan estimates with name loanEstimates

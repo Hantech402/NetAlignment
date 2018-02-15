@@ -87,8 +87,8 @@ export class UserRepositoryService extends Repository {
       })
       .then(account => {
         if (!account.isConfirmed) throw Boom.unauthorized('Your account is not confirmed');
-        if (account.isDeactivated) throw Boom.unauthorized('Your account is deactivated');
-        if (!account.isActive) throw Boom.unauthorized('Your account is deactivated');
+        if (!account.isActive) throw Boom.unauthorized('Your account is not active');
+        if (account.isDeactivated) userObj.isDeactivated = true;
       })
       .then(() => super.updateOne({
         query: { _id: userObj._id },

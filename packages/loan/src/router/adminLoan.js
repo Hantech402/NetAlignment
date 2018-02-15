@@ -105,7 +105,7 @@ export const adminLoanRouter = config => {
     /**
     * Delete lender's estimate by id
     * @route DELETE /loans/admin/estimates/:id
-    * @grpoup LoanAppAmin
+    * @group LoanAppAdmin
     * @param {string} id.path.required - id of loan esitmate
     * @returns 200
     * @security jwtToken

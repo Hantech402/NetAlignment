@@ -140,8 +140,16 @@ export const applicationRouter = config => {
       try {
         const _id = objectId(req.params.id);
         const accountId = objectId(req.user.accountId);
-        const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
-        if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
+        const loanApp = await LoanApplicationRepository.findOne({ query: _id, accountId });
+
+        if (!loanApp) throw Boom.notFound('Unable to find auction. Probably wrong id');
+        if (loanApp.status === 'expired') Boom.badRequest('Your auction is already expired');
+        if (loanApp.status === 'cancled') Boom.badRequest('Your auction is already canceled');
+
+        await LoanApplicationRepository.updateOne({
+          query: { _id, accountId },
+          update: { $set: { status: 'canceled', isDeleted: true } },
+        });
 
         await LoanApplicationRepository.deleteOne({ query: { _id, accountId } });
         res.sendStatus(200);
@@ -318,7 +326,7 @@ export const applicationRouter = config => {
         const loanApp = await LoanApplicationRepository.findOne({
           query: { _id: loanApplicationId, accountId },
         });
-        if (!loanApp) throw Boom.notFound('Unable to find loan app with such id');
+        if (!loanApp) throw Boom.notFound('Unable to find loan app with provided id');
 
         const loanEstimates = await LoanEstimateRepository.findMany({
           query: { loanApplicationId },
