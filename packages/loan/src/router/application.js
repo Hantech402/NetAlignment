@@ -3,6 +3,9 @@ import { ObjectID as objectId } from 'mongodb';
 import Boom from 'boom';
 import Celebrate from 'celebrate';
 import Joi from 'joi';
+import omit from 'lodash/omit';
+
+import loanAppScheme from '../schemas/loanApplication';
 
 export const applicationRouter = config => {
   const {
@@ -25,8 +28,12 @@ export const applicationRouter = config => {
     */
 
     '/',
+    Celebrate({ body: omit(loanAppScheme, ['accountId', 'status']) }),
     async (req, res, next) => {
       try {
+        if (req.body.fileIds) req.body.fileIds = req.body.fileIds.map(fileId => objectId(fileId));
+        if (!req.user.isConfirmed) req.body.status = 'draft';
+
         const loanApp = await LoanApplicationRepository.createOne({
           ...req.body,
           accountId: objectId(req.user.accountId),

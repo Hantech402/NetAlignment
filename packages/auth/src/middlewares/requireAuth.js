@@ -34,9 +34,10 @@ export const requireAuth = ({ jwtSecret }) =>
 
       const _id = objectId(decoded.accountId);
       const account = await AccountRepository.findOne({ query: { _id } });
-      if (!account.isActive) return next(Boom.unauthorized('Your account is disabled'));
+      if (account.isDeleted || account.isDeactivated || !account.isActive) next(Boom.unauthorized('Your account is disabled'));
 
       req.user = decoded;
+      req.user.isConfirmed = account.isConfirmed;
       next();
     } catch (err) {
       if (err.message === 'invalid signature') return next(Boom.unauthorized('Invalid token signature'));

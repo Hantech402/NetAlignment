@@ -65,6 +65,7 @@ export const fileManagerRouter = indexRouterConfig => {
      * @param file.formData.required
      * @security jwtToken
     */
+
     '/upload',
     fileUpload({ safeFileNames: true, preserveExtension: true }),
     async (req, res, next) => {
@@ -89,7 +90,7 @@ export const fileManagerRouter = indexRouterConfig => {
           uploadedAt: new Date(),
         });
 
-        res.sendStatus(200);
+        res.json({ filename: filePath });
       } catch (err) {
         next(err);
       }
