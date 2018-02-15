@@ -17,8 +17,9 @@ export default {
   coBorrower: Joi.string(),
 
   invitedLenders: Joi.array().items(Joi.string().required()),
+  acceptedLenderAccount: Joi.object(),
 
-  status: Joi.string().valid(statuses),
+  status: Joi.string().valid(statuses).default('draft'),
   financialGoal: Joi.string().valid(financialGoals),
   rate: Joi.string().valid(rates),
   termsByRate: Object.keys(termsByRate).reduce((validator, rateValue) => (

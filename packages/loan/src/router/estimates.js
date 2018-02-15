@@ -11,7 +11,7 @@ import loanEstimateSchema from '../schemas/loanEstimate';
 export const estimateRouter = config => {
   const {
     LoanEstimateRepository,
-    // LoanApplicationRepository,
+    LoanApplicationRepository,
     permissions,
     // FileManagerService,
   } = config;
@@ -22,7 +22,7 @@ export const estimateRouter = config => {
 
   router.post(
     /**
-     * Create new loan estimate
+     * Create new loan estimate by auction id
      * @route POST /loans/estimates
      * @group LoanApp
      * @param {string} loanApplicationId.body.required
@@ -40,9 +40,19 @@ export const estimateRouter = config => {
     } }),
     async (req, res, next) => {
       try {
+        const loanAppId = objectId(req.body.loanApplicationId);
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id: loanAppId } });
+        if (!loanApp) throw Boom.notFound('Unable to find auction with provided id');
+        if (loanApp.status !== 'open') throw Boom.badRequest('LE could be created only for open auctions');
+
+        const existLoanEstimate = await LoanEstimateRepository.findOne({
+          query: { loanApplicationId: loanAppId },
+        });
+        if (existLoanEstimate) throw Boom.badRequest('You can create only one LE per one auction');
+
         const loanEstimate = await LoanEstimateRepository.createOne({
           ...req.body,
-          loanApplicationId: objectId(req.body.loanApplicationId),
+          loanApplicationId: loanAppId,
           accountId: objectId(req.user.accountId),
         });
 
@@ -99,6 +109,30 @@ export const estimateRouter = config => {
         });
 
         res.json(loanEstimates);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    /**
+     * Get list of open auctions for lenders
+     * @route GET /loans/estimates/auctions
+     * @group LoanApp
+     * @security jwtToken
+     * @returns {array} 200 - array of auctions
+    */
+
+    '/auctions',
+    async (req, res, next) => {
+      try {
+        const auctions = await LoanApplicationRepository.findMany({
+          query: { status: 'open' },
+          fields: { accountId: 0 },
+        }).toArray();
+
+        res.json(auctions);
       } catch (err) {
         next(err);
       }
