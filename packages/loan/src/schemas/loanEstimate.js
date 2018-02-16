@@ -6,6 +6,7 @@ export default {
   _id: Joi.object(),
   accountId: Joi.object().required(),
   loanApplicationId: Joi.object().required(),
+  status: Joi.string().valid(['draft', 'active']).default('draft'),
   amortizationType: Joi.alternatives(rates).required(),
   interestRate: Joi.number().min(1).max(100).required(),
   nrOfMonths: Joi.number().integer().min(1).required(),

@@ -50,17 +50,33 @@ export const applicationRouter = config => {
     * Find all user's loan apps
     * @route GET /loans/applications
     * @group LoanApp
+    * @param {string} status.query.required - 'draft', 'open', 'closed', 'accepted'
+    * @param {string} .path.required
+    * @param {string} filter.query.required - 'nosubmitted', 'submitted'
     * @returns {object} 200 - loan obj
     * @security jwtToken
     */
 
     '/',
+    Celebrate({ query: Joi.object().keys({
+      status: Joi.string().valid(['draft', 'open', 'closed', 'accepted']),
+      filter: Joi.string().valid(['nosubmitted', 'submitted']),
+    }) }),
+
     async (req, res, next) => {
       try {
         const accountId = objectId(req.user.accountId);
-        const loanApps = await LoanApplicationRepository.findMany({
-          query: { accountId },
-        }).toArray();
+        const query = { accountId };
+        const { status, filter } = req.query;
+
+        if (status) {
+          query.status = status;
+        } else if (filter) {
+          query.submitted = filter === 'submitted';
+          query.status = 'open';
+        }
+
+        const loanApps = await LoanApplicationRepository.findMany({ query }).toArray();
 
         res.json(loanApps);
       } catch (err) {
@@ -331,9 +347,9 @@ export const applicationRouter = config => {
         if (!loanApp) throw Boom.notFound('Unable to find loan app with provided id');
 
         const loanEstimates = await LoanEstimateRepository.findMany({
-          query: { loanApplicationId },
+          query: { loanApplicationId, status: 'active' },
         }).toArray();
-        if (!loanEstimates.length) throw Boom.notFound('Unable to find loan estimates for this auction');
+        if (!loanEstimates.length) throw Boom.notFound('There is no loan estimate for this auction');
 
         res.json({ loanEstimates });
       } catch (err) {

@@ -22,7 +22,7 @@ export const estimateRouter = config => {
 
   router.post(
     /**
-     * Create new loan estimate by auction id
+     * Create new loan estimate by loan loan package id
      * @route POST /loans/estimates
      * @group LoanApp
      * @param {string} loanApplicationId.body.required
@@ -41,20 +41,27 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const loanAppId = objectId(req.body.loanApplicationId);
-        const loanApp = await LoanApplicationRepository.findOne({ query: { _id: loanAppId } });
-        if (!loanApp) throw Boom.notFound('Unable to find auction with provided id');
-        if (loanApp.status !== 'open') throw Boom.badRequest('LE could be created only for open auctions');
-
         const existLoanEstimate = await LoanEstimateRepository.findOne({
           query: { loanApplicationId: loanAppId },
         });
-        if (existLoanEstimate) throw Boom.badRequest('You can create only one LE per one auction');
+        if (existLoanEstimate) throw Boom.badRequest('You can create only one LE per one loan loan packages');
+
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id: loanAppId } });
+        if (!loanApp) throw Boom.notFound('Unable to find loan package with provided id');
+        if (loanApp.status !== 'open') throw Boom.badRequest('LE could be created only for open loan packages');
 
         const loanEstimate = await LoanEstimateRepository.createOne({
           ...req.body,
           loanApplicationId: loanAppId,
           accountId: objectId(req.user.accountId),
         });
+
+        if (!loanApp.submitted) {
+          await LoanApplicationRepository.updateOne({
+            query: { _id: loanAppId },
+            update: { $set: { submitted: true } }, // TODO: draft LE?
+          });
+        }
 
         res.json({ loanEstimate });
       } catch (err) {
@@ -71,7 +78,7 @@ export const estimateRouter = config => {
      * @group LoanApp
      * @returns {array} 200 - array of loan estimates with name loanEstimates
      * @security jwtToken
-    */
+     */
 
     '/',
     async (req, res, next) => {
@@ -96,7 +103,7 @@ export const estimateRouter = config => {
      * @param {object} query.query - mongo query
      * @returns {number} 200 - number of entities
      * @security jwtToken
-    */
+     */
 
     '/count',
     Celebrate({ query: Joi.object().required() }),
@@ -117,22 +124,22 @@ export const estimateRouter = config => {
 
   router.get(
     /**
-     * Get list of open auctions for lenders
-     * @route GET /loans/estimates/auctions
+     * Get list of loan-packages for lenders
+     * @route GET /loans/estimates/loan-packages
      * @group LoanApp
      * @security jwtToken
-     * @returns {array} 200 - array of auctions
-    */
+     * @returns {array} 200 - array of loan packeages
+     */
 
-    '/auctions',
+    '/loan-packages',
     async (req, res, next) => {
       try {
-        const auctions = await LoanApplicationRepository.findMany({
+        const loanPackages = await LoanApplicationRepository.findMany({
           query: { status: 'open' },
-          fields: { accountId: 0 },
+          fields: { accountId: 0, fileIds: 0 },
         }).toArray();
 
-        res.json(auctions);
+        res.json(loanPackages);
       } catch (err) {
         next(err);
       }
@@ -147,7 +154,7 @@ export const estimateRouter = config => {
      * @param {object} query.query
      * @returns {object} 200 - loan estimate object
      * @security jwtToken
-    */
+     */
 
     '/findOne',
     Celebrate({ query: Joi.object().required() }),
@@ -173,7 +180,7 @@ export const estimateRouter = config => {
      * @param {string} id.path.required
      * @returns {object} 200 - loan estimate object
      * @security jwtToken
-    */
+     */
 
     '/:id',
     async (req, res, next) => {
@@ -199,7 +206,7 @@ export const estimateRouter = config => {
      * @param {number} interestRate.body.required
      * @param {number} nrOfMonths.body.required
      * @security jwtToken
-    */
+     */
 
     '/:id',
     Celebrate({ body: Joi.object().keys({
@@ -234,7 +241,7 @@ export const estimateRouter = config => {
      * @group LoanApp
      * @param {string} id.path.required - mongo id
      * @security jwtToken
-    */
+     */
 
     '/:id',
     async (req, res, next) => {
