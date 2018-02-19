@@ -395,5 +395,37 @@ export const applicationRouter = config => {
     },
   );
 
+  router.post(
+    '/invite',
+    Celebrate({ body: {
+      loanApplicationId: Joi.alternatives().try(Joi.string(), Joi.object()).required(),
+      lenderId: Joi.alternatives().try(Joi.string(), Joi.object()).required(),
+    } }),
+
+    async (req, res, next) => {
+      try {
+        const { UserRepository } = req.app.modules.get('net-alignments.users');
+        const accountId = objectId(req.user.accountId);
+        const { loanApplicationId, lenderId } = req.body;
+        const loanAppId = typeof (loanApplicationId) === 'object' ? loanApplicationId : objectId(loanApplicationId);
+        const lendId = typeof (lenderId) === 'object' ? lenderId : objectId(lenderId);
+
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id: loanAppId, accountId } }); // eslint-disable-line
+        if (loanApp.status !== 'open') throw Boom.badRequest('Loan Application must be opened');
+        if (!loanAppId) throw Boom.notFound('Unable to find loan application');
+        if (loanApp.lenders.includes(lendId.toString())) throw Boom.badRequest('This lender already takes part in your loan app');
+
+        await UserRepository.sendInviteEmail({ lenderId: lendId, loanAppId });
+        await LoanApplicationRepository.updateOne({
+          query: { _id: loanAppId, accountId },
+          update: { $push: { lenders: lendId.toString() } },
+        });
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   return router;
 };

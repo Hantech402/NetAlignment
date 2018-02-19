@@ -171,4 +171,15 @@ export class UserRepositoryService extends Repository {
       html: html || `Please confirm your email <a href='${this.apiUrl}/account/${accountId}/confirm'>Click here to confirm</a>`,
     });
   }
+
+  @service()
+  sendInviteEmail({ lenderId, loanAppId }) {
+    return super.findOne({ query: { _id: lenderId } })
+      .then(lender => this.sendEmail({
+        from: 'no-reply@mail.com',
+        to: lender.email,
+        subjet: 'Invitation',
+        html: `Hello, I want invite you to my loan application ${loanAppId.toString()}`,
+      }));
+  }
 }
