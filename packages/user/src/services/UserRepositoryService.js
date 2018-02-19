@@ -34,7 +34,7 @@ export class UserRepositoryService extends Repository {
   generateToken({ userData }) { // eslint-disable-line class-methods-use-this
     return new Promise((resolve, reject) => {
       jwt.sign({
-        ...pick(userData, ['_id', 'username', 'accountId']),
+        ...pick(userData, ['_id', 'email', 'username', 'accountId']),
         role: userData.role,
       }, this.jwtSecret, { expiresIn: this.jwtExpiresIn }, (err, token) => {
         if (err) reject(err);

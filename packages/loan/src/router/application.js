@@ -379,7 +379,7 @@ export const applicationRouter = config => {
           query: { _id: loanEstimate.loanApplicationId },
         });
 
-        if (loanApp.accountId.toString() !== req.user.accountId) {
+        if (loanApp.accountId.toString() !== req.user.accountId.toString()) {
           throw Boom.forbidden('Missing permissions. Its not your auction');
         }
 
@@ -396,6 +396,16 @@ export const applicationRouter = config => {
   );
 
   router.post(
+    /**
+     * Invite lenders to user's loan package
+     * @route POST /loans/applications/invite
+     * @group LoanApp
+     * @param {string} loanApplicationId.body.required - LP id (string or object)
+     * @param {string} lenderId.body.required - lender id (string or object)
+     * @security jwtToken
+     * @returns 200
+    */
+
     '/invite',
     Celebrate({ body: {
       loanApplicationId: Joi.alternatives().try(Joi.string(), Joi.object()).required(),
@@ -420,6 +430,49 @@ export const applicationRouter = config => {
           query: { _id: loanAppId, accountId },
           update: { $push: { lenders: lendId.toString() } },
         });
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    /**
+     * Send message from borrower to accepted lender
+     * @route POST /loans/applications/send-message
+     * @group LoanApp
+     * @param {string} message.body.required - message to send
+     * @param {string} loanApplicationId.body.required - loan package id (accepted!)
+     * @security jwtToken
+     * @returns 200
+    */
+
+    '/send-message',
+    Celebrate({ body: Joi.object().keys({
+      message: Joi.string().required(),
+      loanApplicationId: Joi.string().required(),
+    }).required() }),
+
+    async (req, res, next) => {
+      try {
+        const { UserRepository } = req.app.modules.get('net-alignments.users');
+        const accountId = req.user.accountId;
+        const _id = objectId(req.body.loanApplicationId);
+
+        const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
+        if (!loanApp) throw Boom.notFound('Unable to find loan package');
+        if (loanApp.status !== 'accepted') throw Boom.badRequest('You can send message only to accepted LP');
+
+        // eslint-disable-next-line max-len
+        const lender = await UserRepository.findOne({ query: { accountId: loanApp.acceptedLenderAccount } });
+        await UserRepository.sendEmail({
+          from: 'no-reply@net-alignments.com',
+          to: lender.email,
+          subject: `Message from ${req.user.username}`,
+          text: req.body.message,
+        });
+
         res.sendStatus(200);
       } catch (err) {
         next(err);
