@@ -153,7 +153,7 @@ export const commonUserRouter = configRouter => {
     async (req, res, next) => {
       try {
         const userProfile = await UserRepository.findOne({
-          query: { _id: objectId(req.user._id) },
+          query: { _id: req.user._id },
           options: { fields: { password: 0 } },
         });
         const account = await AccountRepository.findOne({ query: { ownerId: userProfile._id } });

@@ -53,7 +53,7 @@ export const estimateRouter = config => {
         const loanEstimate = await LoanEstimateRepository.createOne({
           ...req.body,
           loanApplicationId: loanAppId,
-          accountId: objectId(req.user.accountId),
+          accountId: req.user.accountId,
         });
 
         if (!loanApp.submitted) {
@@ -83,7 +83,7 @@ export const estimateRouter = config => {
     '/',
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanEstimates = await LoanEstimateRepository.findMany({
           query: { accountId },
         }).toArray();
@@ -109,7 +109,7 @@ export const estimateRouter = config => {
     Celebrate({ query: Joi.object().required() }),
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const query = req.query.query || {};
         const loanEstimates = await LoanEstimateRepository.count({
           query: { ...query, accountId },
@@ -161,7 +161,7 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const query = req.query.query ? JSON.parse(req.query.query) : {};
-        query.accountId = objectId(req.user.accountId);
+        query.accountId = req.user.accountId;
         const loanEstimate = await LoanEstimateRepository.findOne({ query });
         if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
 
@@ -186,7 +186,7 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanEstimate = await LoanEstimateRepository.findOne({ query: { accountId, _id } });
         if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
 
@@ -217,7 +217,7 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
 
         const loanEstimate = await LoanEstimateRepository.findOne({ query: { _id, accountId } });
         if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
@@ -247,7 +247,7 @@ export const estimateRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
 
         const result = await LoanEstimateRepository.deleteOne({ query: { _id, accountId } });
         if (!result) throw Boom.notFound('Unable to find loan estimate');

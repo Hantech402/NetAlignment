@@ -43,7 +43,7 @@ export const fileManagerRouter = indexRouterConfig => {
           accountId = objectId(credentials.id);
         } else {
           config.decodeAndVerifyToken(req, res, next);
-          accountId = objectId(req.user.accountId);
+          accountId = req.user.accountId;
         }
         const dbFile = await FileManagerService.findOne({ query: { _id, accountId } });
 
@@ -81,8 +81,8 @@ export const fileManagerRouter = indexRouterConfig => {
         fileStats.size /= 1000000.0;
 
         await FileManagerService.createOne({
-          accountId: objectId(req.user.accountId),
-          userId: objectId(req.user._id),
+          accountId: req.user.accountId,
+          userId: req.user._id,
           filename: filePath,
           extension: fileExt,
           size: fileStats.size,
@@ -111,7 +111,7 @@ export const fileManagerRouter = indexRouterConfig => {
     async (req, res, next) => {
       try {
         const files = await FileManagerService.findMany({
-          query: { userId: objectId(req.user._id) },
+          query: { userId: req.user._id },
         }).toArray();
 
         res.json({ files });
@@ -163,7 +163,7 @@ export const fileManagerRouter = indexRouterConfig => {
     async (req, res, next) => {
       try {
         const files = await FileManagerService.findOne({
-          query: { userId: objectId(req.user._id) },
+          query: { userId: req.user._id },
         });
         if (!files) return next(Boom.notFound('You do not have any file'));
 
@@ -188,7 +188,7 @@ export const fileManagerRouter = indexRouterConfig => {
       try {
         await rmdir(`${config.usersFilesPath}/${req.user.accountId}/*`);
         await FileManagerService.deleteMany({
-          query: { userId: objectId(req.user._id) },
+          query: { userId: req.user._id },
         });
 
         res.sendStatus(200);

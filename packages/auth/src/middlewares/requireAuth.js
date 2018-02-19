@@ -16,6 +16,8 @@ export const decodeAndVerifyToken = ({ jwtSecret }) =>
       const _id = objectId(decoded.accountId);
       const account = await AccountRepository.findOne({ query: { _id } });
       if (!account.isActive) return next(Boom.unauthorized('Your account is disabled'));
+      decoded._id = objectId(decoded._id);
+      decoded.accountId = objectId(decoded.accountId);
 
       req.user = decoded;
     } catch (err) {
@@ -35,6 +37,8 @@ export const requireAuth = ({ jwtSecret }) =>
       const _id = objectId(decoded.accountId);
       const account = await AccountRepository.findOne({ query: { _id } });
       if (account.isDeleted || account.isDeactivated || !account.isActive) next(Boom.unauthorized('Your account is disabled'));
+      decoded._id = objectId(decoded._id);
+      decoded.accountId = objectId(decoded.accountId);
 
       req.user = decoded;
       req.user.isConfirmed = account.isConfirmed;

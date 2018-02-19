@@ -36,7 +36,7 @@ export const applicationRouter = config => {
 
         const loanApp = await LoanApplicationRepository.createOne({
           ...req.body,
-          accountId: objectId(req.user.accountId),
+          accountId: req.user.accountId,
         });
         res.json(loanApp);
       } catch (err) {
@@ -65,7 +65,7 @@ export const applicationRouter = config => {
 
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const query = { accountId };
         const { status, filter } = req.query;
 
@@ -98,7 +98,7 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
 
         if (!loanApp) throw Boom.notFound('Loan app not found. Probably wrong id');
@@ -131,7 +131,7 @@ export const applicationRouter = config => {
     }).required() }),
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const query = { ...req.body.query, accountId };
         const loanAppExist = await LoanApplicationRepository.count({ query });
         if (!loanAppExist) throw Boom.notFound('Unable to find loan application');
@@ -157,7 +157,7 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanApp = await LoanApplicationRepository.findOne({ query: _id, accountId });
 
         if (!loanApp) throw Boom.notFound('Unable to find auction. Probably wrong id');
@@ -189,7 +189,7 @@ export const applicationRouter = config => {
     '/count',
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanAppsCount = await LoanApplicationRepository.count({ query: { accountId } });
         res.json(loanAppsCount);
       } catch (err) {
@@ -239,7 +239,7 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const _id = objectId(req.params.id);
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanApp = await LoanApplicationRepository.findOne({ query: { _id, accountId } });
 
         if (!loanApp) throw Boom.notFound(`Cannot found loan application with id ${req.params.id}`);
@@ -338,7 +338,7 @@ export const applicationRouter = config => {
     '/estimates/:id',
     async (req, res, next) => {
       try {
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const loanApplicationId = objectId(req.params.id);
 
         const loanApp = await LoanApplicationRepository.findOne({
@@ -405,7 +405,7 @@ export const applicationRouter = config => {
     async (req, res, next) => {
       try {
         const { UserRepository } = req.app.modules.get('net-alignments.users');
-        const accountId = objectId(req.user.accountId);
+        const accountId = req.user.accountId;
         const { loanApplicationId, lenderId } = req.body;
         const loanAppId = typeof (loanApplicationId) === 'object' ? loanApplicationId : objectId(loanApplicationId);
         const lendId = typeof (lenderId) === 'object' ? lenderId : objectId(lenderId);

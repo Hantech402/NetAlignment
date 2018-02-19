@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import Boom from 'boom';
-import { ObjectID as objectId } from 'mongodb';
 import Celebrate from 'celebrate';
 import pick from 'lodash/pick';
 import Joi from 'joi';
@@ -30,13 +29,13 @@ export const accountRouter = indexRouterConfig => {
     '/:id/confirm',
     async (req, res, next) => { // eslint-disable-line consistent-return
       try {
-        const id = req.params.id;
-        const account = await AccountRepository.findOne({ query: { _id: objectId(id) } });
+        const _id = req.params.id;
+        const account = await AccountRepository.findOne({ query: { _id } });
         if (!account) return next(Boom.notFound('Cannot find account with provided id'));
         if (account.isConfirmed) return next(Boom.badRequest('This account is already confirmed'));
 
         const updatedAccount = await AccountRepository.updateOne({
-          query: { _id: objectId(req.params.id) },
+          query: { _id },
           update: { $set: { isConfirmed: true } },
           options: { new: true },
         });
@@ -67,12 +66,12 @@ export const accountRouter = indexRouterConfig => {
       try {
         if (req.user.scope === 'admin') throw Boom.forbidden('Insufficient scope');
         await AccountRepository.updateOne({
-          query: { ownerId: objectId(req.user._id) },
+          query: { ownerId: req.user._id },
           update: { $set: { isDeactivated: true } },
         });
 
         await LoanApplicationRepository.updateMany({
-          query: { accountId: objectId(req.user.accountId) },
+          query: { accountId: req.user.accountId },
           update: { $set: { status: 'canceled' } },
         });
 
