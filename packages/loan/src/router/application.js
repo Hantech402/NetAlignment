@@ -371,6 +371,7 @@ export const applicationRouter = config => {
     '/:leId/accept',
     async (req, res, next) => {
       try {
+        const { UserRepository } = req.app.modules.get('net-alignments.users');
         const leId = objectId(req.params.leId);
         const loanEstimate = await LoanEstimateRepository.findOne({ query: { _id: leId } });
         if (!loanEstimate) throw Boom.notFound('Unable to find loan estimate');
@@ -386,6 +387,15 @@ export const applicationRouter = config => {
         if (loanApp.status !== 'open') throw Boom.badRequest('LE could be accepted only on open auctions');
         await LoanApplicationRepository.updateOne({
           update: { $set: { status: 'accepted', acceptedLenderAccount: loanEstimate.accountId } },
+        });
+
+        // eslint-disable-next-line max-len
+        const lender = await UserRepository.findOne({ query: { accountId: loanEstimate.accountId } });
+        await UserRepository.sendEmail({
+          from: 'no-reply@net-alignments.com',
+          to: lender.email,
+          subject: 'Won loan package!',
+          text: `You have just won loan package ${loanApp._id.toString()}. Congratulations!`,
         });
 
         res.sendStatus(200);
