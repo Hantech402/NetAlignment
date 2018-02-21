@@ -123,6 +123,7 @@ export const applicationRouter = config => {
      * @group LoanApp
      * @param {string} query.query.required
      * @security jwtToken
+     * @returns 200
     */
 
     '/deleteOne',
@@ -391,12 +392,13 @@ export const applicationRouter = config => {
 
         // eslint-disable-next-line max-len
         const lender = await UserRepository.findOne({ query: { accountId: loanEstimate.accountId } });
-        await UserRepository.sendEmail({
+        const requests = [];
+        requests.push(UserRepository.sendEmail({
           from: 'no-reply@net-alignments.com',
           to: lender.email,
           subject: 'Won loan package!',
           text: `You have just won loan package ${loanApp._id.toString()}. Congratulations!`,
-        });
+        }));
 
         res.sendStatus(200);
       } catch (err) {
@@ -481,6 +483,51 @@ export const applicationRouter = config => {
           to: lender.email,
           subject: `Message from ${req.user.username}`,
           text: req.body.message,
+        });
+
+        res.sendStatus(200);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    /**
+     * Rate lender on accepted auction
+     * @route POST /loans/applications/rate/:id
+     * @group LoanApp
+     * @param {number} rate.body.required - min 1, max 5
+     * @param {string} message.body.required - min 1, max 5
+     * @param {string} id.path.required - loan app id
+     * @security jwtToken
+     * @returns 200
+    */
+
+    '/rate/:id',
+    Celebrate({ body: Joi.object().keys({
+      rate: Joi.number().min(1).max(5).required(),
+      message: Joi.string(),
+    }).required() }),
+
+    async (req, res, next) => {
+      try {
+        const { UserRepository } = req.app.modules.get('net-alignments.users');
+        const loanApplicationId = objectId(req.params.id);
+        const accountId = req.user.accountId;
+
+        const loanApp = await LoanApplicationRepository.findOne({
+          query: { _id: loanApplicationId, accountId },
+        });
+        if (!loanApp) throw Boom.notFound('Unable to find loan application');
+        if (loanApp.status !== 'accepted') throw Boom.badRequest('You can rate only accepted loan app');
+
+        await UserRepository.updateOne({
+          query: { accountId: loanApp.acceptedLenderAccount },
+          update: { $set: { [`rate.${req.params.id}`]: {
+            rate: req.body.rate,
+            message: req.body.message,
+          } } },
         });
 
         res.sendStatus(200);

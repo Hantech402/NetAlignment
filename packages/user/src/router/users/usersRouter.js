@@ -349,46 +349,5 @@ export const commonUserRouter = configRouter => {
     },
   );
 
-  router.patch(
-    /**
-     * Rate lender by auction id
-     * @route PATCH /users/lenders/rate
-     * @group Users
-     * @param {number} rate.body.required
-     * @param {string} loanApplicationId.body.required
-     * @security jwtToken
-     * @returns 200
-    */
-
-    '/lenders/rate',
-    Celebrate({ body: Joi.object().keys({
-      rate: Joi.number().min(1).max(10).required(),
-      loanApplicationId: Joi.string().required(),
-    }).required() }),
-
-    async (req, res, next) => {
-      try {
-        const loanApp = await LoanApplicationRepository.findOne({
-          query: { _id: objectId(req.body.loanApplicationId) },
-        });
-
-        if (loanApp.status !== 'accepted') throw Boom.badRequest('Only accepted auctions could be rated');
-        await LoanApplicationRepository.updateOne({
-          query: { _id: objectId(req.body.loanApplicationId) },
-          update: { $set: { lenderRate: req.body.rate } },
-        });
-
-        // await UserRepository.updateOne({
-        //   query: { accountId: loanApp.acceptedLenderAccount },
-        //   update: { $set: { rate: req.body.rate } },
-        // });
-
-        res.sendStatus(200);
-      } catch (err) {
-        next(err);
-      }
-    },
-  );
-
   return router;
 };
