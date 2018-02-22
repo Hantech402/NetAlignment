@@ -17,7 +17,7 @@ export default {
   coBorrower: Joi.string(),
 
   invitedLenders: Joi.array().items(Joi.string().required()),
-  lenders: Joi.array().items(Joi.string().required()).default([]),
+  lenders: Joi.array().items(Joi.object().required()).default([]),
   acceptedLenderAccount: Joi.object(),
   // lenderRate: Joi.number(),
   submitted: Joi.bool().default(false),

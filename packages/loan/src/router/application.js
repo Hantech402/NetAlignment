@@ -392,13 +392,31 @@ export const applicationRouter = config => {
 
         // eslint-disable-next-line max-len
         const lender = await UserRepository.findOne({ query: { accountId: loanEstimate.accountId } });
+        const loosers = await UserRepository.findMany({
+          query: { _id: { $in: loanApp.lenders } },
+        }).toArray();
+
         const requests = [];
+
         requests.push(UserRepository.sendEmail({
           from: 'no-reply@net-alignments.com',
           to: lender.email,
           subject: 'Won loan package!',
           text: `You have just won loan package ${loanApp._id.toString()}. Congratulations!`,
         }));
+
+        loosers.forEach(looser => {
+          if (!looser._id.equals(lender._id)) {
+            requests.push(UserRepository.sendEmail({
+              from: 'no-reply@net-alignments.com',
+              subject: 'Loose loan package',
+              text: `You have just lost loan package ${loanApp._id.toString()}.`,
+              to: looser.email,
+            }));
+          }
+        });
+
+        await Promise.all(requests);
 
         res.sendStatus(200);
       } catch (err) {
@@ -416,7 +434,7 @@ export const applicationRouter = config => {
      * @param {string} lenderId.body.required - lender id (string or object)
      * @security jwtToken
      * @returns 200
-    */
+     */
 
     '/invite',
     Celebrate({ body: {
@@ -458,7 +476,7 @@ export const applicationRouter = config => {
      * @param {string} loanApplicationId.body.required - loan package id (accepted!)
      * @security jwtToken
      * @returns 200
-    */
+     */
 
     '/send-message',
     Celebrate({ body: Joi.object().keys({
@@ -502,7 +520,7 @@ export const applicationRouter = config => {
      * @param {string} id.path.required - loan app id
      * @security jwtToken
      * @returns 200
-    */
+     */
 
     '/rate/:id',
     Celebrate({ body: Joi.object().keys({

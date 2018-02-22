@@ -3,6 +3,7 @@ import Boom from 'boom';
 import Celebrate from 'celebrate';
 import pick from 'lodash/pick';
 import Joi from 'joi';
+import { ObjectID as objectId } from 'mongodb';
 
 import userSchema from '../../schemas/userSchema';
 import { setUserInfo } from '../../utils';
@@ -29,7 +30,7 @@ export const accountRouter = indexRouterConfig => {
     '/:id/confirm',
     async (req, res, next) => { // eslint-disable-line consistent-return
       try {
-        const _id = req.params.id;
+        const _id = objectId(req.params.id);
         const account = await AccountRepository.findOne({ query: { _id } });
         if (!account) return next(Boom.notFound('Cannot find account with provided id'));
         if (account.isConfirmed) return next(Boom.badRequest('This account is already confirmed'));

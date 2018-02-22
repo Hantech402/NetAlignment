@@ -26,7 +26,7 @@ export const estimateRouter = config => {
      * @route POST /loans/estimates
      * @group LoanApp
      * @param {string} loanApplicationId.body.required
-     * @param {string} amortizationType.body.required
+     * @param {string} amortizationType.body.required - 'Fixed', 'Adjustable', 'Interest Only', 'Balloon Payment',
      * @param {number} interestRate.body.required
      * @param {number} nrOfMonths.body.required
      * @returns {object} 200 - new loanEstimate object
@@ -42,7 +42,7 @@ export const estimateRouter = config => {
       try {
         const loanAppId = objectId(req.body.loanApplicationId);
         const existLoanEstimate = await LoanEstimateRepository.findOne({
-          query: { loanApplicationId: loanAppId },
+          query: { loanApplicationId: loanAppId, accountId: req.user.accountId },
         });
         if (existLoanEstimate) throw Boom.badRequest('You can create only one LE per one loan loan packages');
 
@@ -56,12 +56,9 @@ export const estimateRouter = config => {
           accountId: req.user.accountId,
         });
 
-        if (!loanApp.submitted) {
-          await LoanApplicationRepository.updateOne({
-            query: { _id: loanAppId },
-            update: { $set: { submitted: true } }, // TODO: draft LE?
-          });
-        }
+        const update = { $push: { lenders: req.user._id } };
+        if (!loanApp.submitted) update.$set = { submitted: true };
+        await LoanApplicationRepository.updateOne({ query: { _id: loanAppId }, update });
 
         res.json({ loanEstimate });
       } catch (err) {
