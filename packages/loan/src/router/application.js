@@ -85,6 +85,38 @@ export const applicationRouter = config => {
     },
   );
 
+  router.get(
+    /**
+     * Get list of rated lenders per auction
+     * @route GET /loans/applications/reated-lenders
+     * @group LoanApp
+     * @returns {object} - array of user's (lender) object with rates
+     * @security jwtToken
+    */
+
+    '/rated-lenders',
+    async (req, res, next) => {
+      try {
+        const { UserRepository } = req.app.modules.get('net-alignments.users');
+        const loanApps = await LoanApplicationRepository.findMany({
+          query: { accountId: req.user.accountId, status: 'closed' },
+        }).toArray();
+
+        if (!loanApps.length) throw Boom.notFound('You don\'t have any loan application');
+        const lendersAccountIds = loanApps.map(item => item.acceptedLenderAccount);
+
+        const ratedLenders = await UserRepository.findMany({
+          query: { accountId: { $in: lendersAccountIds } },
+          fields: { rate: 1 },
+        }).toArray();
+
+        res.json({ ratedLenders });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   router.patch(
     /**
     * Update loan application
@@ -538,7 +570,7 @@ export const applicationRouter = config => {
           query: { _id: loanApplicationId, accountId },
         });
         if (!loanApp) throw Boom.notFound('Unable to find loan application');
-        if (loanApp.status !== 'accepted') throw Boom.badRequest('You can rate only accepted loan app');
+        if (loanApp.status !== 'closed') throw Boom.badRequest('You can rate only closed loan app');
 
         await UserRepository.updateOne({
           query: { accountId: loanApp.acceptedLenderAccount },
