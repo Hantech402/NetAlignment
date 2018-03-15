@@ -5,7 +5,7 @@ import Joi from 'joi';
 import Boom from 'boom';
 import pick from 'lodash/pick';
 // import { helpers } from 'makeen-mongodb';
-import { ObjectID as objectId } from 'mongodb';
+// import { ObjectID as objectId } from 'mongodb';
 
 import userSchema from '../../schemas/userSchema';
 import accountSchema from '../../schemas/accountSchema';
@@ -14,7 +14,7 @@ import { setUserInfo } from '../../utils'; // pick needed information from objec
 export const commonUserRouter = configRouter => {
   const {
     UserRepository,
-    LoanApplicationRepository,
+    // LoanApplicationRepository,
     AccountRepository,
     config,
     router = Router(),
@@ -30,6 +30,7 @@ export const commonUserRouter = configRouter => {
      * @param {string} password.body.required
      * @param {string} email.body.required
      * @param {string} streetAddress1.address.body.required
+     * @param {string} licenseNr.body.required
      * @param {string} role.body.required
      * @returns {object} 200 - user's object
      */
