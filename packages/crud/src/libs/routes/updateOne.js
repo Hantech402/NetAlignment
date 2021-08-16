@@ -1,45 +1,33 @@
 import Joi from 'joi';
-import Boom from 'boom';
 import { ObjectID as objectId } from 'mongodb';
 import { toBSON } from 'na-core';
+import { objectIdPattern } from 'na-core/src/constants';
+import handler from '../../handlers/updateOne';
 
-export default (serviceNamespace, path, config = {}) => ({
+export default ({ entityName, entityNs, path, config = {} }) => ({
   path,
   method: 'PATCH',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch }, params } = request;
-    const { id } = params;
-
-    try {
-      const parsedPayload = toBSON(request.payload);
-      const entity = await dispatch(`${serviceNamespace}.findById`, objectId(id));
-      if (!entity) {
-        reply(Boom.notFound(`Unable to find entity with id ${id}`));
-      }
-
-      const result = await dispatch(`${serviceNamespace}.updateOne`, {
-        query: {
-          _id: objectId(id),
-        },
-        update: {
-          $set: parsedPayload,
-        },
-      });
-
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:updateOne`,
     validate: {
       params: {
-        id: Joi.string().required(),
+        id: Joi.string().regex(objectIdPattern).required(),
       },
       payload: Joi.object().required(),
     },
-    description: 'Update an entity',
+    description: `Update an entity of type ${entityName}`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => reply({ _id: objectId(request.params.id) }),
+        assign: 'query',
+      },
+      {
+        method: (request, reply) => reply(toBSON(request.payload)),
+        assign: 'payload',
+      },
+    ],
     ...config,
   },
 });

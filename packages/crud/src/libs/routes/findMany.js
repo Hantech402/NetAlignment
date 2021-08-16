@@ -1,41 +1,45 @@
-import Boom from 'boom';
 import { toBSON } from 'na-core';
 import Joi from 'joi';
+import pick from 'lodash/pick';
+import handler from '../../handlers/findMany';
 
-export default (serviceNamespace, path, config = {}) => ({
+export default ({ entityName, entityNs, path, config = {} }) => ({
   path,
   method: 'GET',
-  async handler(request, reply) {
-    const { eventDispatcher: { dispatch }, query } = request;
-
-    try {
-      let cursor = await dispatch(`${serviceNamespace}.findMany`, {
-        query: toBSON(query.query),
-      });
-
-      if (query.offset !== undefined) {
-        cursor = cursor.skip(parseInt(query.offset, 10));
-      }
-
-      if (query.limit !== undefined) {
-        cursor = cursor.limit(parseInt(query.limit, 10));
-      }
-
-      const result = cursor.toArray();
-
-      reply(result);
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handler({ entityName, entityNs }),
   config: {
+    id: `${entityName}:findMany`,
     validate: {
       query: {
         query: Joi.object().default({}),
+        offset: Joi.number(),
+        limit: Joi.number(),
+        orderBy: Joi.object().default({}),
+        fields: Joi.object().default({}),
       },
     },
-    description: 'Find all entities',
+    description: `Find all entities of type ${entityName}`,
     tags: ['api'],
+    pre: [
+      {
+        method: (request, reply) => {
+          const { query } = request;
+          const params = pick(query, ['fields', 'orderBy']);
+          params.query = toBSON(query.query);
+
+          if (query.offset !== undefined) {
+            params.skip = parseInt(query.offset, 10);
+          }
+
+          if (query.limit !== undefined) {
+            params.limit = parseInt(query.limit, 10);
+          }
+
+          reply(params);
+        },
+        assign: 'queryParams',
+      },
+    ],
     ...config,
   },
 });

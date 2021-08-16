@@ -1,10 +1,11 @@
 import Glue from 'glue';
 import path from 'path';
+import DotEnv from 'dotenv';
 
-export default (store) => {
-  const manifest = store.get('/', {
-    env: process.env.NODE_ENV,
-  });
+DotEnv.config();
+
+export default (store, env = process.env.NODE_ENV) => {
+  const manifest = store.get('/', { env });
 
   const options = {
     relativeTo: path.join(__dirname, '..', 'packages'),

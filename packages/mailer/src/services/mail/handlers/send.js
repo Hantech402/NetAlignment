@@ -1,18 +1,27 @@
-const handler = ({ transporter, renderTemplate }) => async ({ params }) => {
-  const { template, context, ...restParams } = params;
-  const html = await renderTemplate(template, context);
-  return new Promise((resolve, reject) => {
-    transporter.sendMail({
-      ...restParams,
-      html,
-    }, (err, info) => {
-      if (err) {
-        return reject(err);
-      }
+const handler = ({ transporter, renderTemplate, app, emailsDir }) =>
+  async ({ params }) => {
+    const { template, context, ...restParams } = params;
 
-      return resolve(info);
+    const html = await renderTemplate(template, {
+      ...context,
+      transportConfig: restParams,
+      app,
     });
-  });
-};
+
+    return new Promise((resolve, reject) => {
+      transporter.sendMail({
+        ...restParams,
+        html,
+        app,
+        emailsDir,
+      }, (err, info) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(info);
+      });
+    });
+  };
 
 export default handler;

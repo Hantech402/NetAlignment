@@ -1,31 +1,34 @@
 import HapiReactViews from 'hapi-react-views';
+import Inert from 'inert';
 import Vision from 'vision';
-import path from 'path';
 import nodemailer from 'nodemailer';
 import Joi from 'joi';
 import pkg from '../package.json';
 import setupServices from './services/index';
 import pluginOptionsSchema from './schemas/pluginOptions';
+import fileTransporter from './fileTransporter';
+import browseEmailsRoute from './routes/browseEmails';
 
 export function register(server, options, next) {
+  const { app } = server.settings;
+  const { isDevelopment } = app;
   const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
+  const { saveToDisk, emailsDir } = pluginOptions;
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
-  const transporter = nodemailer.createTransport({
-    ...pluginOptions,
-    logger: server.settings.isDevelopment,
-    debug: server.settings.isDevelopment,
+
+  const transporter = saveToDisk ? fileTransporter : nodemailer.createTransport({
+    ...pluginOptions.transport,
+    logger: isDevelopment,
+    debug: isDevelopment,
   });
 
   server.register([
+    Inert,
     Vision,
   ]).then(() => {
     server.views({
       engines: {
-        js: HapiReactViews,
-      },
-      compileOptions: {
-        layoutPath: path.join(__dirname, 'views'),
-        layout: 'layout',
+        jsx: HapiReactViews,
       },
       relativeTo: __dirname,
       path: 'views',
@@ -45,9 +48,15 @@ export function register(server, options, next) {
         });
       },
       transporter,
+      emailsDir,
+      app,
     });
 
-    next();
+    if (saveToDisk) {
+      server.route(browseEmailsRoute(emailsDir));
+    }
+
+    return next();
   }, next);
 }
 

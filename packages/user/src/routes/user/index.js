@@ -1,46 +1,92 @@
 import Joi from 'joi';
-import Boom from 'boom';
+import { generateCRUDRoutes } from 'na-crud';
+import { schemas } from 'na-loan';
+import pick from 'lodash/pick';
+import findMany from 'na-crud/src/handlers/findMany';
+import findManyRoute from 'na-crud/src/libs/routes/findMany';
 import * as handlers from './handlers';
+import crudHandlers from './handlers/crud';
+import userSchema from '../../schemas/user';
+import accountSchema from '../../schemas/account';
 
-export default [{
-  path: '/user/register',
-  method: 'POST',
-  handler: {
-    dispatch: {
-      event: 'User.register',
-      buildParams({ payload }) {
-        return payload;
+const pathPrefix = '/users';
+const generatedCRUDRoutes = generateCRUDRoutes({
+  pathPrefix,
+  entityName: 'User',
+  schema: userSchema,
+});
+
+const userCRUDRoutes = [
+  'count', 'deleteOne', 'findById', 'findMany', 'findOne', 'replaceOne', 'updateOne',
+].reduce((acc, route) => ({
+  ...acc,
+  [route]: {
+    ...generatedCRUDRoutes[route],
+    config: {
+      ...generatedCRUDRoutes[route].config,
+      auth: {
+        strategy: 'jwt',
+        scope: 'admin',
       },
     },
+    handler: crudHandlers[route] || generatedCRUDRoutes[route].handler,
   },
+}), {});
+
+const findManyLenders = findManyRoute({ entityName: 'User' });
+
+export default [{
+  path: `${pathPrefix}/register`,
+  method: 'POST',
+  handler: handlers.register,
   config: {
     validate: {
       payload: Joi.object().keys({
-        username: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().required(),
+        ...pick(userSchema, [
+          'title', 'firstName', 'middleName', 'lastName', 'address', 'password',
+          'username', 'email',
+        ]),
+        ...pick(accountSchema, ['loanOfficersEmails']),
+        role: Joi.string().required().valid(['lender', 'borrower', 'broker']),
+        loanApplication: Joi.any().when('role', {
+          is: 'borrower',
+          then: Joi.object().keys(
+            pick(schemas.loanApplication, ['financialGoal', 'rate', 'termsByRate']),
+          ),
+        }),
+        licenseNr: Joi.any().when('role', {
+          is: Joi.any().valid(['lender', 'broker']),
+          then: Joi.string().required(),
+        }),
+        employeesNr: Joi.number().allow(null),
       }).required(),
     },
     description: 'Register a new user',
     tags: ['api'],
+    pre: [{
+      method: handlers.validateLicenseNr,
+      assign: 'brokerAccount',
+    }, {
+      method: handlers.validateLenderRegistration,
+    }],
   },
 }, {
-  path: '/user/reset-password',
+  path: `${pathPrefix}/refresh-token`,
   method: 'POST',
-  async handler(request, reply) {
-    const { User } = this;
-    const { usernameOrEmail } = request.payload;
-    try {
-      const { user, updateResult } = await User.resetPassword(usernameOrEmail);
-      const curatedUser = await User.dump(user);
-      reply({
-        user: curatedUser,
-        updateResult,
-      });
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
+  handler: handlers.register,
+  config: {
+    validate: {
+      payload: Joi.object().keys({
+        token: Joi.string().required(),
+      }).required(),
+    },
+    description: 'Refresh JWT',
+    tags: ['api'],
   },
+}, {
+  path: `${pathPrefix}/reset-password`,
+  method: 'POST',
+  handler: handlers.resetPassword,
   config: {
     validate: {
       payload: Joi.object().keys({
@@ -51,23 +97,9 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/user/recover-password/{token}',
+  path: `${pathPrefix}/recover-password/{token}`,
   method: 'POST',
-  async handler(request, reply) {
-    const { User } = this;
-    const { password } = request.payload;
-    const { token } = request.params;
-    try {
-      const { user, updateResult } = await User.recoverPassword({ password, token });
-      const curatedUser = await User.dump(user);
-      reply({
-        user: curatedUser,
-        updateResult,
-      });
-    } catch (err) {
-      reply(Boom.wrap(err));
-    }
-  },
+  handler: handlers.recoverPassword,
   config: {
     validate: {
       params: Joi.object().keys({
@@ -81,17 +113,79 @@ export default [{
     tags: ['api'],
   },
 }, {
-  path: '/social-login/facebook',
-  method: ['GET', 'POST'],
-  handler: handlers.socialLogin,
+  path: `${pathPrefix}/change-password`,
+  method: 'POST',
+  handler: handlers.changePassword,
   config: {
-    auth: 'facebook',
+    auth: 'jwt',
+    validate: {
+      payload: Joi.object().keys({
+        oldPassword: Joi.string().required(),
+        password: Joi.string().required(),
+      }).required(),
+    },
+    description: 'Change password',
+    tags: ['api'],
   },
 }, {
-  path: '/social-login/google',
-  method: ['GET', 'POST'],
-  handler: handlers.socialLogin,
+  path: `${pathPrefix}/me`,
+  method: 'GET',
+  handler: handlers.getProfile,
   config: {
-    auth: 'google',
+    auth: 'jwt',
+    description: 'User profile',
+    tags: ['api'],
   },
-}];
+}, {
+  path: `${pathPrefix}/me`,
+  method: 'PATCH',
+  handler: handlers.updateProfile,
+  config: {
+    auth: 'jwt',
+    description: 'Update user profile',
+    tags: ['api'],
+    validate: {
+      payload: {
+        ...pick(userSchema, [
+          'title', 'firstName', 'middleName', 'lastName', 'address',
+        ]),
+        address: userSchema.address.optional(),
+      },
+    },
+  },
+}, {
+  path: `${pathPrefix}/lenders`,
+  method: 'GET',
+  handler: findMany({
+    entityName: 'User',
+  }),
+  config: {
+    id: 'findLenders',
+    auth: {
+      strategy: 'jwt',
+      scope: ['borrower', 'broker'],
+    },
+    validate: {
+      ...findManyLenders.config.validate,
+    },
+    pre: [
+      ...findManyLenders.config.pre,
+      {
+        async method(request, reply) {
+          const { queryParams } = request.pre;
+          /**
+           * TODO
+           * add more filters to make sure the related account is active
+           *  - use user._account for that
+           */
+          queryParams.query.role = 'lender';
+          reply();
+        },
+      },
+    ],
+    description: 'Find lenders',
+    tags: ['api'],
+  },
+}].concat(
+  Object.keys(userCRUDRoutes).map((routeName) => userCRUDRoutes[routeName]),
+);

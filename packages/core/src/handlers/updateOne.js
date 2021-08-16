@@ -12,7 +12,7 @@ export default ({
 
   try {
     const parsedPayload = omit(toBSON(request.payload), ['accountId']);
-    const entity = await dispatch(`entity.${entityName}.findOne`, {
+    const entity = request.pre.entity || await dispatch(`entity.${entityName}.findOne`, {
       query: {
         _id: objectId(id),
         accountId,

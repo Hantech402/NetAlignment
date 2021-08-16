@@ -18,7 +18,7 @@ const handler = async ({ params, next, User, Account }) => {
   const user = await next(params);
 
   if (shouldAcknowledgeOwner) {
-    Account.updateOne({
+    await Account.updateOne({
       query: {
         _id: user.accountId,
       },

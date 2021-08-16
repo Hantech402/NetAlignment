@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import * as hbUser from 'hb-user';
+import pick from 'lodash/pick';
 import pkg from '../package.json';
 import pluginOptionsSchema from './schemas/pluginOptions';
 import userSchema from './schemas/user';
@@ -10,7 +11,7 @@ export function register(server, options, next) {
   const dispatcher = server.plugins['hapi-octobus'].eventDispatcher;
   const { dispatch, lookup } = dispatcher;
   const pluginOptions = Joi.attempt(options, pluginOptionsSchema);
-  const { mongoDb } = server.plugins['re-storage'];
+  const { mongoDb, refManager } = server.plugins['na-storage'];
 
   if (pluginOptions.socialPlatforms.facebook) {
     server.auth.strategy('facebook', 'bell', {
@@ -34,20 +35,31 @@ export function register(server, options, next) {
       jwt: pluginOptions.jwt,
       serviceOptions: {
         ...pluginOptions.user,
-        references: [],
+        references: [{
+          collectionName: 'Account',
+          refProperty: 'accountId',
+          extractor: (account = {}) => (
+            pick(account, ['licenseNr', 'loanOfficersEmails', 'isConfirmed', 'isActive', 'isDeactivated'])
+          ),
+        }],
         schema: userSchema,
         db: mongoDb,
+        refManager,
       },
     },
   }]).then(() => {
     setupServices({
       dispatcher,
       db: mongoDb,
+      pluginOptions,
+      refManager,
+      app: server.settings.app,
     });
 
     const UserEntity = lookup('entity.User');
     const AccountEntity = lookup('entity.Account');
     const User = lookup('User');
+    const LoanApplicationEntity = lookup('entity.LoanApplication');
 
     server.expose('UserEntity', UserEntity);
     server.expose('AccountEntity', AccountEntity);
@@ -59,6 +71,7 @@ export function register(server, options, next) {
       UserEntity,
       AccountEntity,
       User,
+      LoanApplicationEntity,
     });
 
     server.route(routes);
@@ -69,5 +82,5 @@ export function register(server, options, next) {
 
 register.attributes = {
   pkg,
-  dependencies: ['na-storage', 'bell'],
+  dependencies: ['na-storage', 'bell', 'na-crud', 'na-loan'],
 };

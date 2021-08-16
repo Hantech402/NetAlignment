@@ -1,0 +1,19 @@
+{
+  "name": "na-messenger",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Victor Zamfir <victor.zamfir@wirestorm.us>",
+  "license": "ISC",
+  "dependencies": {
+    "boom": "4.2.0",
+    "joi": "10.0.2",
+    "lodash": "4.17.2",
+    "mongodb": "2.2.12",
+    "octobus-mongodb": "0.8.5",
+    "octobus.js": "0.18.2"
+  }
+}
